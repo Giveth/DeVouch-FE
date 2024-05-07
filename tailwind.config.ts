@@ -15,18 +15,36 @@ const config: Config = {
       },
     },
     animation: {
-      "move-bounce": "move-bounce 0.3s forwards", // Use 'forwards' to retain the last keyframe state
+      "move-bounce-enter": "move-bounce-enter 0.3s forwards", // Use 'forwards' to retain the last keyframe state
+      "move-bounce-leave": "move-bounce-leave 0.2s forwards", // Use 'forwards' to retain the last keyframe state
     },
     keyframes: {
-      "move-bounce": {
+      "move-bounce-enter": {
         "0%": {
           transform: "translate(0, 0)", // Start at original position
         },
-        "50%": {
+        "40%": {
           transform: "translate(-10px, 10px)", // Move down and to the left
         },
+        "70%": {
+          transform: "translate(-6px, 6px)", // Move down and to the left
+        },
         "100%": {
-          transform: "translate(-5px, 5px)", // End at near original with slight offset
+          transform: "translate(-8px, 8px)", // End at near original with slight offset
+        },
+      },
+      "move-bounce-leave": {
+        "0%": {
+          transform: "translate(-8px, 8px)", // Start at original position
+        },
+        // "40%": {
+        //   transform: "translate(-10px, 10px)", // Move down and to the left
+        // },
+        "70%": {
+          transform: "translate(2px, -2px)", // Move down and to the left
+        },
+        "100%": {
+          transform: "translate(0px, 0px)", // End at near original with slight offset
         },
       },
     },

@@ -5,7 +5,7 @@ export const Button = () => {
     <div className="group relative m-2">
       <div
         id="shadow"
-        className="absolute w-full h-full bg-black z-0  bottom-0 transform group-hover:animate-move-bounce"
+        className="absolute w-full h-full bg-black z-0  bottom-0 animate-move-bounce-leave transform group-hover:animate-move-bounce-enter"
       />
       <button
         type="button"
