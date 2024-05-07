@@ -1,5 +1,5 @@
 import React from "react";
 
 export const Header = () => {
-  return <div>Header</div>;
+  return <div className="container mx-auto py-10">Header</div>;
 };
