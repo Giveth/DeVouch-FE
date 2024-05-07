@@ -14,7 +14,7 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
-        "c-blue": "#3742FA",
+        "c-blue": { 100: "#1B9CFC", 200: "#3742FA" },
       },
       animation: {
         "move-bounce-enter": "move-bounce-enter 0.3s forwards", // Use 'forwards' to retain the last keyframe state
