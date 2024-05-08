@@ -19,6 +19,13 @@ export default function Home() {
         height={109}
         alt="arc-2"
       />
+      <Image
+        className="absolute top-96 right-0 -z-10"
+        src="/images/arcs/3.svg"
+        width={116}
+        height={369}
+        alt="arc-3"
+      />
       <Header />
       <div className="container mx-auto ">
         <div className="px-20 py-10 flex flex-col gap-6">
