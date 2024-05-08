@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import { type HTMLAttributes } from "react";
 import { Button } from "../Button";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { summarizeAddress } from "@/helpers/wallet";
 import Dropdown from "../Dropdown/Dropdown";
 import { ConnectedWalletInfo } from "./ConnectedWalletInfo";
 import Link from "next/link";
 import { ROUTES } from "@/cofig/routes";
 
+const optionClasses: HTMLAttributes<HTMLDivElement>["className"] =
+  "text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100";
+
 export const Header = () => {
+  const { disconnect } = useDisconnect();
   const { address } = useAccount();
   return (
     <div className="container mx-auto py-10 flex justify-between items-center">
@@ -20,17 +24,16 @@ export const Header = () => {
           label={<ConnectedWalletInfo />}
           options={[
             <Link href={ROUTES.MY_ATTESTATIONS}>
-              <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
-                My Attestations
-              </div>
+              <div className={optionClasses}>My Attestations</div>
             </Link>,
             <Link href={ROUTES.SUPPORT}>
-              <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
-                Support
-              </div>
+              <div className={optionClasses}>Support</div>
             </Link>,
             <hr className="my-2" />,
-            <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100 flex gap-4 justify-between min-w-52">
+            <div
+              className={`${optionClasses} flex gap-4 justify-between min-w-52`}
+              onClick={() => disconnect()}
+            >
               <div>Disconnect</div>
               <Image
                 src="/images/icons/power-sharp.svg"
