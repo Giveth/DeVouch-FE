@@ -9,7 +9,7 @@ import Dropdown from "../Dropdown/Dropdown";
 import { ConnectedWalletInfo } from "./ConnectedWalletInfo";
 
 export const Header = () => {
-  const { address, isConnected, isConnecting } = useAccount();
+  const { address } = useAccount();
   return (
     <div className="container mx-auto py-10 flex justify-between items-center">
       <Image src="/images/logo.svg" alt="logo" width={165} height={30} />

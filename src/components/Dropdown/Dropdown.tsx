@@ -93,7 +93,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           <div
             style={dropdownStyle}
             ref={dropdownRef}
-            className=" border py-4 px-6 border-black bg-white"
+            className=" border py-2 px-2 border-black bg-white"
           >
             {options.map((option, idx) =>
               option.isHidden ? null : (
