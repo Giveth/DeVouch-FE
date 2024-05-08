@@ -85,11 +85,8 @@ const Dropdown: React.FC<DropdownProps> = ({
       ref={containerRef}
       onClick={() => setIsOpen((_open) => !_open)}
     >
-      <div className="flex justify-between w-full">
+      <div className="flex justify-between w-full border py-4 px-6 border-black bg-white">
         <div>{label}</div>
-        <div className="pointer-events-none w-6 h-6">
-          {/* {isOpen ? <IconChevronUp24 /> : <IconChevronDown24 />} */}
-        </div>
       </div>
       {isOpen &&
         createPortal(
