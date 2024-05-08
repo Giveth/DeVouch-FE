@@ -1,9 +1,17 @@
 import { Header } from "@/components/Header/Header";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="h-screen flex flex-col gap-50 ">
+    <div className="h-screen flex flex-col gap-50 relative">
+      <Image
+        className="absolute top-28 -z-10"
+        src="/images/arcs/1.svg"
+        width={116}
+        height={369}
+        alt="arc-1"
+      />
       <Header />
       <div className="container mx-auto ">
         <div className="px-20 py-10 flex flex-col gap-6">
