@@ -26,7 +26,7 @@ export interface IOption {
 }
 
 interface DropdownProps {
-  label: string;
+  label: ReactNode;
   stickToRight?: boolean;
   options: IOption[];
 }
