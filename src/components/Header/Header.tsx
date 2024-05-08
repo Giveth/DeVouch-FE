@@ -25,14 +25,15 @@ export const Header = () => {
         <Dropdown
           label={<ConnectedWalletInfo />}
           options={[
-            <Link href={ROUTES.MY_ATTESTATIONS}>
+            <Link href={ROUTES.MY_ATTESTATIONS} key={1}>
               <div className={optionClasses}>My Attestations</div>
             </Link>,
-            <Link href={ROUTES.SUPPORT}>
+            <Link href={ROUTES.SUPPORT} key={2}>
               <div className={optionClasses}>Support</div>
             </Link>,
-            <hr className="my-2" />,
+            <hr className="my-2" key={3} />,
             <div
+              key={4}
               className={`${optionClasses} flex gap-4 justify-between min-w-52`}
               onClick={() => disconnect()}
             >
