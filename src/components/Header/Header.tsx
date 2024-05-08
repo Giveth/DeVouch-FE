@@ -6,6 +6,7 @@ import { Button } from "../Button";
 import { useAccount } from "wagmi";
 import { summarizeAddress } from "@/helpers/wallet";
 import Dropdown from "../Dropdown/Dropdown";
+import { ConnectedWalletInfo } from "./ConnectedWalletInfo";
 
 export const Header = () => {
   const { address, isConnected, isConnecting } = useAccount();
@@ -14,7 +15,7 @@ export const Header = () => {
       <Image src="/images/logo.svg" alt="logo" width={165} height={30} />
       {address ? (
         <Dropdown
-          label={summarizeAddress(address)}
+          label={<ConnectedWalletInfo />}
           options={[{ label: "Disconnect", cb: () => {} }]}
           stickToRight
         />
