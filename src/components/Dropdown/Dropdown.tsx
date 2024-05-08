@@ -8,27 +8,14 @@ import {
   type SetStateAction,
   type Dispatch,
   type FC,
+  Fragment,
 } from "react";
 import { createPortal } from "react-dom";
-
-export enum EOptionType {
-  ITEM,
-  SEPARATOR,
-}
-
-export interface IOption {
-  type?: EOptionType;
-  label?: string;
-  icon?: ReactNode;
-  cb?: any;
-  isHidden?: boolean;
-  color?: string;
-}
 
 interface DropdownProps {
   label: ReactNode;
   stickToRight?: boolean;
-  options: IOption[];
+  options: ReactNode[];
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -95,37 +82,12 @@ const Dropdown: React.FC<DropdownProps> = ({
             ref={dropdownRef}
             className=" border py-2 px-2 border-black bg-white"
           >
-            {options.map((option, idx) =>
-              option.isHidden ? null : (
-                <Option key={idx} option={option} setIsOpen={setIsOpen} />
-              )
-            )}
+            {options.map((option, idx) => (
+              <Fragment key={idx}>{option}</Fragment>
+            ))}
           </div>,
           document.body
         )}
-    </div>
-  );
-};
-
-interface OptionProps {
-  option: IOption;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  color?: string;
-}
-
-const Option: FC<OptionProps> = ({ option, setIsOpen }) => {
-  return option.type === EOptionType.SEPARATOR ? (
-    <hr className="border-none border-t border-gray-300 w-full my-2" />
-  ) : (
-    <div
-      className="flex p-2 px-4 item-center gap-2 cursor-pointer hover:bg-gray-100"
-      onClick={() => {
-        option.cb && option.cb();
-        setIsOpen(false);
-      }}
-    >
-      {option.icon && option.icon}
-      {option.label}
     </div>
   );
 };
