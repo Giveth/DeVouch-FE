@@ -9,11 +9,13 @@ import Dropdown from "../Dropdown/Dropdown";
 import { ConnectedWalletInfo } from "./ConnectedWalletInfo";
 import Link from "next/link";
 import { ROUTES } from "@/cofig/routes";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 const optionClasses: HTMLAttributes<HTMLDivElement>["className"] =
   "text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100";
 
 export const Header = () => {
+  const { open } = useWeb3Modal();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   return (
@@ -46,7 +48,7 @@ export const Header = () => {
           stickToRight
         />
       ) : (
-        <Button>Connect Wallet</Button>
+        <Button onClick={() => open()}>Connect Wallet</Button>
       )}
     </div>
   );
