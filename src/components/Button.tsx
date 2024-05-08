@@ -9,7 +9,7 @@ export const Button: FC<ButtonProps> = ({ children }) => {
     <div className="group relative m-4  text-white h-10">
       <div
         id="shadow"
-        className="absolute w-full h-full bg-black z-0  bottom-0 animate-move-bounce-leave transform group-hover:animate-move-bounce-enter"
+        className="absolute w-full h-full bg-c-blue-200 z-0  bottom-0 animate-move-bounce-leave transform group-hover:animate-move-bounce-enter"
       />
       <button
         type="button"
