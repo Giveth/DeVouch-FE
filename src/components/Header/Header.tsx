@@ -16,6 +16,7 @@ export const Header = () => {
         <Dropdown
           label={summarizeAddress(address)}
           options={[{ label: "Disconnect", cb: () => {} }]}
+          stickToRight
         />
       ) : (
         <Button>Connect Wallet</Button>

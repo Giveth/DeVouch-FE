@@ -83,14 +83,18 @@ const Dropdown: React.FC<DropdownProps> = ({
     <div
       className="relative select-none cursor-pointer"
       ref={containerRef}
-      onClick={() => setIsOpen((_open) => !_open)}
+      onClick={toggleDropdown}
     >
-      <div className="flex justify-between w-full border py-4 px-6 border-black bg-white">
+      <div className="flex justify-between w-full border py-4 px-6 border-black bg-white mb-2">
         <div>{label}</div>
       </div>
       {isOpen &&
         createPortal(
-          <div style={dropdownStyle} ref={dropdownRef}>
+          <div
+            style={dropdownStyle}
+            ref={dropdownRef}
+            className=" border py-4 px-6 border-black bg-white"
+          >
             {options.map((option, idx) =>
               option.isHidden ? null : (
                 <Option key={idx} option={option} setIsOpen={setIsOpen} />
