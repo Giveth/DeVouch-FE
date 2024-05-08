@@ -7,6 +7,8 @@ import { useAccount } from "wagmi";
 import { summarizeAddress } from "@/helpers/wallet";
 import Dropdown from "../Dropdown/Dropdown";
 import { ConnectedWalletInfo } from "./ConnectedWalletInfo";
+import Link from "next/link";
+import { ROUTES } from "@/cofig/routes";
 
 export const Header = () => {
   const { address } = useAccount();
@@ -17,12 +19,16 @@ export const Header = () => {
         <Dropdown
           label={<ConnectedWalletInfo />}
           options={[
-            <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
-              My Attestations
-            </div>,
-            <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
-              Support
-            </div>,
+            <Link href={ROUTES.MY_ATTESTATIONS}>
+              <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
+                My Attestations
+              </div>
+            </Link>,
+            <Link href={ROUTES.SUPPORT}>
+              <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100">
+                Support
+              </div>
+            </Link>,
             <hr className="my-2" />,
             <div className="text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100 flex gap-4 justify-between min-w-52">
               <div>Disconnect</div>
