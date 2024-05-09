@@ -49,6 +49,7 @@ export const Projects = () => {
 						options={sortOptions}
 						value={sort}
 						setValue={setSort}
+						className='w-60'
 					/>
 				</div>
 			</div>
