@@ -1,10 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Header } from '@/components/Header/Header';
+import { Projects } from '@/features/home/Projects';
 
 export default function Home() {
 	return (
-		<div className='h-screen flex flex-col gap-50 relative'>
+		<div className='min-h-screen flex flex-col gap-24 relative'>
 			<Image
 				className='absolute top-28 -z-10'
 				src='/images/arcs/1.svg'
@@ -48,6 +49,7 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
+			<Projects />
 		</div>
 	);
 }

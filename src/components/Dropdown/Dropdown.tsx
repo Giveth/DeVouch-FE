@@ -6,19 +6,26 @@ import {
 	type CSSProperties,
 	type ReactNode,
 	Fragment,
+	type HTMLAttributes,
 } from 'react';
 import { createPortal } from 'react-dom';
 
-interface DropdownProps {
+export interface DropdownProps {
 	label: ReactNode;
 	stickToRight?: boolean;
+	sameWidth?: boolean;
 	options: ReactNode[];
+	className?: HTMLAttributes<HTMLDivElement>['className'];
+	showChevron?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
 	label,
 	options,
 	stickToRight,
+	sameWidth,
+	className = '',
+	showChevron,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -44,17 +51,18 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const dropdownStyle: CSSProperties =
 		isOpen && containerRef.current
 			? {
-					position: 'absolute',
 					top:
 						containerRef.current.getBoundingClientRect().bottom +
 						window.scrollY +
 						'px',
-					right: stickToRight
-						? document.documentElement.clientWidth -
-							containerRef.current.getBoundingClientRect().right +
-							window.scrollX +
-							'px'
-						: 'unset',
+					right:
+						stickToRight || sameWidth
+							? document.documentElement.clientWidth -
+								containerRef.current.getBoundingClientRect()
+									.right +
+								window.scrollX +
+								'px'
+							: 'unset',
 					left: stickToRight
 						? 'unset'
 						: containerRef.current.getBoundingClientRect().left +
@@ -65,19 +73,20 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	return (
 		<div
-			className='relative select-none cursor-pointer'
+			className={`relative select-none cursor-pointer ${className}`}
 			ref={containerRef}
 			onClick={toggleDropdown}
 		>
-			<div className='flex justify-between w-full border py-4 px-6 border-black bg-white mb-2'>
+			<div className='flex justify-between w-full border py-2 px-6 border-black bg-white mb-2'>
 				<div>{label}</div>
+				{showChevron && (isOpen ? '▲' : '▼')}
 			</div>
 			{isOpen &&
 				createPortal(
 					<div
 						style={dropdownStyle}
 						ref={dropdownRef}
-						className=' border py-2 px-2 border-black bg-white'
+						className='absolute border py-2 px-2 border-black bg-white'
 					>
 						{options.map((option, idx) => (
 							<Fragment key={idx}>{option}</Fragment>

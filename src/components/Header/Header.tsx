@@ -38,7 +38,7 @@ export const Header = () => {
 						>
 							<div>Disconnect</div>
 							<Image
-								src='/images/icons/power-sharp.svg'
+								src='/images/icons/power.svg'
 								alt='disconnect'
 								width={20}
 								height={20}
