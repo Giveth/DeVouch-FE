@@ -1,4 +1,9 @@
-import { type Dispatch, type SetStateAction, type FC } from 'react';
+import {
+	type Dispatch,
+	type SetStateAction,
+	type FC,
+	type HTMLAttributes,
+} from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
 
@@ -11,11 +16,18 @@ interface SelectProps {
 	options: IOption[];
 	setValue: Dispatch<SetStateAction<IOption>>;
 	value: IOption;
+	className?: HTMLAttributes<HTMLDivElement>['className'];
 }
 
-export const Select: FC<SelectProps> = ({ options, setValue, value }) => {
+export const Select: FC<SelectProps> = ({
+	options,
+	setValue,
+	value,
+	className,
+}) => {
 	return (
 		<Dropdown
+			className={className}
 			options={options.map(option => (
 				<Option
 					key={option.key}
