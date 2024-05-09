@@ -46,7 +46,6 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const dropdownStyle: CSSProperties =
 		isOpen && containerRef.current
 			? {
-					position: 'absolute',
 					top:
 						containerRef.current.getBoundingClientRect().bottom +
 						window.scrollY +
@@ -81,7 +80,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 					<div
 						style={dropdownStyle}
 						ref={dropdownRef}
-						className=' border py-2 px-2 border-black bg-white'
+						className='absolute border py-2 px-2 border-black bg-white'
 					>
 						{options.map((option, idx) => (
 							<Fragment key={idx}>{option}</Fragment>
