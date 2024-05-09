@@ -69,7 +69,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 			ref={containerRef}
 			onClick={toggleDropdown}
 		>
-			<div className='flex justify-between w-full border py-4 px-6 border-black bg-white mb-2'>
+			<div className='flex justify-between w-full border py-2 px-6 border-black bg-white mb-2'>
 				<div>{label}</div>
 			</div>
 			{isOpen &&
