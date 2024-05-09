@@ -9,9 +9,10 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-interface DropdownProps {
+export interface DropdownProps {
 	label: ReactNode;
 	stickToRight?: boolean;
+	sameWidth?: boolean;
 	options: ReactNode[];
 }
 
@@ -19,6 +20,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	label,
 	options,
 	stickToRight,
+	sameWidth,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -49,12 +51,14 @@ const Dropdown: React.FC<DropdownProps> = ({
 						containerRef.current.getBoundingClientRect().bottom +
 						window.scrollY +
 						'px',
-					right: stickToRight
-						? document.documentElement.clientWidth -
-							containerRef.current.getBoundingClientRect().right +
-							window.scrollX +
-							'px'
-						: 'unset',
+					right:
+						stickToRight || sameWidth
+							? document.documentElement.clientWidth -
+								containerRef.current.getBoundingClientRect()
+									.right +
+								window.scrollX +
+								'px'
+							: 'unset',
 					left: stickToRight
 						? 'unset'
 						: containerRef.current.getBoundingClientRect().left +
