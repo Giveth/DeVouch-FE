@@ -6,6 +6,7 @@ import {
 	type CSSProperties,
 	type ReactNode,
 	Fragment,
+	type HTMLAttributes,
 } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -14,6 +15,7 @@ export interface DropdownProps {
 	stickToRight?: boolean;
 	sameWidth?: boolean;
 	options: ReactNode[];
+	className?: HTMLAttributes<HTMLDivElement>['className'];
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -21,6 +23,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	options,
 	stickToRight,
 	sameWidth,
+	className = '',
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -68,7 +71,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	return (
 		<div
-			className='relative select-none cursor-pointer'
+			className={`relative select-none cursor-pointer ${className}`}
 			ref={containerRef}
 			onClick={toggleDropdown}
 		>
