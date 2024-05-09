@@ -16,6 +16,7 @@ export interface DropdownProps {
 	sameWidth?: boolean;
 	options: ReactNode[];
 	className?: HTMLAttributes<HTMLDivElement>['className'];
+	showChevron?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -24,6 +25,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	stickToRight,
 	sameWidth,
 	className = '',
+	showChevron,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -77,6 +79,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 		>
 			<div className='flex justify-between w-full border py-2 px-6 border-black bg-white mb-2'>
 				<div>{label}</div>
+				{showChevron && (isOpen ? '▲' : '▼')}
 			</div>
 			{isOpen &&
 				createPortal(

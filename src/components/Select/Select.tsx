@@ -38,6 +38,7 @@ export const Select: FC<SelectProps> = ({
 			))}
 			label={value.value}
 			sameWidth
+			showChevron
 		/>
 	);
 };
