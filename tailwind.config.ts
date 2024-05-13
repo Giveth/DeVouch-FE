@@ -16,6 +16,7 @@ const config: Config = {
 			},
 			colors: {
 				'c-blue': { 100: '#1B9CFC', 200: '#3742FA' },
+				'c-red': { 100: '#FF416C', 200: '#FF4B2B' },
 			},
 			animation: {
 				'move-bounce-enter': 'move-bounce-enter 0.3s forwards',
