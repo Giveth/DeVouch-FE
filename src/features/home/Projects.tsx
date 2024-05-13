@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Select, type IOption } from '@/components/Select/Select';
+import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 
 enum EProjectSort {
 	NEWEST = 'newest',
@@ -41,7 +42,7 @@ const sortOptions: IOption[] = [
 export const Projects = () => {
 	const [sort, setSort] = useState(sortOptions[0]);
 	return (
-		<div className='container mx-auto'>
+		<div className='container mx-auto flex flex-col gap-10'>
 			<div className='flex'>
 				<div className='flex gap-4 items-center'>
 					<p className='text-gray-400'>Sort By</p>
@@ -53,6 +54,8 @@ export const Projects = () => {
 					/>
 				</div>
 			</div>
+			<h2 className='text-2xl font-bold'>Explore Projects </h2>
+			<ProjectCard />
 		</div>
 	);
 };
