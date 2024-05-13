@@ -31,12 +31,11 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const toggleDropdown = () => setIsOpen(!isOpen);
-
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node)
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
 			) {
 				setIsOpen(false);
 			}
