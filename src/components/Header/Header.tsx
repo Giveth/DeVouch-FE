@@ -5,7 +5,7 @@ import { type HTMLAttributes } from 'react';
 import { useAccount, useDisconnect } from 'wagmi';
 import Link from 'next/link';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { Button } from '../Button';
+import { Button } from '../Button/Button';
 import Dropdown from '../Dropdown/Dropdown';
 import { ConnectedWalletInfo } from './ConnectedWalletInfo';
 import { ROUTES } from '@/cofig/routes';
