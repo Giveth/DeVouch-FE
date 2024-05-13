@@ -1,5 +1,6 @@
 import React from 'react';
 import { AttestInfo } from './AttestInfo';
+import { Button } from '../Button/Button';
 
 export const ProjectCard = () => {
 	return (
@@ -19,6 +20,12 @@ export const ProjectCard = () => {
 				</div>
 				<div>
 					<h4 className='text-lg font-bold'>Flagged By</h4>
+					<div className='flex'>
+						<AttestInfo count={3} organization='Optimism Group' />
+					</div>
+				</div>
+				<div className='flex'>
+					<Button>Vouch For Project</Button>
 				</div>
 			</div>
 		</div>
