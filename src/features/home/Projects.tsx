@@ -55,7 +55,12 @@ export const Projects = () => {
 				</div>
 			</div>
 			<h2 className='text-2xl font-bold'>Explore Projects </h2>
-			<ProjectCard />
+			<div className='grid grid-cols-2 gap-8 mb-8'>
+				<ProjectCard />
+				<ProjectCard />
+				<ProjectCard />
+				<ProjectCard />
+			</div>
 		</div>
 	);
 };
