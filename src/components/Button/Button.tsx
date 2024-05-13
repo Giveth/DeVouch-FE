@@ -6,8 +6,8 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
 }
 
 export enum ButtonType {
-	BLUE,
-	RED,
+	BLUE = 'blue',
+	RED = 'red',
 }
 
 const buttonTypeToColorName = {
@@ -18,20 +18,20 @@ const buttonTypeToColorName = {
 const buttonTypeToStyle = {
 	[ButtonType.BLUE]: {
 		'--bounce-text-color': '#3742FA',
-		'--bounce-color-start': '#3742FA',
+		'--bounce-bg-start': '#3742FA',
 		'--bounce-border-start': '#3742FA',
-		'--bounce-color-middle': '#EEEEEE',
+		'--bounce-bg-middle': '#EEEEEE',
 		'--bounce-border-middle': '#3742FA',
-		'--bounce-color-end': '#FFFFFF',
+		'--bounce-bg-end': '#FFFFFF',
 		'--bounce-border-end': '#000000',
 	},
 	[ButtonType.RED]: {
 		'--bounce-text-color': '#FF4B2B',
-		'--bounce-color-start': '#FF4B2B',
+		'--bounce-bg-start': '#FF4B2B',
 		'--bounce-border-start': '#FF4B2B',
-		'--bounce-color-middle': '#EEEEEE',
+		'--bounce-bg-middle': '#EEEEEE',
 		'--bounce-border-middle': '#FF4B2B',
-		'--bounce-color-end': '#FFFFFF',
+		'--bounce-bg-end': '#FFFFFF',
 		'--bounce-border-end': '#000000',
 	},
 };

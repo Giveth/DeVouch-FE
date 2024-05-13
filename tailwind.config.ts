@@ -51,28 +51,37 @@ const config: Config = {
 				},
 				'color-bounce-enter': {
 					'0%': {
-						backgroundColor: 'var(--bounce-color-start, #3742FA)',
+						backgroundColor: 'var(--bounce-bg-start, #3742FA)',
 						border: `1px solid var(--bounce-border-start, #3742FA)`,
+						color: 'var(--bounce-color-start, #3742FA)',
 					},
 					'40%': {
-						backgroundColor: 'var(--bounce-color-end, #FFFFFF)',
+						backgroundColor: 'var(--bounce-bg-end, #FFFFFF)',
 						border: '1px solid var(--bounce-border-end, #000000)',
-						color: 'var(--bounce-text-color, #3742FA)',
+						color: 'var(--bounce-color-end, #3742FA)',
 					},
 					'70%': {
-						backgroundColor: 'var(--bounce-color-middle, #EEEEEE)',
+						backgroundColor: 'var(--bounce-bg-middle, #EEEEEE)',
 						border: `1px solid var(--bounce-border-middle, #3742FA)`,
-						color: 'var(--bounce-text-color, #3742FA)',
+						color: 'var(--bounce-color-middle, #3742FA)',
 					},
 					'100%': {
-						backgroundColor: 'var(--bounce-color-end, #FFFFFF)',
+						backgroundColor: 'var(--bounce-bg-end, #FFFFFF)',
 						border: '1px solid var(--bounce-border-end, #000000)',
-						color: 'var(--bounce-text-color, #3742FA)',
+						color: 'var(--bounce-color-end, #3742FA)',
 					},
 				},
 			},
 		},
 	},
+	safelist: [
+		'bg-c-blue-200',
+		'border-c-blue-200',
+		'bg-c-red-200',
+		'border-c-red-200',
+		'text-c-blue-200',
+		'text-c-red-200',
+	],
 	plugins: [],
 };
 export default config;
