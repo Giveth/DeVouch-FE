@@ -1,4 +1,5 @@
 import React from 'react';
+import { AttestInfo } from './AttestInfo';
 
 export const ProjectCard = () => {
 	return (
@@ -11,6 +12,9 @@ export const ProjectCard = () => {
 				</div>
 				<div>
 					<h4 className='text-lg font-bold'>Vouched By</h4>
+					<div className='flex'>
+						<AttestInfo count={17} organization='Optimism Group' />
+					</div>
 				</div>
 				<div>
 					<h4 className='text-lg font-bold'>Flagged By</h4>
