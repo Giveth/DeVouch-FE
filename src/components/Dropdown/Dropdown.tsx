@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import {
 	useState,
 	useRef,
@@ -78,7 +79,14 @@ const Dropdown: React.FC<DropdownProps> = ({
 		>
 			<div className='flex justify-between w-full border py-2 px-6 border-black bg-white mb-2'>
 				<div>{label}</div>
-				{showChevron && (isOpen ? '▲' : '▼')}
+				{showChevron && (
+					<Image
+						src='/images/icons/chevron-down.svg'
+						width={20}
+						height={20}
+						alt='chevron-down'
+					/>
+				)}
 			</div>
 			{isOpen &&
 				createPortal(
