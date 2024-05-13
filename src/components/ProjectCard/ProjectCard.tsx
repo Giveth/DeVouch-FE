@@ -1,6 +1,6 @@
 import React from 'react';
 import { AttestInfo } from './AttestInfo';
-import { Button, ButtonType } from '../Button/Button';
+import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 
 export const ProjectCard = () => {
 	return (
@@ -25,9 +25,12 @@ export const ProjectCard = () => {
 					</div>
 				</div>
 				<div className='flex'>
-					<Button buttonType={ButtonType.BLUE}>
+					<OutlineButton buttonType={OutlineButtonType.BLUE}>
 						Vouch For Project
-					</Button>
+					</OutlineButton>
+					<OutlineButton buttonType={OutlineButtonType.RED}>
+						Flag Project
+					</OutlineButton>
 				</div>
 			</div>
 		</div>
