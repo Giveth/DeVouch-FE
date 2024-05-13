@@ -14,14 +14,6 @@ enum EProjectSort {
 
 const sortOptions: IOption[] = [
 	{
-		key: EProjectSort.NEWEST,
-		value: 'Newest',
-	},
-	{
-		key: EProjectSort.OLDEST,
-		value: 'Oldest',
-	},
-	{
 		key: EProjectSort.HIGHEST_VOUCH_COUNT,
 		value: 'Highest Vouch Count',
 	},
