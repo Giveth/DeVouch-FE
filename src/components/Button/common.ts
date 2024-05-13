@@ -5,11 +5,11 @@ export enum ButtonType {
 	OUTLINE_RED,
 }
 
-export const buttonTypeToClassName = {
-	[ButtonType.FILLED_BLUE]: 'bg-c-blue-200',
-	[ButtonType.OUTLINE_BLUE]: 'bg-c-blue-200',
-	[ButtonType.FILLED_RED]: 'bg-c-red-200',
-	[ButtonType.OUTLINE_RED]: 'bg-c-red-200',
+export const buttonTypeToColorName = {
+	[ButtonType.FILLED_BLUE]: 'c-blue-200',
+	[ButtonType.OUTLINE_BLUE]: 'c-blue-200',
+	[ButtonType.FILLED_RED]: 'c-red-200',
+	[ButtonType.OUTLINE_RED]: 'c-red-200',
 };
 
 export const buttonTypeToStyle = {
