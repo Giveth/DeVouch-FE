@@ -47,7 +47,7 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 }) => {
 	return (
 		<div
-			className={`group/OutlineButton relative m-4  `}
+			className={`group/OutlineButton relative`}
 			style={buttonTypeToStyle[buttonType] as any}
 		>
 			<div
@@ -55,7 +55,7 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 				className={`absolute w-full h-full  bg-black z-0  bottom-0 animate-move-bounce-leave transform group-hover/OutlineButton:animate-move-bounce-enter`}
 			/>
 			<button
-				className={`bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-1 relative py-2 px-4 group-hover/OutlineButton:animate-color-bounce-enter`}
+				className={`bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/OutlineButton:animate-color-bounce-enter`}
 				{...props}
 			>
 				{children}

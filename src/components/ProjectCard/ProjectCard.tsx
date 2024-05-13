@@ -24,7 +24,7 @@ export const ProjectCard = () => {
 						<AttestInfo count={3} organization='Optimism Group' />
 					</div>
 				</div>
-				<div className='flex'>
+				<div className='flex gap-6'>
 					<OutlineButton buttonType={OutlineButtonType.BLUE}>
 						Vouch For Project
 					</OutlineButton>

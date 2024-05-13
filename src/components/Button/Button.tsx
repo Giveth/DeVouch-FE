@@ -51,7 +51,7 @@ export const Button: FC<ButtonProps> = ({
 				className={`absolute w-full h-full  bg-${buttonTypeToColorName[buttonType]} z-0  bottom-0 animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter`}
 			/>
 			<button
-				className={`bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-2 px-4 group-hover/button:animate-color-bounce-enter`}
+				className={`bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/button:animate-color-bounce-enter`}
 				{...props}
 			>
 				{children}
