@@ -1,6 +1,6 @@
 import React from 'react';
 import { AttestInfo } from './AttestInfo';
-import { Button } from '../Button/Button';
+import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 
 export const ProjectCard = () => {
 	return (
@@ -24,8 +24,13 @@ export const ProjectCard = () => {
 						<AttestInfo count={3} organization='Optimism Group' />
 					</div>
 				</div>
-				<div className='flex'>
-					<Button>Vouch For Project</Button>
+				<div className='flex gap-6'>
+					<OutlineButton buttonType={OutlineButtonType.BLUE}>
+						Vouch For Project
+					</OutlineButton>
+					<OutlineButton buttonType={OutlineButtonType.RED}>
+						Flag Project
+					</OutlineButton>
 				</div>
 			</div>
 		</div>
