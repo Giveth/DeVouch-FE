@@ -1,5 +1,7 @@
 import { type FC, type HTMLAttributes } from 'react';
+import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
+import OptionsIcon from '../../../public/images/icons/options.svg';
 
 interface FilterMenuProps {
 	options: IOptions;
@@ -9,7 +11,6 @@ interface FilterMenuProps {
 	>;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 	label?: string;
-	showChevron?: boolean;
 	stickToRight?: boolean;
 }
 
@@ -23,7 +24,6 @@ const FilterMenu: FC<FilterMenuProps> = ({
 	setValues,
 	className,
 	label = 'Filter',
-	showChevron = true,
 	stickToRight = false,
 }) => {
 	const handleSetValue = ({
@@ -91,8 +91,13 @@ const FilterMenu: FC<FilterMenuProps> = ({
 					<p>Clear Filters</p>
 				</div>,
 			]}
-			label={`Filter (${selectedCount})`}
-			showChevron={showChevron}
+			label={
+				<div className='flex gap-6'>
+					<span>Filter</span>
+					<Image src={OptionsIcon} alt='' />
+				</div>
+			}
+			showChevron={false}
 			stickToRight={stickToRight}
 		/>
 	);

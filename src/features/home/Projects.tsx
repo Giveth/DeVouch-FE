@@ -61,7 +61,6 @@ export const Projects = () => {
 						setValues={setFilterValues}
 						className='custom-class'
 						label='Custom Filter'
-						showChevron={true}
 						stickToRight={true}
 					/>
 				</div>
