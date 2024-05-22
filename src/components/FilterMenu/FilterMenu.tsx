@@ -3,9 +3,12 @@ import Dropdown from '../Dropdown/Dropdown';
 
 interface FilterMenuProps {
 	options: IOptions;
-	setValue: (value: { key: string; values: string[] }) => void;
 	value: { [key: string]: string[] };
+	setValues: React.Dispatch<
+		React.SetStateAction<{ [key: string]: string[] }>
+	>;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
+	label?: string;
 	showChevron?: boolean;
 	stickToRight?: boolean;
 }
@@ -16,18 +19,32 @@ interface IOptions {
 
 const FilterMenu: FC<FilterMenuProps> = ({
 	options,
-	setValue,
 	value,
+	setValues,
 	className,
+	label = 'Filter',
 	showChevron = true,
 	stickToRight = false,
 }) => {
+	const handleSetValue = ({
+		key,
+		values,
+	}: {
+		key: string;
+		values: string[];
+	}) => {
+		setValues(prevValues => ({
+			...prevValues,
+			[key]: values,
+		}));
+	};
+
 	const handleCheckboxChange = (key: string, option: string) => {
 		const currentValues = value[key] || [];
 		const newValues = currentValues.includes(option)
 			? currentValues.filter(val => val !== option)
 			: [...currentValues, option];
-		setValue({ key, values: newValues });
+		handleSetValue({ key, values: newValues });
 	};
 
 	const selectedCount = Object.values(value).reduce(
