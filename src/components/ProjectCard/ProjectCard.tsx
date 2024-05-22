@@ -25,7 +25,10 @@ export const ProjectCard = () => {
 					</div>
 				</div>
 				<div className='flex gap-6'>
-					<OutlineButton buttonType={OutlineButtonType.BLUE}>
+					<OutlineButton
+						buttonType={OutlineButtonType.BLUE}
+						className='flex-1'
+					>
 						Vouch For Project
 					</OutlineButton>
 					<OutlineButton buttonType={OutlineButtonType.RED}>
