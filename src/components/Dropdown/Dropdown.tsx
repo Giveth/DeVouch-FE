@@ -31,17 +31,21 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
-	const toggleDropdown = () => setIsOpen(!isOpen);
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(event.target as Node)
-			) {
-				setIsOpen(false);
-			}
-		};
 
+	const toggleDropdown = () => setIsOpen(!isOpen);
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (
+			dropdownRef.current &&
+			!dropdownRef.current.contains(event.target as Node) &&
+			containerRef.current &&
+			!containerRef.current.contains(event.target as Node)
+		) {
+			setIsOpen(false);
+		}
+	};
+
+	useEffect(() => {
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
@@ -94,6 +98,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 						style={dropdownStyle}
 						ref={dropdownRef}
 						className='absolute border py-2 px-2 border-black bg-white'
+						onClick={e => e.stopPropagation()} // Prevent click inside dropdown from toggling it
 					>
 						{options.map((option, idx) => (
 							<Fragment key={idx}>{option}</Fragment>
