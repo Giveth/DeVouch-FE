@@ -47,6 +47,10 @@ const FilterMenu: FC<FilterMenuProps> = ({
 		handleSetValue({ key, values: newValues });
 	};
 
+	const handleClearFilters = () => {
+		setValues({});
+	};
+
 	const selectedCount = Object.values(value).reduce(
 		(acc, selectedOptions) => acc + selectedOptions.length,
 		0,
@@ -55,25 +59,38 @@ const FilterMenu: FC<FilterMenuProps> = ({
 	return (
 		<Dropdown
 			className={className}
-			options={Object.entries(options).map(([key, optionList]) => (
-				<div key={key}>
-					<div>{key}</div>
-					{optionList.map(option => (
-						<div
-							key={option}
-							className='flex items-center gap-2'
-							onClick={() => handleCheckboxChange(key, option)}
-						>
-							<input
-								type='checkbox'
-								checked={(value[key] || []).includes(option)}
-								readOnly
-							/>
-							<p>{option}</p>
-						</div>
-					))}
-				</div>
-			))}
+			options={[
+				...Object.entries(options).map(([key, optionList]) => (
+					<div key={key}>
+						<div>{key}</div>
+						{optionList.map(option => (
+							<div
+								key={option}
+								className='flex items-center gap-2'
+								onClick={() =>
+									handleCheckboxChange(key, option)
+								}
+							>
+								<input
+									type='checkbox'
+									checked={(value[key] || []).includes(
+										option,
+									)}
+									readOnly
+								/>
+								<p>{option}</p>
+							</div>
+						))}
+					</div>
+				)),
+				<div
+					key='clear-filters'
+					className='flex items-center gap-2 cursor-pointer'
+					onClick={handleClearFilters}
+				>
+					<p>Clear Filters</p>
+				</div>,
+			]}
 			label={`Filter (${selectedCount})`}
 			showChevron={showChevron}
 			stickToRight={stickToRight}
