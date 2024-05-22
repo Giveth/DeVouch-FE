@@ -16,7 +16,7 @@ const Checkbox: FC<CheckboxProps> = ({
 	className = '',
 }) => {
 	return (
-		<div className={`flex items-center ${className}`}>
+		<>
 			<input
 				id={id}
 				type='checkbox'
@@ -24,7 +24,10 @@ const Checkbox: FC<CheckboxProps> = ({
 				onChange={onChange}
 				className='hidden'
 			/>
-			<label htmlFor={id} className={`flex items-center cursor-pointer`}>
+			<label
+				htmlFor={id}
+				className={`flex items-center cursor-pointer ${className}`}
+			>
 				<span
 					className={`w-4 h-4 inline-block mr-2 border border-gray-300 rounded-sm ${
 						checked ? 'bg-blue-500 border-transparent' : 'bg-white'
@@ -46,7 +49,7 @@ const Checkbox: FC<CheckboxProps> = ({
 				</span>
 				{label}
 			</label>
-		</div>
+		</>
 	);
 };
 

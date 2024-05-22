@@ -68,22 +68,16 @@ const FilterMenu: FC<FilterMenuProps> = ({
 							{key}
 						</div>
 						{optionList.map(option => (
-							<div
+							<Checkbox
 								key={option}
-								className='flex items-center gap-2 cursor-pointer px-4 py-2 hover:bg-gray-100'
-							>
-								<Checkbox
-									id={`${key}-${option}`}
-									label={option}
-									checked={(value[key] || []).includes(
-										option,
-									)}
-									onChange={() =>
-										handleCheckboxChange(key, option)
-									}
-									className='flex items-center gap-2'
-								/>
-							</div>
+								id={`${key}-${option}`}
+								label={option}
+								checked={(value[key] || []).includes(option)}
+								onChange={() =>
+									handleCheckboxChange(key, option)
+								}
+								className='flex items-center gap-2 w-full  px-4 py-2 hover:bg-gray-100'
+							/>
 						))}
 					</div>
 				)),
