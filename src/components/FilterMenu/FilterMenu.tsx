@@ -1,6 +1,7 @@
 import { type FC, type HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
+import Checkbox from '../CheckBox/CheckBox';
 import OptionsIcon from '../../../public/images/icons/options.svg';
 import TrashIcon from '../../../public/images/icons/trash.svg';
 
@@ -70,18 +71,18 @@ const FilterMenu: FC<FilterMenuProps> = ({
 							<div
 								key={option}
 								className='flex items-center gap-2 cursor-pointer px-4 py-2 hover:bg-gray-100'
-								onClick={() =>
-									handleCheckboxChange(key, option)
-								}
 							>
-								<input
-									type='checkbox'
+								<Checkbox
+									id={`${key}-${option}`}
+									label={option}
 									checked={(value[key] || []).includes(
 										option,
 									)}
-									readOnly
+									onChange={() =>
+										handleCheckboxChange(key, option)
+									}
+									className='flex items-center gap-2'
 								/>
-								<p>{option}</p>
 							</div>
 						))}
 					</div>
