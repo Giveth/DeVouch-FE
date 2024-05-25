@@ -107,10 +107,9 @@ export const Projects = () => {
 			</div>
 			<h2 className='text-2xl font-bold'>Explore Projects </h2>
 			<div className='grid grid-cols-2 gap-8 mb-8'>
-				<ProjectCard />
-				<ProjectCard />
-				<ProjectCard />
-				<ProjectCard />
+				{projects.map(project => (
+					<ProjectCard key={project.id} project={project} />
+				))}
 			</div>
 			<button onClick={handleLoadMore} disabled={isFetchingMore}>
 				{isFetchingMore ? 'Loading...' : 'Load More'}
