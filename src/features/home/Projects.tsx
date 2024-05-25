@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
+import { FETCH_PROJECTS } from '@/features/home/queries';
+import useFetchGraphQL from '@/lib/useFetchGraphQL';
 
 enum EProjectSort {
 	NEWEST = 'newest',
@@ -32,15 +34,36 @@ const sortOptions: IOption[] = [
 	},
 ];
 
+const options = {
+	'Source Platform': ['Giveth', 'Gitcoin', 'Retro Funding'],
+	'Attested By': ['Optimism Badge Holder', 'Giveth Verification'],
+};
+
 export const Projects = () => {
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
-	const options = {
-		'Source Platform': ['Giveth', 'Gitcoin', 'Retro Funding'],
-		'Attested By': ['Optimism Badge Holder', 'Giveth Verification'],
+
+	const [projects, setProjects] = useState<Project[]>([]);
+	const [page, setPage] = useState(0);
+	const limit = 10;
+	const { data, loading, error, refetch } = useFetchGraphQL<{
+		projects: Project[];
+	}>(FETCH_PROJECTS, { limit, offset: page * limit });
+
+	useEffect(() => {
+		if (data?.projects) {
+			setProjects(prevProjects => [...prevProjects, ...data.projects]);
+		}
+	}, []);
+
+	const handleLoadMore = () => {
+		setPage(prevPage => prevPage + 1);
+		refetch({ limit, offset: (page + 1) * limit });
 	};
+
+	if (loading && page === 0) return <p>Loading...</p>;
 
 	return (
 		<div className='container mx-auto flex flex-col gap-10'>
