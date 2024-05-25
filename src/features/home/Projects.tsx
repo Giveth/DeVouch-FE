@@ -4,7 +4,7 @@ import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { FETCH_PROJECTS } from '@/features/home/queries';
-import useFetchGraphQL from '@/lib/useFetchGraphQL';
+import { fetchGraphQL } from '@/helpers/request';
 
 enum EProjectSort {
 	NEWEST = 'newest',
@@ -45,22 +45,39 @@ export const Projects = () => {
 		[key: string]: string[];
 	}>({});
 
-	const [projects, setProjects] = useState<Project[]>([]);
+	const [projects, setProjects] = useState<IProject[]>([]);
 	const [page, setPage] = useState(0);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const limit = 10;
-	const { data, loading, error, refetch } = useFetchGraphQL<{
-		projects: Project[];
-	}>(FETCH_PROJECTS, { limit, offset: page * limit });
+
+	const loadProjects = async (page: number, append: boolean = false) => {
+		setLoading(true);
+		setError(null);
+		try {
+			const data = await fetchGraphQL<{ projects: IProject[] }>(
+				FETCH_PROJECTS,
+				{ limit, offset: page * limit },
+			);
+			setProjects(prevProjects =>
+				append ? [...prevProjects, ...data.projects] : data.projects,
+			);
+		} catch (err: any) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+			setIsFetchingMore(false);
+		}
+	};
 
 	useEffect(() => {
-		if (data?.projects) {
-			setProjects(prevProjects => [...prevProjects, ...data.projects]);
-		}
-	}, []);
+		loadProjects(page);
+	}, [page]);
 
 	const handleLoadMore = () => {
 		setPage(prevPage => prevPage + 1);
-		refetch({ limit, offset: (page + 1) * limit });
+		setIsFetchingMore(true);
 	};
 
 	if (loading && page === 0) return <p>Loading...</p>;
@@ -95,6 +112,9 @@ export const Projects = () => {
 				<ProjectCard />
 				<ProjectCard />
 			</div>
+			<button onClick={handleLoadMore} disabled={isFetchingMore}>
+				{isFetchingMore ? 'Loading...' : 'Load More'}
+			</button>
 		</div>
 	);
 };
