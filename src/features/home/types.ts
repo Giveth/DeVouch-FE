@@ -1,5 +1,9 @@
 interface IProject {
+	id: string;
 	title: string;
-	source: string;
+	description: string;
 	image: string;
+	source: string;
+	totalVouches: number;
+	totalFlags: number;
 }
