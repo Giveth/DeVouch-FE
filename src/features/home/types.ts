@@ -6,4 +6,16 @@ interface IProject {
 	source: string;
 	totalVouches: number;
 	totalFlags: number;
+	attestedOrganisations: IAttestedOrganisation[];
+}
+
+interface IAttestedOrganisation {
+	id: string;
+	vouch: boolean;
+	organisation: IOrganisation;
+}
+
+interface IOrganisation {
+	id: string;
+	name: string;
 }
