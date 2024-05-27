@@ -15,6 +15,10 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'static.tgbwidget.com',
 			},
+			{
+				protocol: 'https',
+				hostname: 'images.unsplash.com',
+			},
 		],
 	},
 };
