@@ -4,8 +4,8 @@ import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
-import { FETCH_PROJECTS } from './queries';
 import { Button } from '@/components/Button/Button';
+import { generateFetchProjectsQuery } from './query-genrator';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -54,12 +54,17 @@ export const Projects = () => {
 		async (append: boolean = false, offset: number) => {
 			setLoading(true);
 			try {
+				const projectSource = filterValues['Source Platform'];
+				const organisationId = filterValues['Attested By'];
+
 				const data = await fetchGraphQL<{ projects: IProject[] }>(
-					FETCH_PROJECTS,
+					generateFetchProjectsQuery(projectSource, organisationId),
 					{
 						orderBy: sort.key,
 						limit,
 						offset,
+						project_source: projectSource,
+						organisation_id: organisationId,
 					},
 				);
 				setProjects(prevProjects =>
@@ -68,17 +73,15 @@ export const Projects = () => {
 						: data.projects,
 				);
 			} catch (err: any) {
-				// setError(err.message);
+				console.log('err', err.message);
 			} finally {
 				setLoading(false);
-				// setIsFetchingMore(false);
 			}
 		},
-		[sort],
+		[filterValues, sort.key],
 	);
 
 	useEffect(() => {
-		if (loading) return;
 		fetchProjects(false, 0);
 	}, [fetchProjects]);
 
