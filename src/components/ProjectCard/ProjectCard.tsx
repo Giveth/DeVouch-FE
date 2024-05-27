@@ -37,8 +37,10 @@ const categorizeAttestedOrganisations = (
 	};
 };
 
+const NO_DATA = 'No data available to show here!';
+
 export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
-	const categorizedData = categorizeAttestedOrganisations(
+	const { vouches, flags } = categorizeAttestedOrganisations(
 		project.attestedOrganisations,
 	);
 
@@ -55,33 +57,53 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 							alt='Project Image'
 						/>
 					)}
+					<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-30'>
+						<span className='text-gray-300'>From</span>
+						<span className='text-black'>{project.source}</span>
+					</div>
 				</div>
 				<div className='flex-1'>
-					<h3 className='text-2xl font-bold mb-2'>{project.title}</h3>
-					<p className='text-gray-400'>{project.description}</p>
+					<h3 className='text-2xl font-bold mb-2'>
+						{project.title || NO_DATA}
+					</h3>
+					<p className='text-gray-400'>
+						{project.description || NO_DATA}
+					</p>
 				</div>
 				<div>
-					<h4 className='text-lg font-bold'>Vouched By</h4>
+					<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
 					<div className='flex gap-2'>
-						{categorizedData.vouches.map(data => (
-							<AttestInfo
-								key={data.organization.id}
-								count={data.count}
-								organization={data.organization.name}
-							/>
-						))}
+						{vouches.length > 0 ? (
+							vouches.map(data => (
+								<AttestInfo
+									key={data.organization.id}
+									count={data.count}
+									organization={data.organization.name}
+								/>
+							))
+						) : (
+							<div className='bg-gray-100 py-1 px-2 w-full text-center'>
+								No Vouches Received Yet
+							</div>
+						)}
 					</div>
 				</div>
 				<div>
-					<h4 className='text-lg font-bold'>Flagged By</h4>
+					<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
 					<div className='flex gap-2'>
-						{categorizedData.flags.map(data => (
-							<AttestInfo
-								key={data.organization.id}
-								count={data.count}
-								organization={data.organization.name}
-							/>
-						))}
+						{flags?.length > 0 ? (
+							flags.map(data => (
+								<AttestInfo
+									key={data.organization.id}
+									count={data.count}
+									organization={data.organization.name}
+								/>
+							))
+						) : (
+							<div className='bg-gray-100 py-1 px-2 w-full text-center'>
+								No Flags Received Yet
+							</div>
+						)}
 					</div>
 				</div>
 				<div className='flex gap-6'>
