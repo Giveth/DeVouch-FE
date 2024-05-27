@@ -9,8 +9,10 @@ query fetchProjects($offset: Int!, $limit: Int, $orderBy: [ProjectOrderByInput!]
     totalVouches
     totalFlags
     attestedOrganisations {
+      id
       vouch
       organisation {
+        id
         name
       }
     }
