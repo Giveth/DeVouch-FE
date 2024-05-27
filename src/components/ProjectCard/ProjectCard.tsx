@@ -52,9 +52,9 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					{project.image && (
 						<Image
 							src={project.image}
-							layout='fill'
-							objectFit='cover'
+							fill
 							alt='Project Image'
+							className='object-cover'
 						/>
 					)}
 					<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
