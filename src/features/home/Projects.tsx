@@ -86,7 +86,12 @@ export const Projects = () => {
 		fetchProjects(true, projects.length);
 	};
 
-	// if (loading && page === 0) return <p>Loading...</p>;
+	if (loading && projects.length === 0)
+		return (
+			<div className='container mx-auto flex flex-col gap-10'>
+				Loading ...
+			</div>
+		);
 
 	return (
 		<div className='container mx-auto flex flex-col gap-10'>
@@ -117,9 +122,11 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
-			<div className='text-center'>
-				<Button onClick={handleLoadMore}>Load More Projects</Button>
-			</div>
+			{!loading && (
+				<div className='text-center'>
+					<Button onClick={handleLoadMore}>Load More Projects</Button>
+				</div>
+			)}
 		</div>
 	);
 };
