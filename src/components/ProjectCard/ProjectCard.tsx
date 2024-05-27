@@ -62,7 +62,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 				</div>
 				<div>
 					<h4 className='text-lg font-bold'>Vouched By</h4>
-					<div className='flex'>
+					<div className='flex gap-2'>
 						{categorizedData.vouches.map(data => (
 							<AttestInfo
 								key={data.organization.id}
@@ -74,7 +74,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 				</div>
 				<div>
 					<h4 className='text-lg font-bold'>Flagged By</h4>
-					<div className='flex'>
+					<div className='flex gap-2'>
 						{categorizedData.flags.map(data => (
 							<AttestInfo
 								key={data.organization.id}
