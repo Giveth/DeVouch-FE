@@ -37,6 +37,8 @@ const categorizeAttestedOrganisations = (
 	};
 };
 
+const NO_DATA = 'No data available to show here!';
+
 export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 	const { vouches, flags } = categorizeAttestedOrganisations(
 		project.attestedOrganisations,
@@ -57,8 +59,12 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					)}
 				</div>
 				<div className='flex-1'>
-					<h3 className='text-2xl font-bold mb-2'>{project.title}</h3>
-					<p className='text-gray-400'>{project.description}</p>
+					<h3 className='text-2xl font-bold mb-2'>
+						{project.title || NO_DATA}
+					</h3>
+					<p className='text-gray-400'>
+						{project.description || NO_DATA}
+					</p>
 				</div>
 				<div>
 					<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
