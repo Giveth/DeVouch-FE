@@ -57,7 +57,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 							alt='Project Image'
 						/>
 					)}
-					<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-30'>
+					<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
 						<span className='text-gray-300'>From</span>
 						<span className='text-black'>{project.source}</span>
 					</div>
