@@ -7,12 +7,12 @@ import { FETCH_PROJECTS } from '@/features/home/queries';
 import { fetchGraphQL } from '@/helpers/request';
 
 enum EProjectSort {
-	NEWEST = 'newest',
-	OLDEST = 'oldest',
-	HIGHEST_VOUCH_COUNT = 'highest_count',
-	LOWEST_VOUCH_COUNT = 'lowest_count',
-	HIGHEST_FLAG = 'highest_flag',
-	LOWEST_FLAG = 'lowest_flag',
+	NEWEST = 'lastUpdatedTimestamp_DESC',
+	OLDEST = 'lastUpdatedTimestamp_ASC',
+	HIGHEST_VOUCH_COUNT = 'totalVouches_DESC',
+	LOWEST_VOUCH_COUNT = 'totalVouches_ASC',
+	HIGHEST_FLAG = 'totalFlags_DESC',
+	LOWEST_FLAG = 'totalFlags_ASC',
 }
 
 const sortOptions: IOption[] = [
@@ -58,7 +58,11 @@ export const Projects = () => {
 		try {
 			const data = await fetchGraphQL<{ projects: IProject[] }>(
 				FETCH_PROJECTS,
-				{ limit, offset: page * limit },
+				{
+					orderBy: sort.key,
+					limit,
+					offset: page * limit,
+				},
 			);
 			setProjects(prevProjects =>
 				append ? [...prevProjects, ...data.projects] : data.projects,
