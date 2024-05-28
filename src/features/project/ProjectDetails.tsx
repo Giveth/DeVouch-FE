@@ -153,27 +153,14 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							</span>
 						</button>
 					</div>
-					<button className='w-full sm:w-auto px-4 py-2 rounded border flex items-center mt-2 sm:mt-0'>
-						Filters{' '}
-						<svg
-							className='w-4 h-4 ml-2'
-							fill='none'
-							stroke='currentColor'
-							strokeWidth='2'
-							viewBox='0 0 24 24'
-							xmlns='http://www.w3.org/2000/svg'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1h-3l-4 5v3l-4-5H4a1 1 0 01-1-1V4z'
-							></path>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M14 12h4l-5 5H9l-5-5h4'
-							></path>
-						</svg>
+					<button className='w-full sm:w-auto gap-4 px-4 py-2 rounded border flex items-center mt-2 sm:mt-0 font-bold'>
+						Filters
+						<Image
+							src={'/images/icons/filter.svg'}
+							alt={'filter'}
+							width={18}
+							height={18}
+						/>
 					</button>
 				</div>
 
@@ -186,10 +173,18 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 						<table className='min-w-full table-auto text-left'>
 							<thead>
 								<tr className='bg-transparent'>
-									<th className='px-4 py-2'>Attesters</th>
-									<th className='px-4 py-2'>Attested As</th>
-									<th className='px-4 py-2'>Comments</th>
-									<th className='px-4 py-2'>Signal</th>
+									<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+										Attesters
+									</th>
+									<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+										Attested As
+									</th>
+									<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+										Comments
+									</th>
+									<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+										Signal
+									</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -200,54 +195,50 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 									)
 									.map((attestation: any, index: number) => (
 										<tr key={index} className='border-t'>
-											<td className='px-4 py-2 align-top'>
+											<td className='px-4 py-6 align-top text-gray-800'>
 												{attestation.id}
+												<br />
+												<span className='text-gray-500 text-sm'>
+													{new Date(
+														attestation.attestTimestamp,
+													).toLocaleDateString()}
+												</span>
 											</td>
-											<td className='px-4 py-2 align-top'>
-												{
-													attestation
-														.attestorOrganisation
-														.organisation.name
-												}
+											<td className='flex px-4 py-6 align-top text-gray-800 items-center'>
+												<span className='bg-gray-200 px-2 py-1'>
+													{
+														attestation
+															.attestorOrganisation
+															.organisation.name
+													}
+												</span>
 											</td>
-											<td className='px-4 py-2 align-top'>
+											<td className='px-4 py-6 align-top text-gray-800'>
 												{attestation.comment || '-'}
 											</td>
-											<td className='px-4 py-2 align-top'>
+											<td className='px-4 py-6 align-top'>
 												{attestation.vouch ? (
-													<span className='text-blue-500 flex items-center'>
-														<svg
-															className='w-4 h-4 mr-1'
-															fill='none'
-															stroke='currentColor'
-															strokeWidth='2'
-															viewBox='0 0 24 24'
-															xmlns='http://www.w3.org/2000/svg'
-														>
-															<path
-																strokeLinecap='round'
-																strokeLinejoin='round'
-																d='M5 13l4 4L19 7'
-															></path>
-														</svg>
+													<span className='flex gap-2 items-center'>
+														<Image
+															src={
+																'/images/icons/vouched.svg'
+															}
+															alt={'vouched'}
+															width={24}
+															height={24}
+														/>
 														Vouched
 													</span>
 												) : (
-													<span className='text-red-500 flex items-center'>
-														<svg
-															className='w-4 h-4 mr-1'
-															fill='none'
-															stroke='currentColor'
-															strokeWidth='2'
-															viewBox='0 0 24 24'
-															xmlns='http://www.w3.org/2000/svg'
-														>
-															<path
-																strokeLinecap='round'
-																strokeLinejoin='round'
-																d='M18 12H6'
-															></path>
-														</svg>
+													<span className='gap-4 flex items-center'>
+														<Image
+															src={
+																'/images/icons/red-flag.svg'
+															}
+															alt={'red-flag'}
+															width={18}
+															height={18}
+														/>
 														Flagged
 													</span>
 												)}
@@ -294,25 +285,17 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 
 			<div className='flex bg-transparent rounded-lg p-6 justify-end items-center text-center gap-2 mt-[-20px]'>
 				<span className='block text-gray-500'>
-					Feeling Proud Of Your Project? Share This Project And Its
-					Attestations
+					Share this project with your community and invite them to
+					attest!
 				</span>
-				<button className='bg-white border border-gray-300 text-gray-500 px-4 py-2 rounded flex items-center justify-center'>
+				<button className='bg-white border border-gray-300 text-gray-500 gap-2 px-4 py-2 rounded flex items-center justify-center'>
 					<b> Share Project</b>
-					<svg
-						className='w-4 h-4 ml-2'
-						fill='none'
-						stroke='currentColor'
-						strokeWidth='2'
-						viewBox='0 0 24 24'
-						xmlns='http://www.w3.org/2000/svg'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							d='M4 12V8a4 4 0 014-4h8a4 4 0 014 4v4M16 16l-4-4-4 4M12 12v12'
-						></path>
-					</svg>
+					<Image
+						src={'/images/icons/share.svg'}
+						alt={'share'}
+						width={18}
+						height={18}
+					/>
 				</button>
 			</div>
 		</div>
