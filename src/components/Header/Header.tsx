@@ -18,7 +18,7 @@ export const Header = () => {
 	const { disconnect } = useDisconnect();
 	const { address } = useAccount();
 	return (
-		<div className='container mx-auto py-10 flex justify-between items-center'>
+		<div className='container py-10 flex justify-between items-center'>
 			<Image src='/images/logo.svg' alt='logo' width={165} height={30} />
 			{address ? (
 				<Dropdown
