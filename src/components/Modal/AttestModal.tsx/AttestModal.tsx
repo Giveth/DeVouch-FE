@@ -14,7 +14,7 @@ interface IOrganisation {
 interface AttestModalProps extends IModal {}
 
 export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
-	const [organisations, setOrganisations] = useState([]);
+	const [organisations, setOrganisations] = useState<IOrganisation[]>([]);
 	const [selectedValue, setSelectedValue] = useState<string>('');
 
 	const { address } = useAccount();
@@ -30,7 +30,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 				FETCH_USER_ORGANISATIONS,
 				{ id_eq: address?.toLowerCase() },
 			);
-			console.log('data', data);
+			setOrganisations(data?.organisations || []);
 		};
 		fetchOrganisations();
 	}, []);
@@ -43,30 +43,19 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 						Select the Attester Group you wish to vouch as:
 					</div>
 					<div className='border p-4'>
-						<RadioButton
-							id='radio1'
-							name='example'
-							label='Option 1'
-							checked={selectedValue === 'option1'}
-							onChange={() => handleRadioChange('option1')}
-							className='my-2'
-						/>
-						<RadioButton
-							id='radio2'
-							name='example'
-							label='Option 2'
-							checked={selectedValue === 'option2'}
-							onChange={() => handleRadioChange('option2')}
-							className='my-2'
-						/>
-						<RadioButton
-							id='radio3'
-							name='example'
-							label='Option 3'
-							checked={selectedValue === 'option3'}
-							onChange={() => handleRadioChange('option3')}
-							className='my-2'
-						/>
+						{organisations.map(organisation => (
+							<RadioButton
+								key={organisation.id}
+								id={organisation.id}
+								name='organisation'
+								label={organisation.name}
+								checked={selectedValue === organisation.id}
+								onChange={() =>
+									handleRadioChange(organisation.id)
+								}
+								className='my-2'
+							/>
+						))}
 					</div>
 				</div>
 				<div>
