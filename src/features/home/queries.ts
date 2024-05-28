@@ -3,6 +3,7 @@ query fetchProjects($offset: Int!, $limit: Int, $orderBy: [ProjectOrderByInput!]
   projects(offset: $offset, limit: $limit, orderBy: $orderBy) {
     id
     title
+    slug
     description
     image
     source
