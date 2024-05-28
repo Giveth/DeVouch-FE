@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
+import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 
 interface IProjectCardProps {
 	project: IProject;
@@ -41,6 +42,7 @@ const categorizeAttestedOrganisations = (
 const NO_DATA = 'No data available to show here!';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
+	const [showAttestModal, setShowAttestModal] = useState(false);
 	const { vouches, flags } = categorizeAttestedOrganisations(
 		project.attestedOrganisations,
 	);
@@ -113,6 +115,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<OutlineButton
 						buttonType={OutlineButtonType.BLUE}
 						className='flex-1'
+						onClick={() => setShowAttestModal(true)}
 					>
 						Vouch For Project
 					</OutlineButton>
@@ -121,6 +124,12 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					</OutlineButton>
 				</div>
 			</div>
+			{showAttestModal && (
+				<AttestModal
+					setShowModal={setShowAttestModal}
+					showModal={showAttestModal}
+				/>
+			)}
 		</div>
 	);
 };

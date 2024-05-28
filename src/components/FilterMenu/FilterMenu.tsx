@@ -17,7 +17,7 @@ interface FilterMenuProps {
 }
 
 interface IOptions {
-	[key: string]: string[];
+	[key: string]: { key: string; value: string }[];
 }
 
 const FilterMenu: FC<FilterMenuProps> = ({
@@ -41,11 +41,11 @@ const FilterMenu: FC<FilterMenuProps> = ({
 		}));
 	};
 
-	const handleCheckboxChange = (key: string, option: string) => {
+	const handleCheckboxChange = (key: string, optionValue: string) => {
 		const currentValues = value[key] || [];
-		const newValues = currentValues.includes(option)
-			? currentValues.filter(val => val !== option)
-			: [...currentValues, option];
+		const newValues = currentValues.includes(optionValue)
+			? currentValues.filter(val => val !== optionValue)
+			: [...currentValues, optionValue];
 		handleSetValue({ key, values: newValues });
 	};
 
@@ -68,16 +68,22 @@ const FilterMenu: FC<FilterMenuProps> = ({
 							{key}
 						</div>
 						{optionList.map(option => (
-							<Checkbox
-								key={option}
-								id={`${key}-${option}`}
-								label={option}
-								checked={(value[key] || []).includes(option)}
-								onChange={() =>
-									handleCheckboxChange(key, option)
+							<div
+								key={option.value}
+								onClick={() =>
+									handleCheckboxChange(key, option.value)
 								}
-								className='flex items-center gap-2 w-full  px-4 py-2 hover:bg-gray-100'
-							/>
+							>
+								<Checkbox
+									id={`${key}-${option.value}`}
+									label={option.key}
+									checked={(value[key] || []).includes(
+										option.value,
+									)}
+									onChange={() => {}}
+									className='flex items-center gap-2 w-full  px-4 py-2 hover:bg-gray-100'
+								/>
+							</div>
 						))}
 					</div>
 				)),

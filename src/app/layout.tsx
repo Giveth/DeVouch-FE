@@ -3,12 +3,11 @@ import { Space_Grotesk } from 'next/font/google';
 import Image from 'next/image';
 import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
-import Footer from '@/components/Footer/Footer';
-import { Header } from '@/components/Header/Header';
-import { wagmiConfig } from '@/cofig/wagmi';
 import Web3ModalProvider from '@/context';
+import { wagmiConfig } from '@/config/wagmi';
+import { Header } from '@/components/Header/Header';
+import { Footer } from '@/components/Footer/Footer';
 import type { Metadata } from 'next';
-
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
 export const metadata: Metadata = {

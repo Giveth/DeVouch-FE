@@ -39,11 +39,12 @@ const buttonTypeToStyle = {
 export const Button: FC<ButtonProps> = ({
 	children,
 	buttonType = ButtonType.BLUE,
+	className,
 	...props
 }) => {
 	return (
 		<div
-			className='group/button relative m-4  text-white '
+			className={`group/button inline-block relative   text-white ${className}`}
 			style={buttonTypeToStyle[buttonType] as any}
 		>
 			<div
@@ -51,7 +52,7 @@ export const Button: FC<ButtonProps> = ({
 				className={`absolute w-full h-full  bg-${buttonTypeToColorName[buttonType]} z-0  bottom-0 animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter`}
 			/>
 			<button
-				className={`font-bold bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/button:animate-color-bounce-enter`}
+				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/button:animate-color-bounce-enter`}
 				{...props}
 			>
 				{children}

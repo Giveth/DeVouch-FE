@@ -7,7 +7,7 @@ import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { State, WagmiProvider } from 'wagmi';
-import { projectId, wagmiConfig } from '@/cofig/wagmi';
+import { projectId, wagmiConfig } from '@/config/wagmi';
 
 // Setup queryClient
 const queryClient = new QueryClient();

@@ -48,7 +48,7 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 }) => {
 	return (
 		<div
-			className={`group/OutlineButton relative ${className}`}
+			className={`group/OutlineButton inline-block relative ${className}`}
 			style={buttonTypeToStyle[buttonType] as any}
 		>
 			<div

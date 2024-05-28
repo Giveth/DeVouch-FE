@@ -1,44 +1,23 @@
-import React from 'react';
 import Image from 'next/image';
+import React from 'react';
 
-const Footer = () => {
+export const Footer = () => {
 	return (
-		<div className='w-full bg-transparent py-4 mt-8'>
-			<div className='container mx-auto flex justify-between items-center'>
-				<div className='flex gap-4'>
-					<a
-						href='/documentation'
-						className='text-gray-700 hover:underline'
-					>
-						Documentations
-					</a>
-					<a
-						href='/contact'
-						className='text-gray-700 hover:underline'
-					>
-						Contact Us
-					</a>
-				</div>
-				<div className='flex items-center'>
-					<span className='text-gray-500 mr-[-10px]'>
-						Built by <b>Giveth</b>
-					</span>
-					<a
-						href='https://giveth.io'
-						target='_blank'
-						rel='noopener noreferrer'
-					>
-						<Image
-							src='/images/icons/giveth.svg'
-							alt='giveth'
-							width={52}
-							height={52}
-						/>
-					</a>
-				</div>
+		<div className='container py-8 flex justify-between'>
+			<div className='flex gap-2'>
+				<a className='px-4 py-2'>Documentations</a>
+				<a className='px-4 py-2'>Contact Us</a>
+			</div>
+			<div className='flex gap-3 items-center text-lg'>
+				<span className='text-gray-400 font-semibold'>Built by</span>
+				<span className='font-bold'>Giveth</span>
+				<Image
+					src='/images/icons/giveth.svg'
+					alt='giveth'
+					width={32}
+					height={32}
+				/>
 			</div>
 		</div>
 	);
 };
-
-export default Footer;
