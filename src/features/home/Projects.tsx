@@ -99,13 +99,11 @@ export const Projects = () => {
 
 	if (loading && projects.length === 0)
 		return (
-			<div className='container mx-auto flex flex-col gap-10'>
-				Loading ...
-			</div>
+			<div className='container flex flex-col gap-10'>Loading ...</div>
 		);
 
 	return (
-		<div className='container mx-auto flex flex-col gap-10'>
+		<div className='container flex flex-col gap-10'>
 			<div className='flex justify-between'>
 				<div className='flex gap-4 items-center'>
 					<p className='text-gray-400'>Sort By</p>
@@ -128,7 +126,7 @@ export const Projects = () => {
 				</div>
 			</div>
 			<h2 className='text-2xl font-bold'>Explore Projects </h2>
-			<div className='grid grid-cols-2 gap-8 mb-8'>
+			<div className='grid grid-col-1 lg:grid-cols-2 gap-8 mb-8'>
 				{projects.map(project => (
 					<ProjectCard key={project.id} project={project} />
 				))}

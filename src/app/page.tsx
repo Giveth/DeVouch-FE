@@ -28,7 +28,7 @@ export default function Home() {
 				alt='arc-3'
 			/>
 			<Header />
-			<div className='container mx-auto '>
+			<div className='container'>
 				<div className='px-20 py-10 flex flex-col gap-6'>
 					<h1 className='text-8xl	font-bold leading-normal'>
 						On-Chain Vouching via Attestations
