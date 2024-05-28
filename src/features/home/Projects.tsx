@@ -36,8 +36,15 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': ['Giveth', 'Gitcoin', 'Retro Funding'],
-	'Attested By': ['Optimism Badge Holder', 'Giveth Verification'],
+	'Source Platform': [
+		{ key: 'Giveth', value: 'giveth' },
+		{ key: 'Gitcoin', value: 'gitcoin' },
+		{ key: 'Retro Funding', value: 'retro_funding' },
+	],
+	'Attested By': [
+		{ key: 'Optimism Badge Holder', value: '0x123131281238dasdas' },
+		{ key: 'Giveth Verification', value: 'giveth_verification' },
+	],
 };
 
 const limit = 10;
@@ -49,6 +56,8 @@ export const Projects = () => {
 	}>({});
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
+
+	console.log('filterValues', filterValues);
 
 	const fetchProjects = useCallback(
 		async (append: boolean = false, offset: number) => {
