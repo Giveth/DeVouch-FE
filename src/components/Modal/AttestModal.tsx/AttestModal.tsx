@@ -39,7 +39,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 		<Modal {...props} title='Vouch for Project'>
 			<div className='flex flex-col gap-6'>
 				<div>
-					<div className='mb-2'>
+					<div className='mb-2 text-gray-600'>
 						Select the Attester Group you wish to vouch as:
 					</div>
 					<div className='border p-4'>
@@ -59,7 +59,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 					</div>
 				</div>
 				<div>
-					<div className='mb-2'>
+					<div className='mb-2 text-gray-600'>
 						Any comments you want to add with your Attestation?
 					</div>
 					<textarea
