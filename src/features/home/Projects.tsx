@@ -6,6 +6,7 @@ import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
 import { Button } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
+import config from '@/config/configuration';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -36,15 +37,8 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': [
-		{ key: 'Giveth', value: 'giveth' },
-		{ key: 'Gitcoin', value: 'gitcoin' },
-		{ key: 'Retro Funding', value: 'retro_funding' },
-	],
-	'Attested By': [
-		{ key: 'Optimism Badge Holder', value: '0x123131281238dasdas' },
-		{ key: 'Giveth Verification', value: 'giveth_verification' },
-	],
+	'Source Platform': config.sourcePlatforms,
+	'Attested By': config.attestorGroups,
 };
 
 const limit = 10;
