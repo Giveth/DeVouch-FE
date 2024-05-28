@@ -44,7 +44,7 @@ export const Button: FC<ButtonProps> = ({
 }) => {
 	return (
 		<div
-			className={`group/button inline-block relative m-4  text-white ${className}`}
+			className={`group/button inline-block relative   text-white ${className}`}
 			style={buttonTypeToStyle[buttonType] as any}
 		>
 			<div
