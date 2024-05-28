@@ -2,7 +2,7 @@ import { Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
-import { wagmiConfig } from '@/cofig/wagmi';
+import { wagmiConfig } from '@/config/wagmi';
 import Web3ModalProvider from '@/context';
 import type { Metadata } from 'next';
 

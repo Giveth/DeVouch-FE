@@ -1,10 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
-import { FETCH_PROJECTS } from '@/features/home/queries';
 import { fetchGraphQL } from '@/helpers/request';
+import { Button } from '@/components/Button/Button';
+import { generateFetchProjectsQuery } from './query-genrator';
+import config from '@/config/configuration';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -35,56 +37,72 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': ['Giveth', 'Gitcoin', 'Retro Funding'],
-	'Attested By': ['Optimism Badge Holder', 'Giveth Verification'],
+	'Source Platform': config.sourcePlatforms,
+	'Attested By': config.attestorGroups,
 };
+
+const limit = 10;
 
 export const Projects = () => {
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
-
+	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
-	const [page, setPage] = useState(0);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [isFetchingMore, setIsFetchingMore] = useState(false);
-	const limit = 10;
+	const [hasMore, setHasMore] = useState(true);
 
-	const loadProjects = async (page: number, append: boolean = false) => {
-		setLoading(true);
-		setError(null);
-		try {
-			const data = await fetchGraphQL<{ projects: IProject[] }>(
-				FETCH_PROJECTS,
-				{
-					orderBy: sort.key,
-					limit,
-					offset: page * limit,
-				},
-			);
-			setProjects(prevProjects =>
-				append ? [...prevProjects, ...data.projects] : data.projects,
-			);
-		} catch (err: any) {
-			setError(err.message);
-		} finally {
-			setLoading(false);
-			setIsFetchingMore(false);
-		}
-	};
+	console.log('filterValues', filterValues);
+
+	const fetchProjects = useCallback(
+		async (append: boolean = false, offset: number) => {
+			setLoading(true);
+			try {
+				const projectSource = filterValues['Source Platform'];
+				const organisationId = filterValues['Attested By'];
+
+				const data = await fetchGraphQL<{ projects: IProject[] }>(
+					generateFetchProjectsQuery(projectSource, organisationId),
+					{
+						orderBy: sort.key,
+						limit,
+						offset,
+						project_source: projectSource,
+						organisation_id: organisationId,
+					},
+				);
+
+				if (data.projects.length < limit) {
+					setHasMore(false);
+				}
+				setProjects(prevProjects =>
+					append
+						? [...prevProjects, ...data.projects]
+						: data.projects,
+				);
+			} catch (err: any) {
+				console.log('err', err.message);
+			} finally {
+				setLoading(false);
+			}
+		},
+		[filterValues, sort.key],
+	);
 
 	useEffect(() => {
-		loadProjects(page);
-	}, [page]);
+		fetchProjects(false, 0);
+	}, [fetchProjects]);
 
 	const handleLoadMore = () => {
-		setPage(prevPage => prevPage + 1);
-		setIsFetchingMore(true);
+		fetchProjects(true, projects.length);
 	};
 
-	if (loading && page === 0) return <p>Loading...</p>;
+	if (loading && projects.length === 0)
+		return (
+			<div className='container mx-auto flex flex-col gap-10'>
+				Loading ...
+			</div>
+		);
 
 	return (
 		<div className='container mx-auto flex flex-col gap-10'>
@@ -115,9 +133,11 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
-			<button onClick={handleLoadMore} disabled={isFetchingMore}>
-				{isFetchingMore ? 'Loading...' : 'Load More'}
-			</button>
+			{!loading && hasMore && (
+				<div className='text-center'>
+					<Button onClick={handleLoadMore}>Load More Projects</Button>
+				</div>
+			)}
 		</div>
 	);
 };

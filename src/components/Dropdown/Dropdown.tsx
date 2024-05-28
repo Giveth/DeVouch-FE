@@ -98,7 +98,6 @@ const Dropdown: React.FC<DropdownProps> = ({
 						style={dropdownStyle}
 						ref={dropdownRef}
 						className='absolute border py-2 px-2 border-black bg-white'
-						onClick={e => e.stopPropagation()} // Prevent click inside dropdown from toggling it
 					>
 						{options.map((option, idx) => (
 							<Fragment key={idx}>{option}</Fragment>

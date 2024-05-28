@@ -8,7 +8,7 @@ import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { Button } from '../Button/Button';
 import Dropdown from '../Dropdown/Dropdown';
 import { ConnectedWalletInfo } from './ConnectedWalletInfo';
-import { ROUTES } from '@/cofig/routes';
+import { ROUTES } from '@/config/routes';
 
 const optionClasses: HTMLAttributes<HTMLDivElement>['className'] =
 	'text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100';
