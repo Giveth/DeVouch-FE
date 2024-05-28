@@ -39,6 +39,7 @@ export const generateFetchProjectsQuery = (
 		  description
 		  image
 		  source
+		  slug
 		  totalVouches
 		  totalFlags
 		  attestedOrganisations {

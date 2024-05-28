@@ -56,7 +56,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
 	if (!project) return <p>Project not found.</p>;
-	console.log({ project });
+
 	return (
 		<div className='container mx-auto flex flex-col gap-8 p-4'>
 			<div className='bg-white shadow rounded-lg p-6'>
