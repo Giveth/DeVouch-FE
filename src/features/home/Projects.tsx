@@ -50,6 +50,7 @@ export const Projects = () => {
 	}>({});
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
+	const [hasMore, setHasMore] = useState(true);
 
 	console.log('filterValues', filterValues);
 
@@ -70,6 +71,10 @@ export const Projects = () => {
 						organisation_id: organisationId,
 					},
 				);
+
+				if (data.projects.length < limit) {
+					setHasMore(false);
+				}
 				setProjects(prevProjects =>
 					append
 						? [...prevProjects, ...data.projects]
@@ -128,7 +133,7 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
-			{!loading && (
+			{!loading && hasMore && (
 				<div className='text-center'>
 					<Button onClick={handleLoadMore}>Load More Projects</Button>
 				</div>
