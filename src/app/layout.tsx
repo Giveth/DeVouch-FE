@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Web3ModalProvider from '@/context';
 import { wagmiConfig } from '@/config/wagmi';
 import { Header } from '@/components/Header/Header';
+import { Footer } from '@/components/Footer/Footer';
 import type { Metadata } from 'next';
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
@@ -51,6 +52,7 @@ export default function RootLayout({
 						/>
 						<Header />
 						{children}
+						<Footer />
 					</div>
 				</Web3ModalProvider>
 			</body>
