@@ -1,9 +1,9 @@
 import React, { useState, type FC } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
-import Link from 'next/link';
 
 interface IProjectCardProps {
 	project: IProject;
