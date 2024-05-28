@@ -5,6 +5,7 @@ import { Button } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
 import { FETCH_USER_ORGANISATIONS } from '@/queries/user';
 import { fetchGraphQL } from '@/helpers/request';
+import { OutlineButton } from '@/components/Button/OutlineButton';
 
 interface IOrganisation {
 	id: string;
@@ -68,8 +69,14 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 						className='border w-full resize-none p-4'
 					></textarea>
 				</div>
-				<div className='flex justify-end'>
-					<Button className='btn btn-primary'>Vouch</Button>
+				<div className='flex gap-8'>
+					<OutlineButton
+						className='flex-1'
+						onClick={() => props.setShowModal(false)}
+					>
+						Cancel
+					</OutlineButton>
+					<Button className='flex-1'>Confirm</Button>
 				</div>
 			</div>
 		</Modal>
