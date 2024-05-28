@@ -1,18 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { FETCH_PROJECT_BY_SLUG } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
+import { getSourceLink } from '@/helpers/source';
+import {
+	OutlineButton,
+	OutlineButtonType,
+} from '@/components/Button/OutlineButton';
 
 const ITEMS_PER_PAGE = 5;
 
 export const ProjectDetails = ({ slug }: { slug: string }) => {
+	const router = useRouter();
 	const [project, setProject] = useState<any | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [filter, setFilter] = useState<'all' | 'vouched' | 'flagged'>('all');
-	const fromRetroFunding = project?.source === 'Retro Funding';
 
 	const fetchProjectData = async (
 		slug: string,
@@ -49,29 +56,58 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
 	if (!project) return <p>Project not found.</p>;
-
+	console.log({ project });
 	return (
 		<div className='container mx-auto flex flex-col gap-8 p-4'>
 			<div className='bg-white shadow rounded-lg p-6'>
-				<h1 className='text-2xl font-bold mb-4'>{project.title}</h1>
-				{fromRetroFunding && (
-					<div className='flex justify-end'>
-						<span className='bg-red-500 text-white px-2 py-1 rounded'>
-							From Retro Funding
+				<h1 className='flex flex-row gap-6 text-2xl font-bold mb-4'>
+					<Image
+						onClick={() => router.back()}
+						src={'/images/icons/left-arrow.svg'}
+						style={{ cursor: 'pointer' }}
+						alt={'arrow'}
+						width={24}
+						height={24}
+					/>
+					{project.title}
+				</h1>
+
+				<div className='relative h-48 rounded-lg overflow-hidden mb-4 bg-blue-100'>
+					<div
+						onClick={() =>
+							router.push(getSourceLink(project.source))
+						}
+						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
+					>
+						<span className='bg-white text-black px-2 py-1 rounded'>
+							From {project.source}
 						</span>
 					</div>
-				)}
-				<div className='bg-blue-100 h-48 rounded-lg mb-4'></div>
+					{project.image && (
+						<Image
+							src={project.image}
+							alt={project.title}
+							layout='fill'
+							objectFit='cover'
+							className='rounded-lg'
+						/>
+					)}
+				</div>
 				<p className='text-gray-700 mb-4'>{project.description}</p>
-				<div className='flex justify-between items-center'>
-					<span>Do You Trust This Project?</span>
-					<div className='flex gap-4'>
-						<button className='bg-blue-500 text-white px-4 py-2 rounded'>
+				<div className='flex justify-between items-center border-t border-[rgba(219, 219, 219, 1)] pt-4'>
+					<span className='text-gray-500'>
+						Do You Trust This Project?
+					</span>
+					<div className='flex gap-6 z-50'>
+						<OutlineButton
+							buttonType={OutlineButtonType.BLUE}
+							className='flex-1'
+						>
 							Vouch For Project
-						</button>
-						<button className='border border-red-500 text-red-500 px-4 py-2 rounded'>
+						</OutlineButton>
+						<OutlineButton buttonType={OutlineButtonType.RED}>
 							Flag Project
-						</button>
+						</OutlineButton>
 					</div>
 				</div>
 			</div>
@@ -143,13 +179,13 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 
 				<div className='overflow-x-auto'>
 					{filteredAttests.length === 0 ? (
-						<div className='text-center py-10 text-gray-500'>
+						<div className='text-center py-10 text-gray-500 font-bold my-12'>
 							Do you know this project? Attest to it!
 						</div>
 					) : (
 						<table className='min-w-full table-auto text-left'>
 							<thead>
-								<tr className='bg-gray-100'>
+								<tr className='bg-transparent'>
 									<th className='px-4 py-2'>Attesters</th>
 									<th className='px-4 py-2'>Attested As</th>
 									<th className='px-4 py-2'>Comments</th>
@@ -165,7 +201,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 									.map((attestation: any, index: number) => (
 										<tr key={index} className='border-t'>
 											<td className='px-4 py-2 align-top'>
-												{attestation.recipient}
+												{attestation.id}
 											</td>
 											<td className='px-4 py-2 align-top'>
 												{

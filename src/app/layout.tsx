@@ -3,6 +3,7 @@ import { Space_Grotesk } from 'next/font/google';
 import Image from 'next/image';
 import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
+import Footer from '@/components/Footer/Footer';
 import { Header } from '@/components/Header/Header';
 import { wagmiConfig } from '@/cofig/wagmi';
 import Web3ModalProvider from '@/context';
@@ -51,7 +52,8 @@ export default function RootLayout({
 							alt='arc-3'
 						/>
 						<Header />
-						{children}
+						<div className='min-h-[80vh]'>{children}</div>
+						<Footer />
 					</div>
 				</Web3ModalProvider>
 			</body>
