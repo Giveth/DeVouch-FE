@@ -26,6 +26,7 @@ const buttonTypeToStyle = {
 		'--bounce-color-end': '#3742FA',
 		'--bounce-bg-end': '#3742FA',
 		'--bounce-border-end': '#3742FA',
+		'--bounce-text-end': '#FFFFFF',
 	},
 	[OutlineButtonType.RED]: {
 		'--bounce-color-start': '#FF4B2B',
@@ -37,6 +38,7 @@ const buttonTypeToStyle = {
 		'--bounce-color-end': '#FF4B2B',
 		'--bounce-bg-end': '#FF4B2B',
 		'--bounce-border-end': '#FF4B2B',
+		'--bounce-text-end': '#FFFFFF',
 	},
 };
 

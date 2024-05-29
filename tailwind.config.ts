@@ -48,17 +48,17 @@ const config: Config = {
 					'40%': {
 						backgroundColor: 'var(--bounce-bg-middle)',
 						borderColor: 'var(--bounce-border-middle)',
-						color: 'white',
+						color: 'var(--bounce-text-end)',
 					},
 					'70%': {
 						backgroundColor: 'var(--bounce-bg-middle)',
 						borderColor: 'var(--bounce-border-middle)',
-						color: 'white',
+						color: 'var(--bounce-text-end)',
 					},
 					'100%': {
 						backgroundColor: 'var(--bounce-bg-end)',
 						borderColor: 'var(--bounce-border-end)',
-						color: 'white',
+						color: 'var(--bounce-text-end)',
 					},
 				},
 			},

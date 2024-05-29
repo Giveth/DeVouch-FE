@@ -24,6 +24,7 @@ const buttonTypeToStyle = {
 		'--bounce-border-middle': '#3742FA',
 		'--bounce-bg-end': '#FFFFFF',
 		'--bounce-border-end': '#000000',
+		'--bounce-text-end': '#000000',
 	},
 	[ButtonType.RED]: {
 		'--bounce-text-color': '#FF4B2B',
@@ -33,6 +34,7 @@ const buttonTypeToStyle = {
 		'--bounce-border-middle': '#FF4B2B',
 		'--bounce-bg-end': '#FFFFFF',
 		'--bounce-border-end': '#000000',
+		'--bounce-text-end': '#000000',
 	},
 };
 
