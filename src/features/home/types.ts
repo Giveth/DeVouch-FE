@@ -1,12 +1,15 @@
 interface IProject {
 	id: string;
 	title: string;
+	slug: string;
 	description: string;
 	image: string;
 	source: string;
+	totalAttests: number;
 	totalVouches: number;
 	totalFlags: number;
 	attestedOrganisations: IAttestedOrganisation[];
+	attests: ProjectAttestation[];
 }
 
 interface IAttestedOrganisation {
@@ -15,7 +18,32 @@ interface IAttestedOrganisation {
 	organisation: IOrganisation;
 }
 
+interface IAttestorOrganisation {
+	id: string;
+	attestor: IAttestor;
+	organisation: IOrganisation;
+	attestTimestamp: Date;
+	revoked: boolean;
+}
+
 interface IOrganisation {
 	id: string;
 	name: string;
+}
+
+interface IAttestor {
+	id: string;
+	organisations: IAttestorOrganisation[];
+}
+
+interface ProjectAttestation {
+	id: string;
+	recipient: string;
+	vouch: boolean;
+	txHash: string;
+	revoked: boolean;
+	attestorOrganisation: IAttestorOrganisation;
+	project: IProject;
+	attestTimestamp: Date;
+	comment: string;
 }

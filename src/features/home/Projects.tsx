@@ -4,7 +4,7 @@ import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
-import { Button } from '@/components/Button/Button';
+import { Button, ButtonType } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
 
@@ -133,7 +133,12 @@ export const Projects = () => {
 			</div>
 			{!loading && hasMore && (
 				<div className='text-center'>
-					<Button onClick={handleLoadMore}>Load More Projects</Button>
+					<Button
+						buttonType={ButtonType.BLUE}
+						onClick={handleLoadMore}
+					>
+						Load More Projects
+					</Button>
 				</div>
 			)}
 		</div>

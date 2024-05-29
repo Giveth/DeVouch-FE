@@ -29,50 +29,36 @@ const config: Config = {
 			},
 			keyframes: {
 				'move-bounce-enter': {
-					'0%': {
-						transform: 'translate(0, 0)',
-					},
-					'40%': {
-						transform: 'translate(-10px, 10px)',
-					},
-					'70%': {
-						transform: 'translate(-6px, 6px)',
-					},
-					'100%': {
-						transform: 'translate(-8px, 8px)',
-					},
+					'0%': { transform: 'translate(0, 0)' },
+					'40%': { transform: 'translate(-10px, 10px)' },
+					'70%': { transform: 'translate(-6px, 6px)' },
+					'100%': { transform: 'translate(-8px, 8px)' },
 				},
 				'move-bounce-leave': {
-					'0%': {
-						transform: 'translate(-8px, 8px)',
-					},
-					'70%': {
-						transform: 'translate(2px, -2px)',
-					},
-					'100%': {
-						transform: 'translate(0px, 0px)',
-					},
+					'0%': { transform: 'translate(-8px, 8px)' },
+					'70%': { transform: 'translate(2px, -2px)' },
+					'100%': { transform: 'translate(0px, 0px)' },
 				},
 				'color-bounce-enter': {
 					'0%': {
-						backgroundColor: 'var(--bounce-bg-start, #3742FA)',
-						border: `1px solid var(--bounce-border-start, #3742FA)`,
-						color: 'var(--bounce-color-start, #3742FA)',
+						backgroundColor: 'var(--bounce-bg-start)',
+						borderColor: 'var(--bounce-border-start)',
+						color: 'var(--bounce-color-start)',
 					},
 					'40%': {
-						backgroundColor: 'var(--bounce-bg-end, #FFFFFF)',
-						border: '1px solid var(--bounce-border-end, #000000)',
-						color: 'var(--bounce-color-end, #3742FA)',
+						backgroundColor: 'var(--bounce-bg-middle)',
+						borderColor: 'var(--bounce-border-middle)',
+						color: 'var(--bounce-text-end)',
 					},
 					'70%': {
-						backgroundColor: 'var(--bounce-bg-middle, #EEEEEE)',
-						border: `1px solid var(--bounce-border-middle, #3742FA)`,
-						color: 'var(--bounce-color-middle, #3742FA)',
+						backgroundColor: 'var(--bounce-bg-middle)',
+						borderColor: 'var(--bounce-border-middle)',
+						color: 'var(--bounce-text-end)',
 					},
 					'100%': {
-						backgroundColor: 'var(--bounce-bg-end, #FFFFFF)',
-						border: '1px solid var(--bounce-border-end, #000000)',
-						color: 'var(--bounce-color-end, #3742FA)',
+						backgroundColor: 'var(--bounce-bg-end)',
+						borderColor: 'var(--bounce-border-end)',
+						color: 'var(--bounce-text-end)',
 					},
 				},
 			},
@@ -88,4 +74,5 @@ const config: Config = {
 	],
 	plugins: [],
 };
+
 export default config;

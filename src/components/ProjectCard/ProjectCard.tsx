@@ -1,5 +1,6 @@
 import React, { useState, type FC } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
@@ -45,25 +46,26 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 	const { vouches, flags } = categorizeAttestedOrganisations(
 		project.attestedOrganisations,
 	);
-
 	return (
 		<div className='relative group'>
 			<div className='absolute w-full h-full top-0 left-0 group-hover:top-2 group-hover:-left-2 bg-black transition-all '></div>
 			<div className='p-8 border h-full border-gray-100 bg-white hover:border-black flex flex-col gap-6 relative'>
-				<div className='h-56 bg-blue-100 relative'>
-					{project.image && (
-						<Image
-							src={project.image}
-							fill
-							alt='Project Image'
-							className='object-cover'
-						/>
-					)}
-					<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
-						<span className='text-gray-300'>From</span>
-						<span className='text-black'>{project.source}</span>
+				<Link href={`/project/${project.slug}`}>
+					<div className='h-56 bg-blue-100 relative'>
+						{project.image && (
+							<Image
+								src={project.image}
+								fill
+								alt='Project Image'
+								className='object-cover'
+							/>
+						)}
+						<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
+							<span className='text-gray-300'>From</span>
+							<span className='text-black'>{project.source}</span>
+						</div>
 					</div>
-				</div>
+				</Link>
 				<div className='flex-1'>
 					<h3 className='text-2xl font-bold mb-2'>
 						{project.title || NO_DATA}
