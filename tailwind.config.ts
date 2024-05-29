@@ -48,7 +48,7 @@ const config: Config = {
 					'40%': {
 						backgroundColor: 'var(--bounce-bg-middle)',
 						borderColor: 'var(--bounce-border-middle)',
-						color: 'white', // Immediate change to white
+						color: 'white',
 					},
 					'70%': {
 						backgroundColor: 'var(--bounce-bg-middle)',
@@ -58,7 +58,7 @@ const config: Config = {
 					'100%': {
 						backgroundColor: 'var(--bounce-bg-end)',
 						borderColor: 'var(--bounce-border-end)',
-						color: 'white', // Ensure it stays white
+						color: 'white',
 					},
 				},
 			},
