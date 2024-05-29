@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAccount } from 'wagmi';
 import { FETCH_PROJECT_BY_SLUG } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -10,16 +11,30 @@ import {
 	OutlineButton,
 	OutlineButtonType,
 } from '@/components/Button/OutlineButton';
+import { summarizeAddress } from '@/helpers/wallet';
+import FilterMenu from '@/components/FilterMenu/FilterMenu';
+import config from '@/config/configuration';
 
 const ITEMS_PER_PAGE = 5;
 
+const filterOptions = {
+	'Attested By': config.attestorGroups,
+};
+const sourcePlatforms = config.sourcePlatforms;
+
 export const ProjectDetails = ({ slug }: { slug: string }) => {
 	const router = useRouter();
+	const { address } = useAccount();
 	const [project, setProject] = useState<any | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
-	const [filter, setFilter] = useState<'all' | 'vouched' | 'flagged'>('all');
+	const [filter, setFilter] = useState<
+		'all' | 'vouched' | 'flagged' | 'yours'
+	>('all');
+	const [sourceFilterValues, setSourceFilterValues] = useState<{
+		[key: string]: string[];
+	}>({});
 
 	const fetchProjectData = async (
 		slug: string,
@@ -46,9 +61,28 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 
 	const filteredAttests =
 		project?.attests.filter((attestation: any) => {
-			if (filter === 'vouched') return attestation.vouch;
-			if (filter === 'flagged') return !attestation.vouch;
-			return true;
+			let match = true;
+
+			if (filter === 'vouched') match = match && attestation.vouch;
+			if (filter === 'flagged') match = match && !attestation.vouch;
+			if (filter === 'yours') {
+				match =
+					match &&
+					attestation.attestorOrganisation.organisation.attestors.find(
+						(i: any) =>
+							i.id?.toLowerCase() === address?.toLowerCase(),
+					);
+			}
+
+			if (sourceFilterValues['Attested By']?.length) {
+				match =
+					match &&
+					sourceFilterValues['Attested By'].includes(
+						attestation.attestorOrganisation.organisation.id,
+					);
+			}
+
+			return match;
 		}) || [];
 
 	const totalPages = Math.ceil(filteredAttests.length / ITEMS_PER_PAGE);
@@ -59,7 +93,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 
 	return (
 		<div className='container mx-auto flex flex-col gap-8 p-4'>
-			<div className='bg-white shadow roundd-lg p-6 '>
+			<div className='bg-white shadow rounded-lg p-6'>
 				<h1 className='flex flex-row gap-6 text-2xl font-bold mb-6 border-b-2 pb-4 border-[#dbdbdb]'>
 					<Image
 						onClick={() => router.back()}
@@ -80,7 +114,14 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
 						<span className='bg-white text-black px-2 py-1 rounded'>
-							From {project.source}
+							From{' '}
+							{
+								sourcePlatforms?.find(
+									i =>
+										i.key.toLowerCase() ===
+										project?.source.toLowerCase(),
+								)?.value
+							}
 						</span>
 					</div>
 					{project.image && (
@@ -113,8 +154,32 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 			</div>
 
 			<div className='bg-white shadow p-6'>
-				<div className='flex flex-col sm:flex-row justify-between items-center mb-4 gap-2'>
-					<div className='flex flex-col sm:flex-row gap-4 w-full'>
+				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
+					<div className='flex flex-col lg:flex-row gap-4 w-full'>
+						<button
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'yours' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							onClick={() => setFilter('yours')}
+						>
+							{filter === 'yours' && (
+								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
+							)}
+							Your Attestations{' '}
+							<span
+								className={`ml-2 text-white rounded-full px-2 ${filter === 'yours' ? 'bg-black' : 'bg-[#82899a]'}`}
+							>
+								(
+								{
+									project.attests.filter((attestation: any) =>
+										attestation.attestorOrganisation.organisation.attestors.find(
+											(i: any) =>
+												i.id?.toLowerCase() ===
+												address?.toLowerCase(),
+										),
+									).length
+								}
+								)
+							</span>
+						</button>
 						<button
 							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'all' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
 							onClick={() => setFilter('all')}
@@ -168,20 +233,19 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							</span>
 						</button>
 					</div>
-					<button className='w-full sm:w-auto gap-4 px-4 py-2 rounded border flex items-center mt-2 sm:mt-0 font-bold'>
-						Filters
-						<Image
-							src={'/images/icons/filter.svg'}
-							alt={'filter'}
-							width={18}
-							height={18}
-						/>
-					</button>
+					<FilterMenu
+						options={filterOptions}
+						value={sourceFilterValues}
+						setValues={setSourceFilterValues}
+						className='custom-class'
+						label='Source Filter'
+						stickToRight={true}
+					/>
 				</div>
 				<div className='overflow-x-auto'>
 					{filteredAttests.length === 0 ? (
 						<div className='text-center py-10 text-gray-500 font-bold my-12'>
-							Do you know this project? Attest to it!
+							No Attestations
 						</div>
 					) : (
 						<table className='min-w-full table-auto text-left'>
@@ -210,7 +274,9 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 									.map((attestation: any, index: number) => (
 										<tr key={index} className='border-t'>
 											<td className='px-4 py-6 align-top text-gray-800'>
-												{attestation.id}
+												{summarizeAddress(
+													attestation.id,
+												)}
 												<br />
 												<span className='text-gray-500 text-sm'>
 													{new Date(

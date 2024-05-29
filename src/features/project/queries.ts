@@ -24,6 +24,9 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int) {
         organisation {
           id
           name
+          attestors {
+            id
+          }
         }
       }
     }
