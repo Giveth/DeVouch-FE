@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from 'react';
 import { useAccount } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
+import Image from 'next/image';
 import Modal, { IModal } from '../Modal';
 import { Button } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
@@ -25,11 +26,18 @@ interface IAttestorOrganisation {
 	organisation: IOrganisation;
 }
 
+enum AttestSteps {
+	ATTEST,
+	ATTESTING,
+	SUCCESS,
+}
+
 export const AttestModal: FC<AttestModalProps> = ({
 	project,
 	vouch = true,
 	...props
 }) => {
+	const [step, setStep] = useState(AttestSteps.ATTEST);
 	const [attestorOrganisations, setAttestorOrganisations] = useState<
 		IAttestorOrganisation[]
 	>([]);
@@ -58,6 +66,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 		if (!signer) return;
 
 		try {
+			setStep(AttestSteps.ATTESTING);
 			const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
 			eas.connect(signer);
 
@@ -93,56 +102,83 @@ export const AttestModal: FC<AttestModalProps> = ({
 
 			const newAttestationUID = await tx.wait();
 			console.log('newAttestationUID', newAttestationUID);
+			setStep(AttestSteps.SUCCESS);
 		} catch (error: any) {
 			console.log('error', error.message);
+			setStep(AttestSteps.ATTEST);
 		}
 	};
 
 	return (
-		<Modal {...props} title={`${vouch ? 'Vouch for' : 'Flag'} Project`}>
-			<div className='flex flex-col gap-6'>
-				<div>
-					<div className='mb-2 text-gray-600'>
-						Select the Attester Group you wish to vouch as:
+		<Modal
+			{...props}
+			title={`${vouch ? 'Vouch for' : 'Flag'} Project`}
+			showHeader={step !== AttestSteps.SUCCESS}
+		>
+			{step === AttestSteps.SUCCESS ? (
+				<div className='flex flex-col gap-6 items-center'>
+					<Image
+						src='/images/devouch-green.svg'
+						width={100}
+						height={100}
+						alt='Success'
+					/>
+					<div className='text-2xl font-black'>
+						Attestation Successful
 					</div>
-					<div className='border p-4'>
-						{attestorOrganisations.map(ao => (
-							<RadioButton
-								key={ao.id}
-								id={ao.id}
-								name='organisation'
-								label={ao.organisation.name}
-								checked={selectedValue === ao.id}
-								onChange={() => handleRadioChange(ao.id)}
-								className='my-2'
-							/>
-						))}
+					<div className='text-gray-500'>
+						Your attestation to this project has been successful!
+						Check out more projects to Attest to.
 					</div>
-				</div>
-				<div>
-					<div className='mb-2 text-gray-600'>
-						Any comments you want to add with your Attestation?
-					</div>
-					<textarea
-						rows={3}
-						placeholder='Write here'
-						className='border w-full resize-none p-4'
-						value={comment}
-						onChange={e => setComment(e.target.value)}
-					></textarea>
-				</div>
-				<div className='flex gap-8'>
-					<OutlineButton
-						className='flex-1'
-						onClick={() => props.setShowModal(false)}
-					>
-						Cancel
-					</OutlineButton>
-					<Button className='flex-1' onClick={handleConfirm}>
-						Confirm
+					<Button onClick={() => props.setShowModal(false)}>
+						View Projects
 					</Button>
 				</div>
-			</div>
+			) : (
+				<div className='flex flex-col gap-6'>
+					<div>
+						<div className='mb-2 text-gray-600'>
+							Select the Attester Group you wish to vouch as:
+						</div>
+						<div className='border p-4'>
+							{attestorOrganisations.map(ao => (
+								<RadioButton
+									key={ao.id}
+									id={ao.id}
+									name='organisation'
+									label={ao.organisation.name}
+									checked={selectedValue === ao.id}
+									onChange={() => handleRadioChange(ao.id)}
+									className='my-2'
+								/>
+							))}
+						</div>
+					</div>
+					<div>
+						<div className='mb-2 text-gray-600'>
+							Any comments you want to add with your Attestation?
+						</div>
+						<textarea
+							rows={3}
+							placeholder='Write here'
+							className='border w-full resize-none p-4'
+							value={comment}
+							onChange={e => setComment(e.target.value)}
+						></textarea>
+					</div>
+					<div className='flex gap-8'>
+						<OutlineButton
+							className='flex-1'
+							onClick={() => props.setShowModal(false)}
+						>
+							Cancel
+						</OutlineButton>
+						<Button className='flex-1' onClick={handleConfirm}>
+							Confirm
+						</Button>
+					</div>
+				</div>
+			)}
 		</Modal>
 	);
 };
