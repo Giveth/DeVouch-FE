@@ -15,7 +15,9 @@ interface IOrganisation {
 	name: string;
 }
 
-interface AttestModalProps extends IModal {}
+interface AttestModalProps extends IModal {
+	project: IProject;
+}
 
 interface IAttestorOrganisation {
 	id: string;
@@ -46,6 +48,8 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 		fetchOrganisations();
 	}, [address]);
 
+	const { project } = props;
+
 	const handleConfirm = async () => {
 		if (!signer) return;
 		// Confirm the Attestation
@@ -57,8 +61,8 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 			'string projectSource,string projectId,bool vouch,string comment',
 		);
 		const encodedData = schemaEncoder.encodeData([
-			{ name: 'projectSource', value: 'giveth', type: 'string' },
-			{ name: 'projectId', value: '3251', type: 'string' },
+			{ name: 'projectSource', value: project.source, type: 'string' },
+			{ name: 'projectId', value: project.projectId, type: 'string' },
 			{ name: 'vouch', value: true, type: 'bool' },
 			{ name: 'comment', value: 'Test Cherik', type: 'string' },
 		]);

@@ -52,8 +52,6 @@ export const Projects = () => {
 	const [projects, setProjects] = useState<IProject[]>([]);
 	const [hasMore, setHasMore] = useState(true);
 
-	console.log('filterValues', filterValues);
-
 	const fetchProjects = useCallback(
 		async (append: boolean = false, offset: number) => {
 			setLoading(true);

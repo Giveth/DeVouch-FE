@@ -127,6 +127,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 				<AttestModal
 					setShowModal={setShowAttestModal}
 					showModal={showAttestModal}
+					project={project}
 				/>
 			)}
 		</div>
