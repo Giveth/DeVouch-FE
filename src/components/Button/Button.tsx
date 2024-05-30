@@ -1,7 +1,7 @@
-import { type HTMLAttributes, type FC } from 'react';
+import { type ButtonHTMLAttributes, type FC } from 'react';
 import { Spinner } from '../Loading/Spinner';
 
-interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	children: React.ReactNode;
 	buttonType?: ButtonType;
 	loading?: boolean;
@@ -45,19 +45,23 @@ export const Button: FC<ButtonProps> = ({
 	buttonType = ButtonType.BLUE,
 	className,
 	loading = false,
+	disabled = false,
 	...props
 }) => {
+	const isInteractive = !loading && !disabled;
+
 	return (
 		<div
-			className={`group/button inline-block relative   text-white ${className}`}
+			className={`group/button inline-block relative text-white ${className}`}
 			style={buttonTypeToStyle[buttonType] as any}
 		>
 			<div
 				id='shadow'
-				className={`absolute w-full h-full  bg-${buttonTypeToColorName[buttonType]} z-0  bottom-0 animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter`}
+				className={`absolute w-full h-full bg-${buttonTypeToColorName[buttonType]} z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter' : ''}`}
 			/>
 			<button
-				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/button:animate-color-bounce-enter`}
+				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 ${isInteractive ? 'group-hover/button:animate-color-bounce-enter' : ''}`}
+				disabled={disabled}
 				{...props}
 			>
 				<div className='flex gap-2 justify-center items-center'>
