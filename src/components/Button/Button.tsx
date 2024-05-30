@@ -57,10 +57,10 @@ export const Button: FC<ButtonProps> = ({
 		>
 			<div
 				id='shadow'
-				className={`absolute w-full h-full bg-${buttonTypeToColorName[buttonType]} z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter' : ''}`}
+				className={`absolute w-full h-full bg-${buttonTypeToColorName[buttonType]} z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/button:animate-move-bounce-enter' : 'hidden'}`}
 			/>
 			<button
-				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 ${isInteractive ? 'group-hover/button:animate-color-bounce-enter' : ''}`}
+				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 ${isInteractive ? 'group-hover/button:animate-color-bounce-enter' : 'bg-gray-300 border-gray-300'}`}
 				disabled={disabled}
 				{...props}
 			>

@@ -61,10 +61,10 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 		>
 			<div
 				id='shadow'
-				className={`absolute w-full h-full bg-black z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/OutlineButton:animate-move-bounce-enter' : ''}`}
+				className={`absolute w-full h-full bg-black z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/OutlineButton:animate-move-bounce-enter' : 'hidden'}`}
 			/>
 			<button
-				className={`font-bold w-full h-full bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-10 relative py-4 px-6 ${isInteractive ? 'group-hover/OutlineButton:animate-color-bounce-enter' : ''}`}
+				className={`font-bold w-full h-full bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-10 relative py-4 px-6 ${isInteractive ? 'group-hover/OutlineButton:animate-color-bounce-enter' : 'border-gray-300 text-gray-300'}`}
 				disabled={disabled}
 				{...props}
 			>
