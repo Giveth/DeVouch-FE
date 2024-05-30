@@ -53,39 +53,46 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 
 	const handleConfirm = async () => {
 		if (!signer) return;
-		// Confirm the Attestation
-		const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
-		eas.connect(signer);
 
-		// Initialize SchemaEncoder with the schema string
-		const schemaEncoder = new SchemaEncoder(
-			'string projectSource,string projectId,bool vouch,string comment',
-		);
-		const encodedData = schemaEncoder.encodeData([
-			{ name: 'projectSource', value: project.source, type: 'string' },
-			{ name: 'projectId', value: project.projectId, type: 'string' },
-			{ name: 'vouch', value: true, type: 'bool' },
-			{ name: 'comment', value: comment, type: 'string' },
-		]);
+		try {
+			const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
+			eas.connect(signer);
 
-		const schemaUID = config.PROJECT_VERIFY_SCHEMA;
+			const schemaEncoder = new SchemaEncoder(
+				'string projectSource,string projectId,bool vouch,string comment',
+			);
 
-		const tx = await eas.attest({
-			schema: schemaUID,
-			data: {
-				recipient: '',
-				expirationTime: 0n,
-				revocable: true, // Be aware that if your schema is not revocable, this MUST be false
-				data: encodedData,
-				refUID: selectedValue,
-			},
-		});
+			const encodedData = schemaEncoder.encodeData([
+				{
+					name: 'projectSource',
+					value: project.source,
+					type: 'string',
+				},
+				{ name: 'projectId', value: project.projectId, type: 'string' },
+				{ name: 'vouch', value: true, type: 'bool' },
+				{ name: 'comment', value: comment, type: 'string' },
+			]);
 
-		console.log('tx', tx);
+			const schemaUID = config.PROJECT_VERIFY_SCHEMA;
 
-		const newAttestationUID = await tx.wait();
+			const tx = await eas.attest({
+				schema: schemaUID,
+				data: {
+					recipient: '0x0000000000000000000000000000000000000000',
+					expirationTime: 0n,
+					revocable: true,
+					data: encodedData,
+					refUID: selectedValue,
+				},
+			});
 
-		console.log('newAttestationUID', newAttestationUID);
+			console.log('tx', tx);
+
+			const newAttestationUID = await tx.wait();
+			console.log('newAttestationUID', newAttestationUID);
+		} catch (error: any) {
+			console.log('error', error.message);
+		}
 	};
 
 	return (
