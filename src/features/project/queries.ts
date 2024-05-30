@@ -1,5 +1,5 @@
 export const FETCH_PROJECT_BY_SLUG = `
-query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int) {
+query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [String!]) {
   projects(where: {slug_eq: $slug}) {
     id
     slug
@@ -12,7 +12,12 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int) {
     totalAttests
     title
     source
-    attests(limit: $limit, offset: $offset, orderBy: attestTimestamp_ASC) {
+    attests(
+      where: {attestorOrganisation: {organisation: {id_in: $orgs}}},
+      limit: $limit, 
+      offset: $offset, 
+      orderBy: attestTimestamp_ASC
+    ) {
       vouch
       txHash
       revoked

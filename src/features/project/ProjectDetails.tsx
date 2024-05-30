@@ -18,9 +18,10 @@ import config from '@/config/configuration';
 const ITEMS_PER_PAGE = 5;
 
 const filterOptions = {
-	'Attested By': config.attestorGroups,
+	'Attested By': config.ATTESTOR_GROUPS,
 };
-const sourcePlatforms = config.sourcePlatforms;
+
+const sourcePlatforms = config.SOURCE_PLATFORMS;
 
 export const ProjectDetails = ({ slug }: { slug: string }) => {
 	const router = useRouter();
@@ -40,12 +41,13 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 		slug: string,
 		limit: number,
 		offset: number,
+		orgs?: string[],
 	) => {
 		try {
 			setLoading(true);
 			const data = await fetchGraphQL<{ projects: any[] }>(
 				FETCH_PROJECT_BY_SLUG,
-				{ slug, limit, offset },
+				{ slug, limit, offset, orgs },
 			);
 			setProject(data.projects[0]);
 		} catch (e) {
@@ -56,8 +58,14 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	};
 
 	useEffect(() => {
-		fetchProjectData(slug, ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-	}, [currentPage, slug]);
+		const orgs = sourceFilterValues['Attested By'];
+		fetchProjectData(
+			slug,
+			ITEMS_PER_PAGE,
+			currentPage * ITEMS_PER_PAGE,
+			orgs?.length > 0 ? orgs : undefined,
+		);
+	}, [currentPage, slug, sourceFilterValues]);
 
 	const filteredAttests =
 		project?.attests.filter((attestation: any) => {
@@ -71,14 +79,6 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 					attestation.attestorOrganisation.organisation.attestors.find(
 						(i: any) =>
 							i.id?.toLowerCase() === address?.toLowerCase(),
-					);
-			}
-
-			if (sourceFilterValues['Attested By']?.length) {
-				match =
-					match &&
-					sourceFilterValues['Attested By'].includes(
-						attestation.attestorOrganisation.organisation.id,
 					);
 			}
 
