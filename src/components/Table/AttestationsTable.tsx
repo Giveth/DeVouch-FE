@@ -1,43 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { summarizeAddress } from '@/helpers/wallet';
 
 interface AttestationsTableProps {
 	attests: any[];
 	filter: 'all' | 'vouched' | 'flagged' | 'yours';
-	address?: string;
 	itemsPerPage?: number;
+	currentPage: number;
+	onPageChange: (page: number) => void;
+	totalAttests: number;
 }
 
-const ITEMS_PER_PAGE_DEFAULT = 5;
+const ITEMS_PER_PAGE_DEFAULT = 10;
 
 const AttestationsTable: React.FC<AttestationsTableProps> = ({
 	attests,
 	filter,
-	address,
 	itemsPerPage = ITEMS_PER_PAGE_DEFAULT,
+	currentPage,
+	onPageChange,
+	totalAttests,
 }) => {
-	const [currentPage, setCurrentPage] = useState(0);
-
 	const filteredAttests = attests.filter((attestation: any) => {
 		let match = true;
 
 		if (filter === 'vouched') match = match && attestation.vouch;
 		if (filter === 'flagged') match = match && !attestation.vouch;
-		if (filter === 'yours') {
-			match =
-				match &&
-				attestation.attestorOrganisation.organisation.attestors.find(
-					(i: any) => i.id?.toLowerCase() === address?.toLowerCase(),
-				);
-		}
 
 		return match;
 	});
 
-	const totalPages = Math.ceil(filteredAttests.length / itemsPerPage);
+	const totalPages = Math.ceil(totalAttests / itemsPerPage);
 
 	return (
 		<div className='overflow-x-auto'>
@@ -126,10 +121,12 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 
 			<div className='flex justify-center mt-4'>
 				<button
-					className={`px-3 py-1 border rounded ${currentPage === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-black'}`}
-					onClick={() =>
-						setCurrentPage(prev => Math.max(prev - 1, 0))
-					}
+					className={`px-3 py-1 border rounded ${
+						currentPage === 0
+							? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+							: 'bg-white text-black'
+					}`}
+					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage === 0}
 				>
 					&lt;
@@ -137,19 +134,23 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 				{Array.from({ length: totalPages }).map((_, index) => (
 					<button
 						key={index}
-						className={`px-3 py-1 border rounded mx-1 ${currentPage === index ? 'bg-gray-200 font-bold' : 'bg-white'}`}
-						onClick={() => setCurrentPage(index)}
+						className={`px-3 py-1 border rounded mx-1 ${
+							currentPage === index
+								? 'bg-gray-200 font-bold'
+								: 'bg-white'
+						}`}
+						onClick={() => onPageChange(index)}
 					>
 						{index + 1}
 					</button>
 				))}
 				<button
-					className={`px-3 py-1 border rounded ${currentPage === totalPages - 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-black'}`}
-					onClick={() =>
-						setCurrentPage(prev =>
-							prev + 1 < totalPages ? prev + 1 : prev,
-						)
-					}
+					className={`px-3 py-1 border rounded ${
+						currentPage === totalPages - 1
+							? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+							: 'bg-white text-black'
+					}`}
+					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages - 1}
 				>
 					&gt;

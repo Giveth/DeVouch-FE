@@ -63,14 +63,13 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $limit: Int, $offset: Int, $orgs: [String!]) {
+query fetchUserAttestations($address: String, $orgs: [String!]) {
   projects(where: {attests_some: {attestorOrganisation: {attestor: {id_eq: $address}}}}) {
     title
     id
+    totalAttests
     attests(
-      where: {attestorOrganisation: {organisation: {id_in: $orgs}}},
-      limit: $limit, 
-      offset: $offset, 
+      where: {attestorOrganisation: {organisation: {id_in: $orgs}}}
       orderBy: attestTimestamp_ASC
     ) {
       vouch

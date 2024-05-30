@@ -15,7 +15,7 @@ import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -66,6 +66,10 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 			orgs?.length > 0 ? orgs : undefined,
 		);
 	}, [currentPage, slug, sourceFilterValues]);
+
+	const handlePageChange = (newPage: number) => {
+		setCurrentPage(newPage);
+	};
 
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
@@ -137,7 +141,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
 					<div className='flex flex-col lg:flex-row gap-4 w-full'>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'yours' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'yours'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('yours')}
 						>
 							{filter === 'yours' && (
@@ -145,7 +153,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							)}
 							Your Attestations{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'yours' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'yours'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								(
 								{
@@ -161,7 +173,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							</span>
 						</button>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'all' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'all'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('all')}
 						>
 							{filter === 'all' && (
@@ -169,13 +185,21 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							)}
 							All Attestations{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'all' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'all'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								({project.totalAttests})
 							</span>
 						</button>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'vouched' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'vouched'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('vouched')}
 						>
 							{filter === 'vouched' && (
@@ -183,7 +207,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							)}
 							Vouched{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'vouched' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'vouched'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								(
 								{
@@ -194,7 +222,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							</span>
 						</button>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'flagged' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'flagged'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('flagged')}
 						>
 							{filter === 'flagged' && (
@@ -202,7 +234,11 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 							)}
 							Flagged{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'flagged' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'flagged'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								(
 								{
@@ -225,8 +261,10 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 				<AttestationsTable
 					attests={project.attests}
 					filter={filter}
-					address={address}
+					totalAttests={project.totalAttests}
 					itemsPerPage={ITEMS_PER_PAGE}
+					currentPage={currentPage}
+					onPageChange={handlePageChange}
 				/>
 			</div>
 

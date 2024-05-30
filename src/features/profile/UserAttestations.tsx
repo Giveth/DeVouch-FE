@@ -8,7 +8,7 @@ import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -23,6 +23,7 @@ export const UserAttestations = ({
 	const isExternal = !!externalAddress;
 	const address = externalAddress || connectedAddress;
 	const [attestations, setAttestations] = useState<any[]>([]);
+	const [totalAttests, setTotalAttests] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
@@ -33,19 +34,32 @@ export const UserAttestations = ({
 
 	const fetchUserAttestations = async (
 		address: string,
-		limit: number,
-		offset: number,
+		// limit: number,
+		// offset: number,
 		orgs?: string[],
 	) => {
 		try {
 			setLoading(true);
 			const data = await fetchGraphQL<{ projects: IProject[] }>(
 				FETCH_USER_ATTESTATIONS,
-				{ address, limit, offset, orgs },
+				{
+					address,
+					// limit,
+					// offset,
+					orgs,
+				},
 			);
-			setAttestations(
-				data.projects.flatMap((project: IProject) => project.attests),
+			const attests = data.projects.flatMap(
+				(project: IProject) => project.attests,
 			);
+
+			const totalAttests = data.projects.reduce(
+				(total: number, project: IProject) =>
+					total + project.totalAttests,
+				0,
+			);
+			setTotalAttests(totalAttests);
+			setAttestations(attests);
 		} catch (e) {
 			console.log({ e });
 			setError('Failed to fetch user attestations.');
@@ -58,11 +72,15 @@ export const UserAttestations = ({
 		const orgs = sourceFilterValues['Attested By'];
 		fetchUserAttestations(
 			address || '',
-			ITEMS_PER_PAGE,
-			currentPage * ITEMS_PER_PAGE,
+			// ITEMS_PER_PAGE,
+			// currentPage * ITEMS_PER_PAGE,
 			orgs?.length > 0 ? orgs : undefined,
 		);
 	}, [currentPage, address, sourceFilterValues]);
+
+	const handlePageChange = (newPage: number) => {
+		setCurrentPage(newPage);
+	};
 
 	const filteredAttestations = attestations?.filter((attestation: any) => {
 		let match = true;
@@ -83,13 +101,17 @@ export const UserAttestations = ({
 					<h1 className='text-2xl font-bold mb-6'>
 						{isExternal ? 'All' : 'My'} Attestations
 					</h1>
-					<h1 className='text-md  mb-6'>{address}</h1>
+					<h1 className='text-md mb-6'>{address}</h1>
 				</div>
 
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
 					<div className='flex flex-col lg:flex-row gap-4 w-full'>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'all' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'all'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('all')}
 						>
 							{filter === 'all' && (
@@ -97,13 +119,21 @@ export const UserAttestations = ({
 							)}
 							All Attestations{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'all' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'all'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
-								({attestations.length})
+								({totalAttests})
 							</span>
 						</button>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'vouched' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'vouched'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('vouched')}
 						>
 							{filter === 'vouched' && (
@@ -111,7 +141,11 @@ export const UserAttestations = ({
 							)}
 							Vouched{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'vouched' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'vouched'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								(
 								{
@@ -122,7 +156,11 @@ export const UserAttestations = ({
 							</span>
 						</button>
 						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${filter === 'flagged' ? 'bg-[#d7ddea] font-bold' : 'bg-gray-100 hover:bg-gray-200'}`}
+							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
+								filter === 'flagged'
+									? 'bg-[#d7ddea] font-bold'
+									: 'bg-gray-100 hover:bg-gray-200'
+							}`}
 							onClick={() => setFilter('flagged')}
 						>
 							{filter === 'flagged' && (
@@ -130,7 +168,11 @@ export const UserAttestations = ({
 							)}
 							Flagged{' '}
 							<span
-								className={`ml-2 text-white rounded-full px-2 ${filter === 'flagged' ? 'bg-black' : 'bg-[#82899a]'}`}
+								className={`ml-2 text-white rounded-full px-2 ${
+									filter === 'flagged'
+										? 'bg-black'
+										: 'bg-[#82899a]'
+								}`}
 							>
 								(
 								{
@@ -153,8 +195,10 @@ export const UserAttestations = ({
 				<AttestationsTable
 					attests={filteredAttestations}
 					filter={filter}
-					address={address}
+					totalAttests={totalAttests}
 					itemsPerPage={ITEMS_PER_PAGE}
+					currentPage={currentPage}
+					onPageChange={handlePageChange}
 				/>
 			</div>
 		</div>
