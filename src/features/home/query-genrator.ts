@@ -25,7 +25,7 @@ export const generateFetchProjectsQuery = (
 	query fetchProjects(
 		$offset: Int!,
 		$limit: Int,
-		$orderBy: [ProjectOrderByInput!] = totalVouches_DESC
+		$orderBy: [ProjectOrderByInput!] = lastUpdatedTimestamp_DESC
 		${addedProps}
 	  ) {
 		projects(

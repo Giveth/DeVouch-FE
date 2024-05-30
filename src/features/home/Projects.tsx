@@ -7,6 +7,7 @@ import { fetchGraphQL } from '@/helpers/request';
 import { Button, ButtonType } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
+import { Spinner } from '@/components/Loading/Spinner';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -50,7 +51,7 @@ export const Projects = () => {
 	}>({});
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
-	const [hasMore, setHasMore] = useState(true);
+	const [hasMore, setHasMore] = useState(false);
 
 	const fetchProjects = useCallback(
 		async (append: boolean = false, offset: number) => {
@@ -62,7 +63,7 @@ export const Projects = () => {
 				const data = await fetchGraphQL<{ projects: IProject[] }>(
 					generateFetchProjectsQuery(projectSource, organisationId),
 					{
-						orderBy: sort.key,
+						orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
 						limit,
 						offset,
 						project_source: projectSource,
@@ -72,6 +73,8 @@ export const Projects = () => {
 
 				if (data.projects.length < limit) {
 					setHasMore(false);
+				} else {
+					setHasMore(true);
 				}
 				setProjects(prevProjects =>
 					append
@@ -94,11 +97,6 @@ export const Projects = () => {
 	const handleLoadMore = () => {
 		fetchProjects(true, projects.length);
 	};
-
-	if (loading && projects.length === 0)
-		return (
-			<div className='container flex flex-col gap-10'>Loading ...</div>
-		);
 
 	return (
 		<div className='container flex flex-col gap-10'>
@@ -129,6 +127,15 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
+			{loading && (
+				<div className='flex items-center justify-center'>
+					<Spinner
+						size={32}
+						color='blue'
+						secondaryColor='lightgray'
+					/>
+				</div>
+			)}
 			{!loading && hasMore && (
 				<div className='text-center'>
 					<Button
