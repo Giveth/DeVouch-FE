@@ -35,6 +35,7 @@ export const generateFetchProjectsQuery = (
 		  ${whereClause}
 		) {
 		  id
+		  projectId
 		  title
 		  description
 		  image

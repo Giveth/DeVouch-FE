@@ -1,5 +1,6 @@
 interface IProject {
 	id: string;
+	projectId: string;
 	title: string;
 	slug: string;
 	description: string;

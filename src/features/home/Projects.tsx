@@ -37,8 +37,8 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': config.sourcePlatforms,
-	'Attested By': config.attestorGroups,
+	'Source Platform': config.SOURCE_PLATFORMS,
+	'Attested By': config.ATTESTOR_GROUPS,
 };
 
 const limit = 10;
@@ -51,8 +51,6 @@ export const Projects = () => {
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
 	const [hasMore, setHasMore] = useState(true);
-
-	console.log('filterValues', filterValues);
 
 	const fetchProjects = useCallback(
 		async (append: boolean = false, offset: number) => {
