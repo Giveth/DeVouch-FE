@@ -29,6 +29,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 		IAttestorOrganisation[]
 	>([]);
 	const [selectedValue, setSelectedValue] = useState<string>('');
+	const [comment, setComment] = useState<string>('');
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
@@ -64,7 +65,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 			{ name: 'projectSource', value: project.source, type: 'string' },
 			{ name: 'projectId', value: project.projectId, type: 'string' },
 			{ name: 'vouch', value: true, type: 'bool' },
-			{ name: 'comment', value: 'Test Cherik', type: 'string' },
+			{ name: 'comment', value: comment, type: 'string' },
 		]);
 
 		const schemaUID = config.PROJECT_VERIFY_SCHEMA;
@@ -116,6 +117,8 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 						rows={3}
 						placeholder='Write here'
 						className='border w-full resize-none p-4'
+						value={comment}
+						onChange={e => setComment(e.target.value)}
 					></textarea>
 				</div>
 				<div className='flex gap-8'>
