@@ -1,8 +1,10 @@
 import { type HTMLAttributes, type FC } from 'react';
+import { Spinner } from '../Loading/Spinner';
 
 interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
 	children: React.ReactNode;
 	buttonType?: ButtonType;
+	loading?: boolean;
 }
 
 export enum ButtonType {
@@ -42,6 +44,7 @@ export const Button: FC<ButtonProps> = ({
 	children,
 	buttonType = ButtonType.BLUE,
 	className,
+	loading = false,
 	...props
 }) => {
 	return (
@@ -57,7 +60,10 @@ export const Button: FC<ButtonProps> = ({
 				className={`font-bold w-full bg-${buttonTypeToColorName[buttonType]} border-${buttonTypeToColorName[buttonType]} border z-1 relative py-4 px-6 group-hover/button:animate-color-bounce-enter`}
 				{...props}
 			>
-				{children}
+				<div className='flex gap-2 justify-center items-center'>
+					{loading && <Spinner size={16} />}
+					<span>{children}</span>
+				</div>
 			</button>
 		</div>
 	);
