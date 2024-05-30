@@ -7,6 +7,7 @@ import { fetchGraphQL } from '@/helpers/request';
 import { Button, ButtonType } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
+import { Spinner } from '@/components/Loading/Spinner';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -97,11 +98,6 @@ export const Projects = () => {
 		fetchProjects(true, projects.length);
 	};
 
-	if (loading && projects.length === 0)
-		return (
-			<div className='container flex flex-col gap-10'>Loading ...</div>
-		);
-
 	return (
 		<div className='container flex flex-col gap-10'>
 			<div className='flex justify-between'>
@@ -131,6 +127,15 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
+			{loading && (
+				<div className='flex items-center justify-center'>
+					<Spinner
+						size={32}
+						color='blue'
+						secondaryColor='lightgray'
+					/>
+				</div>
+			)}
 			{!loading && hasMore && (
 				<div className='text-center'>
 					<Button
