@@ -1,13 +1,15 @@
-import { type HTMLAttributes, type FC } from 'react';
+import { type ButtonHTMLAttributes, type FC } from 'react';
+import { Spinner } from '../Loading/Spinner';
 
 export enum OutlineButtonType {
 	BLUE,
 	RED,
 }
 
-interface OutlineButtonProps extends HTMLAttributes<HTMLButtonElement> {
+interface OutlineButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	children: React.ReactNode;
 	buttonType?: OutlineButtonType;
+	loading?: boolean;
 }
 
 const buttonTypeToColorName = {
@@ -46,8 +48,12 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 	children,
 	buttonType = OutlineButtonType.BLUE,
 	className,
+	loading = false,
+	disabled = false,
 	...props
 }) => {
+	const isInteractive = !loading && !disabled;
+
 	return (
 		<div
 			className={`group/OutlineButton inline-block relative ${className}`}
@@ -55,13 +61,17 @@ export const OutlineButton: FC<OutlineButtonProps> = ({
 		>
 			<div
 				id='shadow'
-				className='absolute w-full h-full bg-black z-0 bottom-0 animate-move-bounce-leave transform group-hover/OutlineButton:animate-move-bounce-enter'
+				className={`absolute w-full h-full bg-black z-0 bottom-0 ${isInteractive ? 'animate-move-bounce-leave transform group-hover/OutlineButton:animate-move-bounce-enter' : ''}`}
 			/>
 			<button
-				className={`font-bold w-full bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-10 relative py-4 px-6 group-hover/OutlineButton:animate-color-bounce-enter`}
+				className={`font-bold w-full h-full bg-white border-${buttonTypeToColorName[buttonType]} text-${buttonTypeToColorName[buttonType]} border z-10 relative py-4 px-6 ${isInteractive ? 'group-hover/OutlineButton:animate-color-bounce-enter' : ''}`}
+				disabled={disabled}
 				{...props}
 			>
-				{children}
+				<div className='flex gap-2 justify-center items-center'>
+					{loading && <Spinner size={16} />}
+					<span>{children}</span>
+				</div>
 			</button>
 		</div>
 	);
