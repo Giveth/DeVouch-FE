@@ -115,6 +115,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 			{...props}
 			title={`${vouch ? 'Vouch for' : 'Flag'} Project`}
 			showHeader={step !== AttestSteps.SUCCESS}
+			className='w-full md:w-[500px] p-6'
 		>
 			{step === AttestSteps.SUCCESS ? (
 				<div className='flex flex-col gap-6 items-center'>
@@ -127,7 +128,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					<div className='text-2xl font-black'>
 						Attestation Successful
 					</div>
-					<div className='text-gray-500'>
+					<div className='text-gray-400 text-center'>
 						Your attestation to this project has been successful!
 						Check out more projects to Attest to.
 					</div>
@@ -138,7 +139,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 			) : (
 				<div className='flex flex-col gap-6'>
 					<div>
-						<div className='mb-2 text-gray-600'>
+						<div className='mb-2 text-gray-500'>
 							Select the Attester Group you wish to vouch as:
 						</div>
 						<div className='border p-4'>
@@ -156,7 +157,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 						</div>
 					</div>
 					<div>
-						<div className='mb-2 text-gray-600'>
+						<div className='mb-2 text-gray-500'>
 							Any comments you want to add with your Attestation?
 						</div>
 						<textarea
