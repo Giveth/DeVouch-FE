@@ -1,10 +1,9 @@
-import { easContractAddress, projectVerifySchema } from './configuration';
-
 const config = {
 	EAS_CONTRACT_ADDRESS:
-		easContractAddress || '0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
+		process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS ||
+		'0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
 	PROJECT_VERIFY_SCHEMA:
-		projectVerifySchema ||
+		process.env.NEXT_PUBLIC_PROJECT_VERIFY_SCHEMA ||
 		'0x97b0c9911936fad57e77857fac6eef6771f8d0bf025be9549214e32bf9e2415a',
 	SOURCE_PLATFORMS: [
 		{ key: 'Giveth', value: 'giveth' },
