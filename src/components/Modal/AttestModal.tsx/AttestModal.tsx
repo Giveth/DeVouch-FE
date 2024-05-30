@@ -17,6 +17,7 @@ interface IOrganisation {
 
 interface AttestModalProps extends IModal {
 	project: IProject;
+	vouch?: boolean;
 }
 
 interface IAttestorOrganisation {
@@ -24,7 +25,11 @@ interface IAttestorOrganisation {
 	organisation: IOrganisation;
 }
 
-export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
+export const AttestModal: FC<AttestModalProps> = ({
+	project,
+	vouch = true,
+	...props
+}) => {
 	const [attestorOrganisations, setAttestorOrganisations] = useState<
 		IAttestorOrganisation[]
 	>([]);
@@ -49,8 +54,6 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 		fetchOrganisations();
 	}, [address]);
 
-	const { project } = props;
-
 	const handleConfirm = async () => {
 		if (!signer) return;
 
@@ -69,7 +72,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 					type: 'string',
 				},
 				{ name: 'projectId', value: project.projectId, type: 'string' },
-				{ name: 'vouch', value: true, type: 'bool' },
+				{ name: 'vouch', value: vouch, type: 'bool' },
 				{ name: 'comment', value: comment, type: 'string' },
 			]);
 
@@ -96,7 +99,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 	};
 
 	return (
-		<Modal {...props} title='Vouch for Project'>
+		<Modal {...props} title={`${vouch ? 'Vouch for' : 'Flag'} Project`}>
 			<div className='flex flex-col gap-6'>
 				<div>
 					<div className='mb-2 text-gray-600'>

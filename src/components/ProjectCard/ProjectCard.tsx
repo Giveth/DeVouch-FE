@@ -1,4 +1,4 @@
-import React, { useState, type FC } from 'react';
+import React, { useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AttestInfo } from './AttestInfo';
@@ -46,6 +46,8 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 	const { vouches, flags } = categorizeAttestedOrganisations(
 		project.attestedOrganisations,
 	);
+	const vouch = useRef(true);
+
 	return (
 		<div className='relative group'>
 			<div className='absolute w-full h-full top-0 left-0 group-hover:top-2 group-hover:-left-2 bg-black transition-all '></div>
@@ -114,11 +116,20 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<OutlineButton
 						buttonType={OutlineButtonType.BLUE}
 						className='flex-1'
-						onClick={() => setShowAttestModal(true)}
+						onClick={() => {
+							vouch.current = true;
+							setShowAttestModal(true);
+						}}
 					>
 						Vouch For Project
 					</OutlineButton>
-					<OutlineButton buttonType={OutlineButtonType.RED}>
+					<OutlineButton
+						buttonType={OutlineButtonType.RED}
+						onClick={() => {
+							vouch.current = false;
+							setShowAttestModal(true);
+						}}
+					>
 						Flag Project
 					</OutlineButton>
 				</div>
@@ -128,6 +139,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					setShowModal={setShowAttestModal}
 					showModal={showAttestModal}
 					project={project}
+					vouch={vouch.current}
 				/>
 			)}
 		</div>
