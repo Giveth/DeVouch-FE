@@ -1,6 +1,8 @@
 import React, { useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
@@ -47,6 +49,17 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 		project.attestedOrganisations,
 	);
 	const vouch = useRef(true);
+	const { address } = useAccount();
+	const { open } = useWeb3Modal();
+
+	const onAttestClick = (_vouch: boolean) => {
+		if (address) {
+			vouch.current = _vouch;
+			setShowAttestModal(true);
+		} else {
+			open();
+		}
+	};
 
 	return (
 		<div className='relative group'>
@@ -116,19 +129,13 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<OutlineButton
 						buttonType={OutlineButtonType.BLUE}
 						className='flex-1'
-						onClick={() => {
-							vouch.current = true;
-							setShowAttestModal(true);
-						}}
+						onClick={() => onAttestClick(true)}
 					>
 						Vouch For Project
 					</OutlineButton>
 					<OutlineButton
 						buttonType={OutlineButtonType.RED}
-						onClick={() => {
-							vouch.current = false;
-							setShowAttestModal(true);
-						}}
+						onClick={() => onAttestClick(false)}
 					>
 						Flag Project
 					</OutlineButton>

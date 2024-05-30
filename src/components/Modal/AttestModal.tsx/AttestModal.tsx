@@ -52,6 +52,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 	};
 
 	useEffect(() => {
+		if (!address) return;
 		// Fetch organisations
 		const fetchOrganisations = async () => {
 			const data = await fetchGraphQL<{
