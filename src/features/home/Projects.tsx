@@ -50,7 +50,7 @@ export const Projects = () => {
 	}>({});
 	const [loading, setLoading] = useState(false);
 	const [projects, setProjects] = useState<IProject[]>([]);
-	const [hasMore, setHasMore] = useState(true);
+	const [hasMore, setHasMore] = useState(false);
 
 	const fetchProjects = useCallback(
 		async (append: boolean = false, offset: number) => {
@@ -62,7 +62,7 @@ export const Projects = () => {
 				const data = await fetchGraphQL<{ projects: IProject[] }>(
 					generateFetchProjectsQuery(projectSource, organisationId),
 					{
-						orderBy: sort.key,
+						orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
 						limit,
 						offset,
 						project_source: projectSource,
@@ -72,6 +72,8 @@ export const Projects = () => {
 
 				if (data.projects.length < limit) {
 					setHasMore(false);
+				} else {
+					setHasMore(true);
 				}
 				setProjects(prevProjects =>
 					append
