@@ -8,6 +8,7 @@ import { FETCH_USER_ORGANISATIONS } from '@/queries/user';
 import { fetchGraphQL } from '@/helpers/request';
 import { OutlineButton } from '@/components/Button/OutlineButton';
 import { useEthersSigner } from '@/helpers/wallet';
+import config from '@/config/configuration';
 
 interface IOrganisation {
 	id: string;
@@ -16,8 +17,15 @@ interface IOrganisation {
 
 interface AttestModalProps extends IModal {}
 
+interface IAttestorOrganisation {
+	id: string;
+	organisation: IOrganisation;
+}
+
 export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
-	const [organisations, setOrganisations] = useState<IOrganisation[]>([]);
+	const [attestorOrganisations, setAttestorOrganisations] = useState<
+		IAttestorOrganisation[]
+	>([]);
 	const [selectedValue, setSelectedValue] = useState<string>('');
 
 	const { address } = useAccount();
@@ -30,19 +38,18 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 	useEffect(() => {
 		// Fetch organisations
 		const fetchOrganisations = async () => {
-			const data = await fetchGraphQL<{ organisations: IOrganisation[] }>(
-				FETCH_USER_ORGANISATIONS,
-				{ id_eq: address?.toLowerCase() },
-			);
-			setOrganisations(data?.organisations || []);
+			const data = await fetchGraphQL<{
+				attestorOrganisations: IAttestorOrganisation[];
+			}>(FETCH_USER_ORGANISATIONS, { address: address?.toLowerCase() });
+			setAttestorOrganisations(data?.attestorOrganisations || []);
 		};
 		fetchOrganisations();
-	}, []);
+	}, [address]);
 
 	const handleConfirm = async () => {
 		if (!signer) return;
 		// Confirm the Attestation
-		const eas = new EAS('0xC2679fBD37d54388Ce493F1DB75320D236e1815e');
+		const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
 		eas.connect(signer);
 
 		// Initialize SchemaEncoder with the schema string
@@ -56,17 +63,16 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 			{ name: 'comment', value: 'Test Cherik', type: 'string' },
 		]);
 
-		const schemaUID =
-			'0x97b0c9911936fad57e77857fac6eef6771f8d0bf025be9549214e32bf9e2415a';
+		const schemaUID = config.PROJECT_VERIFY_SCHEMA;
 
 		const tx = await eas.attest({
 			schema: schemaUID,
 			data: {
-				recipient: '0xFD50b031E778fAb33DfD2Fc3Ca66a1EeF0652165',
+				recipient: '',
 				expirationTime: 0n,
 				revocable: true, // Be aware that if your schema is not revocable, this MUST be false
 				data: encodedData,
-				refUID: '0xe75f680320ecfa9334a408337e0225dcc7a1a5d24ea5841e72705e66234fd8c6',
+				refUID: selectedValue,
 			},
 		});
 
@@ -85,16 +91,14 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 						Select the Attester Group you wish to vouch as:
 					</div>
 					<div className='border p-4'>
-						{organisations.map(organisation => (
+						{attestorOrganisations.map(ao => (
 							<RadioButton
-								key={organisation.id}
-								id={organisation.id}
+								key={ao.id}
+								id={ao.id}
 								name='organisation'
-								label={organisation.name}
-								checked={selectedValue === organisation.id}
-								onChange={() =>
-									handleRadioChange(organisation.id)
-								}
+								label={ao.organisation.name}
+								checked={selectedValue === ao.id}
+								onChange={() => handleRadioChange(ao.id)}
 								className='my-2'
 							/>
 						))}
