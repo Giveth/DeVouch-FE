@@ -175,7 +175,11 @@ export const AttestModal: FC<AttestModalProps> = ({
 						>
 							Cancel
 						</OutlineButton>
-						<Button className='flex-1' onClick={handleConfirm}>
+						<Button
+							className='flex-1'
+							onClick={handleConfirm}
+							loading={step === AttestSteps.ATTESTING}
+						>
 							Confirm
 						</Button>
 					</div>
