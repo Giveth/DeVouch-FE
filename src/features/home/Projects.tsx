@@ -37,8 +37,8 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': config.sourcePlatforms,
-	'Attested By': config.attestorGroups,
+	'Source Platform': config.SOURCE_PLATFORMS,
+	'Attested By': config.ATTESTOR_GROUPS,
 };
 
 const limit = 10;

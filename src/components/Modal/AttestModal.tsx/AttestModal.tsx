@@ -1,11 +1,13 @@
 import { useEffect, useState, type FC } from 'react';
 import { useAccount } from 'wagmi';
+import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Modal, { IModal } from '../Modal';
 import { Button } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
 import { FETCH_USER_ORGANISATIONS } from '@/queries/user';
 import { fetchGraphQL } from '@/helpers/request';
 import { OutlineButton } from '@/components/Button/OutlineButton';
+import { useEthersSigner } from '@/helpers/wallet';
 
 interface IOrganisation {
 	id: string;
@@ -19,6 +21,7 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 	const [selectedValue, setSelectedValue] = useState<string>('');
 
 	const { address } = useAccount();
+	const signer = useEthersSigner();
 
 	const handleRadioChange = (value: string) => {
 		setSelectedValue(value);
@@ -35,6 +38,44 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 		};
 		fetchOrganisations();
 	}, []);
+
+	const handleConfirm = async () => {
+		if (!signer) return;
+		// Confirm the Attestation
+		const eas = new EAS('0xC2679fBD37d54388Ce493F1DB75320D236e1815e');
+		eas.connect(signer);
+
+		// Initialize SchemaEncoder with the schema string
+		const schemaEncoder = new SchemaEncoder(
+			'string projectSource,string projectId,bool vouch,string comment',
+		);
+		const encodedData = schemaEncoder.encodeData([
+			{ name: 'projectSource', value: 'giveth', type: 'string' },
+			{ name: 'projectId', value: '3251', type: 'string' },
+			{ name: 'vouch', value: true, type: 'bool' },
+			{ name: 'comment', value: 'Test Cherik', type: 'string' },
+		]);
+
+		const schemaUID =
+			'0x97b0c9911936fad57e77857fac6eef6771f8d0bf025be9549214e32bf9e2415a';
+
+		const tx = await eas.attest({
+			schema: schemaUID,
+			data: {
+				recipient: '0xFD50b031E778fAb33DfD2Fc3Ca66a1EeF0652165',
+				expirationTime: 0n,
+				revocable: true, // Be aware that if your schema is not revocable, this MUST be false
+				data: encodedData,
+				refUID: '0xe75f680320ecfa9334a408337e0225dcc7a1a5d24ea5841e72705e66234fd8c6',
+			},
+		});
+
+		console.log('tx', tx);
+
+		const newAttestationUID = await tx.wait();
+
+		console.log('newAttestationUID', newAttestationUID);
+	};
 
 	return (
 		<Modal {...props} title='Vouch for Project'>
@@ -76,7 +117,9 @@ export const AttestModal: FC<AttestModalProps> = ({ ...props }) => {
 					>
 						Cancel
 					</OutlineButton>
-					<Button className='flex-1'>Confirm</Button>
+					<Button className='flex-1' onClick={handleConfirm}>
+						Confirm
+					</Button>
 				</div>
 			</div>
 		</Modal>
