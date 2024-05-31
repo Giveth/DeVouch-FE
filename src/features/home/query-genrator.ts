@@ -41,14 +41,17 @@ export const generateFetchProjectsQuery = (
 		  image
 		  source
 		  slug
-		  totalVouches
-		  totalFlags
-		  attestedOrganisations {
+		  attests {
 			id
 			vouch
-			organisation {
-			  id
-			  name
+			attestorOrganisation {
+			  attestor {
+				id
+			  }
+			  organisation {
+				id
+				name
+			  }
 			}
 		  }
 		}
