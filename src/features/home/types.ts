@@ -30,6 +30,7 @@ interface IAttestorOrganisation {
 interface IOrganisation {
 	id: string;
 	name: string;
+	attestors: IAttestor[];
 }
 
 interface IAttestor {
