@@ -1,5 +1,6 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
@@ -49,54 +50,44 @@ export const Projects = () => {
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
-	const [loading, setLoading] = useState(false);
-	const [projects, setProjects] = useState<IProject[]>([]);
-	const [hasMore, setHasMore] = useState(false);
 
-	const fetchProjects = useCallback(
-		async (append: boolean = false, offset: number) => {
-			setLoading(true);
-			try {
-				const projectSource = filterValues['Source Platform'];
-				const organisationId = filterValues['Attested By'];
+	const fetchProjects = async ({ pageParam = 0 }) => {
+		const projectSource = filterValues['Source Platform'];
+		const organisationId = filterValues['Attested By'];
 
-				const data = await fetchGraphQL<{ projects: IProject[] }>(
-					generateFetchProjectsQuery(projectSource, organisationId),
-					{
-						orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
-						limit,
-						offset,
-						project_source: projectSource,
-						organisation_id: organisationId,
-					},
-				);
+		const data = await fetchGraphQL<{ projects: IProject[] }>(
+			generateFetchProjectsQuery(projectSource, organisationId),
+			{
+				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
+				limit,
+				offset: pageParam,
+				project_source: projectSource,
+				organisation_id: organisationId,
+			},
+		);
 
-				if (data.projects.length < limit) {
-					setHasMore(false);
-				} else {
-					setHasMore(true);
-				}
-				setProjects(prevProjects =>
-					append
-						? [...prevProjects, ...data.projects]
-						: data.projects,
-				);
-			} catch (err: any) {
-				console.log('err', err.message);
-			} finally {
-				setLoading(false);
-			}
-		},
-		[filterValues, sort.key],
-	);
-
-	useEffect(() => {
-		fetchProjects(false, 0);
-	}, [fetchProjects]);
-
-	const handleLoadMore = () => {
-		fetchProjects(true, projects.length);
+		return {
+			projects: data.projects,
+			nextPage:
+				data.projects.length === limit ? pageParam + limit : undefined,
+		};
 	};
+
+	const {
+		data,
+		error,
+		isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
+		queryKey: ['projects', filterValues, sort.key],
+		initialPageParam: 0,
+		queryFn: fetchProjects,
+		getNextPageParam: lastPage => lastPage.nextPage,
+	});
+
+	const projects = data?.pages.flatMap(page => page.projects) || [];
 
 	return (
 		<div className='container flex flex-col gap-10'>
@@ -127,7 +118,7 @@ export const Projects = () => {
 					<ProjectCard key={project.id} project={project} />
 				))}
 			</div>
-			{loading && (
+			{isLoading && (
 				<div className='flex items-center justify-center'>
 					<Spinner
 						size={32}
@@ -136,13 +127,18 @@ export const Projects = () => {
 					/>
 				</div>
 			)}
-			{!loading && hasMore && (
+			{error && <div>Error loading projects: {error.message}</div>}
+			{!isLoading && hasNextPage && (
 				<div className='text-center'>
 					<Button
 						buttonType={ButtonType.BLUE}
-						onClick={handleLoadMore}
+						onClick={() => fetchNextPage()}
+						loading={isFetchingNextPage}
+						disabled={isFetchingNextPage}
 					>
-						Load More Projects
+						{isFetchingNextPage
+							? 'Loading More...'
+							: 'Load More Projects'}
 					</Button>
 				</div>
 			)}
