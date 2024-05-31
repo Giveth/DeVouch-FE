@@ -1,4 +1,4 @@
-import React, { useRef, useState, type FC } from 'react';
+import { useRef, useState, useMemo, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
@@ -11,33 +11,29 @@ interface IProjectCardProps {
 	project: IProject;
 }
 
-const categorizeAttestedOrganisations = (
-	attestedOrganisations: IAttestedOrganisation[],
-) => {
-	const vouches = attestedOrganisations.filter(
-		attestedOrganisation => attestedOrganisation.vouch,
-	);
-	const flags = attestedOrganisations.filter(
-		attestedOrganisation => !attestedOrganisation.vouch,
-	);
-
+const categorizeAttests = (attests?: ProjectAttestation[]) => {
+	const res: {
+		vouches: { [key: string]: number };
+		flags: { [key: string]: number };
+	} = {
+		vouches: {},
+		flags: {},
+	};
+	if (!attests) return { vouches: [], flags: [] };
+	attests.forEach(attest => {
+		const label = attest.vouch ? 'vouches' : 'flags';
+		if (res[label][attest.attestorOrganisation.organisation.name]) {
+			res[label][attest.attestorOrganisation.organisation.name]++;
+		} else {
+			res[label][attest.attestorOrganisation.organisation.name] = 1;
+		}
+	});
 	return {
-		vouches: vouches.map(attestedOrganisation => ({
-			count: vouches.filter(
-				vouch =>
-					vouch.organisation.id ===
-					attestedOrganisation.organisation.id,
-			).length,
-			organization: attestedOrganisation.organisation,
+		vouches: Object.entries(res.vouches).map(([id, count]) => ({
+			id,
+			count,
 		})),
-		flags: flags.map(attestedOrganisation => ({
-			count: flags.filter(
-				flag =>
-					flag.organisation.id ===
-					attestedOrganisation.organisation.id,
-			).length,
-			organization: attestedOrganisation.organisation,
-		})),
+		flags: Object.entries(res.flags).map(([id, count]) => ({ id, count })),
 	};
 };
 
@@ -45,12 +41,14 @@ const NO_DATA = 'No data available to show here!';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
-	const { vouches, flags } = categorizeAttestedOrganisations(
-		project.attestedOrganisations,
-	);
-	const vouch = useRef(true);
 	const { address } = useAccount();
 	const { open } = useWeb3Modal();
+
+	const { vouches, flags } = useMemo(
+		() => categorizeAttests(project.attests),
+		[project.attests],
+	);
+	const vouch = useRef(true);
 
 	const onAttestClick = (_vouch: boolean) => {
 		if (address) {
@@ -93,11 +91,11 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
 					<div className='flex gap-2'>
 						{vouches.length > 0 ? (
-							vouches.map(data => (
+							vouches.map(vouch => (
 								<AttestInfo
-									key={data.organization.id}
-									count={data.count}
-									organization={data.organization.name}
+									key={vouch.id}
+									count={vouch.count}
+									organization={vouch.id}
 								/>
 							))
 						) : (
@@ -111,11 +109,11 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
 					<div className='flex gap-2'>
 						{flags?.length > 0 ? (
-							flags.map(data => (
+							flags.map(flag => (
 								<AttestInfo
-									key={data.organization.id}
-									count={data.count}
-									organization={data.organization.name}
+									key={flag.id}
+									count={flag.count}
+									organization={flag.id}
 								/>
 							))
 						) : (

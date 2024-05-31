@@ -49,7 +49,6 @@ export const generateFetchProjectsQuery = (
 				id
 			  }
 			  organisation {
-				id
 				name
 			  }
 			}
