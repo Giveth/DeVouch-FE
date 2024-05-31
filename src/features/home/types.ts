@@ -7,10 +7,8 @@ interface IProject {
 	image: string;
 	source: string;
 	totalAttests: number;
-	totalVouches: number;
-	totalFlags: number;
-	attestedOrganisations: IAttestedOrganisation[];
-	attests: ProjectAttestation[];
+	attestedOrganisations?: IAttestedOrganisation[];
+	attests?: ProjectAttestation[];
 }
 
 interface IAttestedOrganisation {
