@@ -52,6 +52,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 	};
 
 	const fetchOrganisations = async () => {
+		if (!address) return [];
 		const data = await fetchGraphQL<{
 			attestorOrganisations: IAttestorOrganisation[];
 		}>(FETCH_USER_ORGANISATIONS, { address: address?.toLowerCase() });
@@ -63,8 +64,6 @@ export const AttestModal: FC<AttestModalProps> = ({
 		queryFn: fetchOrganisations,
 		staleTime: 300_000,
 	});
-
-	console.log('data', data);
 
 	const handleConfirm = async () => {
 		if (!signer || !selectedOrg) return;
@@ -98,7 +97,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					expirationTime: 0n,
 					revocable: true,
 					data: encodedData,
-					refUID: selectedOrg?.id,
+					refUID: selectedOrg.id,
 				},
 			});
 
