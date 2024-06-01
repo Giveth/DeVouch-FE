@@ -41,13 +41,13 @@ export const AttestModal: FC<AttestModalProps> = ({
 	...props
 }) => {
 	const [step, setStep] = useState(AttestSteps.ATTEST);
-	const [selectedOrg, setSelectedOrg] = useState<IOrganisation>();
+	const [selectedOrg, setSelectedOrg] = useState<IAttestorOrganisation>();
 	const [comment, setComment] = useState<string>('');
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
 
-	const handleRadioChange = (value: IOrganisation) => {
+	const handleRadioChange = (value: IAttestorOrganisation) => {
 		setSelectedOrg(value);
 	};
 
@@ -111,25 +111,25 @@ export const AttestModal: FC<AttestModalProps> = ({
 			let attest = _project.attests?.find(
 				_attest =>
 					_attest.attestorOrganisation.organisation.id.toLowerCase() ===
-						selectedOrg?.id.toLowerCase() &&
+						selectedOrg.organisation.id.toLowerCase() &&
 					_attest.attestorOrganisation.attestor.id.toLowerCase() ===
 						address?.toLowerCase(),
 			);
-			console.log('attest', attest);
 			if (attest) {
 				attest.vouch = vouch;
 				attest.comment = comment;
+				attest.id = newAttestationUID;
 			} else {
 				attest = {
-					id: '0x0000000000000000000000000000000000000000000000000000000000000000',
+					id: newAttestationUID,
 					vouch,
 					attestorOrganisation: {
 						attestor: {
 							id: address || '',
 						},
 						organisation: {
-							id: selectedOrg.id,
-							name: selectedOrg.name,
+							id: selectedOrg.organisation.id,
+							name: selectedOrg.organisation.name,
 						},
 						attestTimestamp: new Date(),
 					},
@@ -181,7 +181,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 						</div>
 						<div className='border p-4'>
 							{isLoading ? (
-								<div>Loading user&apos;s Organizations</div>
+								<div>Loading user&apos;s organizations</div>
 							) : data && data?.length > 0 ? (
 								data?.map(ao => (
 									<RadioButton
@@ -190,12 +190,10 @@ export const AttestModal: FC<AttestModalProps> = ({
 										name='organisation'
 										label={ao.organisation.name}
 										checked={
-											selectedOrg?.id ===
+											selectedOrg?.organisation.id ===
 											ao.organisation.id
 										}
-										onChange={() =>
-											handleRadioChange(ao.organisation)
-										}
+										onChange={() => handleRadioChange(ao)}
 										className='my-2'
 									/>
 								))
