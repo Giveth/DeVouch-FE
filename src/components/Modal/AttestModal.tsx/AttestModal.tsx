@@ -58,7 +58,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 		return data?.attestorOrganisations || [];
 	};
 
-	const { data, isLoading, isFetched } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ['fetchUserOrganisations', address],
 		queryFn: fetchOrganisations,
 		staleTime: 300_000,
@@ -181,21 +181,39 @@ export const AttestModal: FC<AttestModalProps> = ({
 							Select the Attester Group you wish to vouch as:
 						</div>
 						<div className='border p-4'>
-							{data?.map(ao => (
-								<RadioButton
-									key={ao.id}
-									id={ao.id}
-									name='organisation'
-									label={ao.organisation.name}
-									checked={
-										selectedOrg?.id === ao.organisation.id
-									}
-									onChange={() =>
-										handleRadioChange(ao.organisation)
-									}
-									className='my-2'
-								/>
-							))}
+							{isLoading ? (
+								<div>Loading user&apos;s Organizations</div>
+							) : data && data?.length > 0 ? (
+								data?.map(ao => (
+									<RadioButton
+										key={ao.id}
+										id={ao.id}
+										name='organisation'
+										label={ao.organisation.name}
+										checked={
+											selectedOrg?.id ===
+											ao.organisation.id
+										}
+										onChange={() =>
+											handleRadioChange(ao.organisation)
+										}
+										className='my-2'
+									/>
+								))
+							) : (
+								<div className='p-4 bg-gray-100 flex gap-4 items-start'>
+									<Image
+										src='/images/icons/warning.svg'
+										width={24}
+										height={24}
+										alt='Empty'
+									/>
+									<div className='text-gray-500'>
+										You do not belong to any attester group
+										currently.
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 					<div>
