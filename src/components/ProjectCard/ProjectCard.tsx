@@ -1,65 +1,121 @@
-import React, { useRef, useState, type FC } from 'react';
+import { useRef, useState, useMemo, useCallback, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { Address } from 'viem';
+import { useQueryClient } from '@tanstack/react-query';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 
 interface IProjectCardProps {
 	project: IProject;
+	queryKey?: (
+		| string
+		| {
+				[key: string]: string[];
+		  }
+	)[];
 }
 
-const categorizeAttestedOrganisations = (
-	attestedOrganisations: IAttestedOrganisation[],
-) => {
-	const vouches = attestedOrganisations.filter(
-		attestedOrganisation => attestedOrganisation.vouch,
-	);
-	const flags = attestedOrganisations.filter(
-		attestedOrganisation => !attestedOrganisation.vouch,
-	);
+interface IPage {
+	projects: IProject[];
+	nextPage: number | undefined;
+}
 
+interface IData {
+	pages: IPage[];
+	pageParams: number[];
+}
+
+const updateProjectInData = (data: IData, newProject: IProject) => {
 	return {
-		vouches: vouches.map(attestedOrganisation => ({
-			count: vouches.filter(
-				vouch =>
-					vouch.organisation.id ===
-					attestedOrganisation.organisation.id,
-			).length,
-			organization: attestedOrganisation.organisation,
+		...data,
+		pages: data.pages.map(page => ({
+			...page,
+			projects: page.projects.map(project =>
+				project.id === newProject.id ? newProject : project,
+			),
 		})),
-		flags: flags.map(attestedOrganisation => ({
-			count: flags.filter(
-				flag =>
-					flag.organisation.id ===
-					attestedOrganisation.organisation.id,
-			).length,
-			organization: attestedOrganisation.organisation,
+	};
+};
+
+const analyzeAttests = (
+	attests?: ProjectAttestation[],
+	address?: Address,
+): {
+	vouches: { id: string; count: number }[];
+	flags: { id: string; count: number }[];
+	attestedByMe: ProjectAttestation | undefined;
+} => {
+	const res: {
+		vouches: { [key: string]: number };
+		flags: { [key: string]: number };
+	} = {
+		vouches: {},
+		flags: {},
+	};
+	if (!attests) return { vouches: [], flags: [], attestedByMe: undefined };
+	let attestedByMe: ProjectAttestation | undefined = undefined;
+	attests.forEach(attest => {
+		const label = attest.vouch ? 'vouches' : 'flags';
+		if (res[label][attest.attestorOrganisation.organisation.name]) {
+			res[label][attest.attestorOrganisation.organisation.name]++;
+		} else {
+			res[label][attest.attestorOrganisation.organisation.name] = 1;
+		}
+		if (attestedByMe || !address) return;
+		attestedByMe =
+			attest.attestorOrganisation.attestor.id.toLowerCase() ===
+			address?.toLowerCase()
+				? attest
+				: undefined;
+	});
+	return {
+		vouches: Object.entries(res.vouches).map(([id, count]) => ({
+			id,
+			count,
 		})),
+		flags: Object.entries(res.flags).map(([id, count]) => ({ id, count })),
+		attestedByMe,
 	};
 };
 
 const NO_DATA = 'No data available to show here!';
 
-export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
+export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
-	const { vouches, flags } = categorizeAttestedOrganisations(
-		project.attestedOrganisations,
-	);
-	const vouch = useRef(true);
 	const { address } = useAccount();
 	const { open } = useWeb3Modal();
+	const queryClient = useQueryClient();
+
+	const { vouches, flags, attestedByMe } = useMemo(
+		() => analyzeAttests(project.attests, address),
+		[address, project.attests],
+	);
+	const isVouching = useRef(true);
 
 	const onAttestClick = (_vouch: boolean) => {
 		if (address) {
-			vouch.current = _vouch;
+			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
 			open();
 		}
 	};
+
+	const onAttestSuccess = useCallback(
+		(updatedProject: IProject) => {
+			if (!queryKey) return;
+			queryClient.setQueryData(queryKey, (oldData: any) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+
+				return updateProjectInData(oldData, updatedProject);
+			});
+		},
+		[queryClient],
+	);
 
 	return (
 		<div className='relative group'>
@@ -76,9 +132,33 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 							/>
 						)}
 						<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
-							<span className='text-gray-300'>From</span>
+							<span className='text-gray-300 font-light'>
+								From
+							</span>
 							<span className='text-black'>{project.source}</span>
 						</div>
+						{attestedByMe && (
+							<div className='absolute flex gap-1 bg-white py-1 px-2 bottom-2 right-2 z-auto'>
+								<span className='text-gray-800 font-light'>
+									You’ve already attested
+								</span>
+								{attestedByMe.vouch ? (
+									<Image
+										src={'/images/icons/vouched.svg'}
+										alt={'vouched'}
+										width={16}
+										height={16}
+									/>
+								) : (
+									<Image
+										src={'/images/icons/red-flag.svg'}
+										alt={'red-flag'}
+										width={10}
+										height={16}
+									/>
+								)}
+							</div>
+						)}
 					</div>
 				</Link>
 				<div className='flex-1'>
@@ -93,11 +173,11 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
 					<div className='flex gap-2'>
 						{vouches.length > 0 ? (
-							vouches.map(data => (
+							vouches.map(vouch => (
 								<AttestInfo
-									key={data.organization.id}
-									count={data.count}
-									organization={data.organization.name}
+									key={vouch.id}
+									count={vouch.count}
+									organization={vouch.id}
 								/>
 							))
 						) : (
@@ -111,11 +191,11 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
 					<div className='flex gap-2'>
 						{flags?.length > 0 ? (
-							flags.map(data => (
+							flags.map(flag => (
 								<AttestInfo
-									key={data.organization.id}
-									count={data.count}
-									organization={data.organization.name}
+									key={flag.id}
+									count={flag.count}
+									organization={flag.id}
 								/>
 							))
 						) : (
@@ -146,7 +226,8 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					setShowModal={setShowAttestModal}
 					showModal={showAttestModal}
 					project={project}
-					vouch={vouch.current}
+					vouch={isVouching.current}
+					onSuccess={onAttestSuccess}
 				/>
 			)}
 		</div>

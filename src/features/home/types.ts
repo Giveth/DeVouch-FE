@@ -7,10 +7,8 @@ interface IProject {
 	image: string;
 	source: string;
 	totalAttests: number;
-	totalVouches: number;
-	totalFlags: number;
-	attestedOrganisations: IAttestedOrganisation[];
-	attests: ProjectAttestation[];
+	attestedOrganisations?: IAttestedOrganisation[];
+	attests?: ProjectAttestation[];
 }
 
 interface IAttestedOrganisation {
@@ -20,32 +18,32 @@ interface IAttestedOrganisation {
 }
 
 interface IAttestorOrganisation {
-	id: string;
+	id?: string;
 	attestor: IAttestor;
 	organisation: IOrganisation;
 	attestTimestamp: Date;
-	revoked: boolean;
+	revoked?: boolean;
 }
 
 interface IOrganisation {
 	id: string;
 	name: string;
-	attestors: IAttestor[];
+	attestors?: IAttestor[];
 }
 
 interface IAttestor {
 	id: string;
-	organisations: IAttestorOrganisation[];
+	organisations?: IAttestorOrganisation[];
 }
 
 interface ProjectAttestation {
 	id: string;
-	recipient: string;
+	recipient?: string;
 	vouch: boolean;
-	txHash: string;
-	revoked: boolean;
+	txHash?: string;
+	revoked?: boolean;
 	attestorOrganisation: IAttestorOrganisation;
-	project: IProject;
+	project?: IProject;
 	attestTimestamp: Date;
 	comment: string;
 }
