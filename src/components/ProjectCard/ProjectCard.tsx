@@ -12,7 +12,14 @@ interface IProjectCardProps {
 	project: IProject;
 }
 
-const analyzeAttests = (attests?: ProjectAttestation[], address?: Address) => {
+const analyzeAttests = (
+	attests?: ProjectAttestation[],
+	address?: Address,
+): {
+	vouches: { id: string; count: number }[];
+	flags: { id: string; count: number }[];
+	attestedByMe: ProjectAttestation | undefined;
+} => {
 	const res: {
 		vouches: { [key: string]: number };
 		flags: { [key: string]: number };
