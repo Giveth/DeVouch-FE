@@ -18,7 +18,8 @@ interface IOrganisation {
 
 interface AttestModalProps extends IModal {
 	project: IProject;
-	vouch?: boolean;
+	vouch: boolean;
+	onSuccess: (project: IProject) => void;
 }
 
 interface IAttestorOrganisation {
@@ -35,20 +36,21 @@ enum AttestSteps {
 export const AttestModal: FC<AttestModalProps> = ({
 	project,
 	vouch = true,
+	onSuccess,
 	...props
 }) => {
 	const [step, setStep] = useState(AttestSteps.ATTEST);
 	const [attestorOrganisations, setAttestorOrganisations] = useState<
 		IAttestorOrganisation[]
 	>([]);
-	const [selectedValue, setSelectedValue] = useState<string>('');
+	const [selectedOrg, setSelectedOrg] = useState<IOrganisation>();
 	const [comment, setComment] = useState<string>('');
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
 
-	const handleRadioChange = (value: string) => {
-		setSelectedValue(value);
+	const handleRadioChange = (value: IOrganisation) => {
+		setSelectedOrg(value);
 	};
 
 	useEffect(() => {
@@ -64,7 +66,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 	}, [address]);
 
 	const handleConfirm = async () => {
-		if (!signer) return;
+		if (!signer || !selectedOrg) return;
 
 		try {
 			setStep(AttestSteps.ATTESTING);
@@ -95,7 +97,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					expirationTime: 0n,
 					revocable: true,
 					data: encodedData,
-					refUID: selectedValue,
+					refUID: selectedOrg?.id,
 				},
 			});
 
@@ -103,6 +105,41 @@ export const AttestModal: FC<AttestModalProps> = ({
 
 			const newAttestationUID = await tx.wait();
 			console.log('newAttestationUID', newAttestationUID);
+
+			// find the project to updating the UI
+			const _project = structuredClone(project);
+			let attest = _project.attests?.find(
+				_attest =>
+					_attest.attestorOrganisation.organisation.id.toLowerCase() ===
+						selectedOrg?.id.toLowerCase() &&
+					_attest.attestorOrganisation.attestor.id.toLowerCase() ===
+						address?.toLowerCase(),
+			);
+			console.log('attest', attest);
+			if (attest) {
+				attest.vouch = vouch;
+				attest.comment = comment;
+			} else {
+				attest = {
+					id: '0x0000000000000000000000000000000000000000000000000000000000000000',
+					vouch,
+					attestorOrganisation: {
+						attestor: {
+							id: address || '',
+						},
+						organisation: {
+							id: selectedOrg.id,
+							name: selectedOrg.name,
+						},
+						attestTimestamp: new Date(),
+					},
+					attestTimestamp: new Date(),
+					comment: comment,
+				};
+				_project.attests = [...(_project.attests || []), attest];
+			}
+			onSuccess(_project);
+
 			setStep(AttestSteps.SUCCESS);
 		} catch (error: any) {
 			console.log('error', error.message);
@@ -149,8 +186,12 @@ export const AttestModal: FC<AttestModalProps> = ({
 									id={ao.id}
 									name='organisation'
 									label={ao.organisation.name}
-									checked={selectedValue === ao.id}
-									onChange={() => handleRadioChange(ao.id)}
+									checked={
+										selectedOrg?.id === ao.organisation.id
+									}
+									onChange={() =>
+										handleRadioChange(ao.organisation)
+									}
 									className='my-2'
 								/>
 							))}
