@@ -20,8 +20,8 @@ const analyzeAttests = (attests?: ProjectAttestation[], address?: Address) => {
 		vouches: {},
 		flags: {},
 	};
-	if (!attests) return { vouches: [], flags: [], attestedByMe: false };
-	let attestedByMe = false;
+	if (!attests) return { vouches: [], flags: [], attestedByMe: undefined };
+	let attestedByMe: ProjectAttestation | undefined = undefined;
 	attests.forEach(attest => {
 		const label = attest.vouch ? 'vouches' : 'flags';
 		if (res[label][attest.attestorOrganisation.organisation.name]) {
@@ -32,7 +32,9 @@ const analyzeAttests = (attests?: ProjectAttestation[], address?: Address) => {
 		if (attestedByMe || !address) return;
 		attestedByMe =
 			attest.attestorOrganisation.attestor.id.toLowerCase() ===
-			address.toLowerCase();
+			address.toLowerCase()
+				? attest
+				: undefined;
 	});
 	return {
 		vouches: Object.entries(res.vouches).map(([id, count]) => ({
@@ -91,6 +93,21 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 								<span className='text-gray-800 font-light'>
 									You’ve already attested
 								</span>
+								{attestedByMe.vouch ? (
+									<Image
+										src={'/images/icons/vouched.svg'}
+										alt={'vouched'}
+										width={16}
+										height={16}
+									/>
+								) : (
+									<Image
+										src={'/images/icons/red-flag.svg'}
+										alt={'red-flag'}
+										width={10}
+										height={16}
+									/>
+								)}
 							</div>
 						)}
 					</div>
