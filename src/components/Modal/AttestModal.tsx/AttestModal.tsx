@@ -1,7 +1,8 @@
-import { useEffect, useState, type FC } from 'react';
+import { useState, type FC } from 'react';
 import { useAccount } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
 import Modal, { IModal } from '../Modal';
 import { Button } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
@@ -40,9 +41,6 @@ export const AttestModal: FC<AttestModalProps> = ({
 	...props
 }) => {
 	const [step, setStep] = useState(AttestSteps.ATTEST);
-	const [attestorOrganisations, setAttestorOrganisations] = useState<
-		IAttestorOrganisation[]
-	>([]);
 	const [selectedOrg, setSelectedOrg] = useState<IOrganisation>();
 	const [comment, setComment] = useState<string>('');
 
@@ -53,17 +51,20 @@ export const AttestModal: FC<AttestModalProps> = ({
 		setSelectedOrg(value);
 	};
 
-	useEffect(() => {
-		if (!address) return;
-		// Fetch organisations
-		const fetchOrganisations = async () => {
-			const data = await fetchGraphQL<{
-				attestorOrganisations: IAttestorOrganisation[];
-			}>(FETCH_USER_ORGANISATIONS, { address: address?.toLowerCase() });
-			setAttestorOrganisations(data?.attestorOrganisations || []);
-		};
-		fetchOrganisations();
-	}, [address]);
+	const fetchOrganisations = async () => {
+		const data = await fetchGraphQL<{
+			attestorOrganisations: IAttestorOrganisation[];
+		}>(FETCH_USER_ORGANISATIONS, { address: address?.toLowerCase() });
+		return data?.attestorOrganisations || [];
+	};
+
+	const { data, isLoading, isFetched } = useQuery({
+		queryKey: ['fetchUserOrganisations', address],
+		queryFn: fetchOrganisations,
+		staleTime: 300_000,
+	});
+
+	console.log('data', data);
 
 	const handleConfirm = async () => {
 		if (!signer || !selectedOrg) return;
@@ -180,7 +181,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 							Select the Attester Group you wish to vouch as:
 						</div>
 						<div className='border p-4'>
-							{attestorOrganisations.map(ao => (
+							{data?.map(ao => (
 								<RadioButton
 									key={ao.id}
 									id={ao.id}
