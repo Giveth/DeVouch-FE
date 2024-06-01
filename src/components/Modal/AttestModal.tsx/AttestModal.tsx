@@ -221,6 +221,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 							className='flex-1'
 							onClick={handleConfirm}
 							loading={step === AttestSteps.ATTESTING}
+							disabled={!selectedOrg}
 						>
 							Confirm
 						</Button>
