@@ -1,16 +1,45 @@
-import { useRef, useState, useMemo, type FC } from 'react';
+import { useRef, useState, useMemo, useCallback, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { Address } from 'viem';
+import { useQueryClient } from '@tanstack/react-query';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 
 interface IProjectCardProps {
 	project: IProject;
+	queryKey?: (
+		| string
+		| {
+				[key: string]: string[];
+		  }
+	)[];
 }
+
+interface IPage {
+	projects: IProject[];
+	nextPage: number | undefined;
+}
+
+interface IData {
+	pages: IPage[];
+	pageParams: number[];
+}
+
+const updateProjectInData = (data: IData, newProject: IProject) => {
+	return {
+		...data,
+		pages: data.pages.map(page => ({
+			...page,
+			projects: page.projects.map(project =>
+				project.id === newProject.id ? newProject : project,
+			),
+		})),
+	};
+};
 
 const analyzeAttests = (
 	attests?: ProjectAttestation[],
@@ -39,7 +68,7 @@ const analyzeAttests = (
 		if (attestedByMe || !address) return;
 		attestedByMe =
 			attest.attestorOrganisation.attestor.id.toLowerCase() ===
-			address.toLowerCase()
+			address?.toLowerCase()
 				? attest
 				: undefined;
 	});
@@ -55,10 +84,11 @@ const analyzeAttests = (
 
 const NO_DATA = 'No data available to show here!';
 
-export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
+export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const { address } = useAccount();
 	const { open } = useWeb3Modal();
+	const queryClient = useQueryClient();
 
 	const { vouches, flags, attestedByMe } = useMemo(
 		() => analyzeAttests(project.attests, address),
@@ -74,6 +104,18 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 			open();
 		}
 	};
+
+	const onAttestSuccess = useCallback(
+		(updatedProject: IProject) => {
+			if (!queryKey) return;
+			queryClient.setQueryData(queryKey, (oldData: any) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+
+				return updateProjectInData(oldData, updatedProject);
+			});
+		},
+		[queryClient],
+	);
 
 	return (
 		<div className='relative group'>
@@ -185,6 +227,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					showModal={showAttestModal}
 					project={project}
 					vouch={isVouching.current}
+					onSuccess={onAttestSuccess}
 				/>
 			)}
 		</div>
