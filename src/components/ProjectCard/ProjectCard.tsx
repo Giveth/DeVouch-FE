@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { Address } from 'viem';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
@@ -11,7 +12,7 @@ interface IProjectCardProps {
 	project: IProject;
 }
 
-const categorizeAttests = (attests?: ProjectAttestation[]) => {
+const analyzeAttests = (attests?: ProjectAttestation[], address?: Address) => {
 	const res: {
 		vouches: { [key: string]: number };
 		flags: { [key: string]: number };
@@ -19,7 +20,8 @@ const categorizeAttests = (attests?: ProjectAttestation[]) => {
 		vouches: {},
 		flags: {},
 	};
-	if (!attests) return { vouches: [], flags: [] };
+	if (!attests) return { vouches: [], flags: [], attestedByMe: false };
+	let attestedByMe = false;
 	attests.forEach(attest => {
 		const label = attest.vouch ? 'vouches' : 'flags';
 		if (res[label][attest.attestorOrganisation.organisation.name]) {
@@ -27,6 +29,10 @@ const categorizeAttests = (attests?: ProjectAttestation[]) => {
 		} else {
 			res[label][attest.attestorOrganisation.organisation.name] = 1;
 		}
+		if (attestedByMe || !address) return;
+		attestedByMe =
+			attest.attestorOrganisation.attestor.id.toLowerCase() ===
+			address.toLowerCase();
 	});
 	return {
 		vouches: Object.entries(res.vouches).map(([id, count]) => ({
@@ -34,6 +40,7 @@ const categorizeAttests = (attests?: ProjectAttestation[]) => {
 			count,
 		})),
 		flags: Object.entries(res.flags).map(([id, count]) => ({ id, count })),
+		attestedByMe,
 	};
 };
 
@@ -44,15 +51,15 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 	const { address } = useAccount();
 	const { open } = useWeb3Modal();
 
-	const { vouches, flags } = useMemo(
-		() => categorizeAttests(project.attests),
-		[project.attests],
+	const { vouches, flags, attestedByMe } = useMemo(
+		() => analyzeAttests(project.attests, address),
+		[address, project.attests],
 	);
-	const vouch = useRef(true);
+	const isVouching = useRef(true);
 
 	const onAttestClick = (_vouch: boolean) => {
 		if (address) {
-			vouch.current = _vouch;
+			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
 			open();
@@ -74,9 +81,18 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 							/>
 						)}
 						<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
-							<span className='text-gray-300'>From</span>
+							<span className='text-gray-300 font-light'>
+								From
+							</span>
 							<span className='text-black'>{project.source}</span>
 						</div>
+						{attestedByMe && (
+							<div className='absolute flex gap-1 bg-white py-1 px-2 bottom-2 right-2 z-auto'>
+								<span className='text-gray-800 font-light'>
+									You’ve already attested
+								</span>
+							</div>
+						)}
 					</div>
 				</Link>
 				<div className='flex-1'>
@@ -144,7 +160,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
 					setShowModal={setShowAttestModal}
 					showModal={showAttestModal}
 					project={project}
-					vouch={vouch.current}
+					vouch={isVouching.current}
 				/>
 			)}
 		</div>
