@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { type FC } from 'react';
+import { IconRightArrow } from '../Icons/IconRightArrow';
 
 export interface AttestInfo {
 	name: string;
@@ -19,12 +19,7 @@ export const AttestInfo: FC<AttestInfoProps> = ({ info }) => {
 			className={`py-1 px-2 bg-gray-100 flex gap-1 items-center group-hover/card:text-[${color}]`}
 		>
 			<span className='font-bold'>{count}</span>
-			<Image
-				src='/images/icons/right-arrow.svg'
-				width={13}
-				height={11}
-				alt='right arrow'
-			/>
+			<IconRightArrow />
 			<span className='font-light'>{name}</span>
 		</div>
 	);
