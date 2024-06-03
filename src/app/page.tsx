@@ -26,9 +26,9 @@ export default function Home() {
 				height={369}
 				alt='arc-3'
 			/>
-			<div className='container mx-auto '>
-				<div className='px-20 py-10 flex flex-col gap-6'>
-					<h1 className='text-8xl	font-bold leading-normal'>
+			<div className='container'>
+				<div className='md:px-20 py-10 flex flex-col gap-6'>
+					<h1 className='text-4xl md:text-6xl lg:text-8xl	font-bold leading-normal'>
 						On-Chain Vouching via Attestations
 					</h1>
 					<p className='text-xl leading-relaxed'>
