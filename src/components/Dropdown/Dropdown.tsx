@@ -81,7 +81,9 @@ const Dropdown: React.FC<DropdownProps> = ({
 			ref={containerRef}
 			onClick={toggleDropdown}
 		>
-			<div className='flex justify-between w-full border py-2 px-6 border-black bg-white mb-2'>
+			<div
+				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white mb-2 hover:border-black ${isOpen ? '!border-black' : ''} `}
+			>
 				<div>{label}</div>
 				{showChevron && (
 					<Image
