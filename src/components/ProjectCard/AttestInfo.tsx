@@ -13,7 +13,7 @@ interface AttestInfoProps {
 
 export const AttestInfo: FC<AttestInfoProps> = ({ info }) => {
 	const { name, count, color } = info;
-	console.log('color', color);
+
 	return (
 		<div
 			className={`py-1 px-2 bg-gray-100 flex gap-1 items-center group-hover/card:text-[${color}]`}
