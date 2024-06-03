@@ -1,6 +1,7 @@
 export const generateFetchProjectsQuery = (
 	projectSource?: string[],
 	organisationId?: string[],
+	term?: string,
 ) => {
 	const conditions = [];
 	const props = [];
@@ -16,10 +17,18 @@ export const generateFetchProjectsQuery = (
 		props.push('$organisation_id: [String!]');
 	}
 
+	if (term) {
+		conditions.push('title_containsInsensitive: $term');
+		props.push('$term: String');
+	}
+
 	const whereClause =
 		conditions.length > 0 ? `,where: { ${conditions.join(', ')} }` : '';
 
 	const addedProps = props.length > 0 ? `,${props.join(', ')}` : '';
+
+	console.log('whereClause', conditions);
+	console.log('addedProps', props);
 
 	return `
 	query fetchProjects(
