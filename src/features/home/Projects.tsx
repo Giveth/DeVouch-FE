@@ -9,6 +9,7 @@ import { Button, ButtonType } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
+import { SearchInput } from './SearchInput';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -93,7 +94,7 @@ export const Projects = () => {
 
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex justify-between'>
+			<div className='flex flex-col md:flex-row gap-4'>
 				<div className='flex gap-4 items-center'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
@@ -103,13 +104,9 @@ export const Projects = () => {
 						className='w-60'
 					/>
 				</div>
+				<div className='flex-1' />
+				<SearchInput setTerm={setTerm} />
 				<div className='flex gap-4 items-center'>
-					<input
-						placeholder='Search for projects'
-						className='inline-block py-2 px-2 border border-white mb-2 outline-none focus:border-black'
-						value={term}
-						onChange={e => setTerm(e.target.value)}
-					></input>
 					<FilterMenu
 						options={options}
 						value={filterValues}
