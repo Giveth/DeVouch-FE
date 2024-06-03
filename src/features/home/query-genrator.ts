@@ -51,6 +51,7 @@ export const generateFetchProjectsQuery = (
 			  organisation {
 				id
 				name
+				color
 			  }
 			}
 		  }
