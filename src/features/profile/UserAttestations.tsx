@@ -15,6 +15,13 @@ const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
 };
 
+enum orderByOptions {
+	'ATTEST_TIMESTAMP_DESC' = 'attestTimestamp_DESC',
+	'ATTEST_TIMESTAMP_ASC' = 'attestTimestamp_ASC',
+	'PROJECT_TITLE_ASC' = 'project_title_ASC_NULLS_LAST',
+	'PROJECT_TITLE_DESC' = 'project_title_DESC_NULLS_LAST',
+}
+
 export const UserAttestations = ({
 	address: externalAddress,
 }: {
@@ -25,6 +32,9 @@ export const UserAttestations = ({
 	const address = externalAddress || connectedAddress;
 	const [attestations, setAttestations] = useState<any[]>([]);
 	const [totalAttests, setTotalAttests] = useState(0);
+	const [orderBy, setOrderBy] = useState(
+		orderByOptions.ATTEST_TIMESTAMP_DESC,
+	);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
@@ -50,6 +60,7 @@ export const UserAttestations = ({
 				address: !!address ? address : null,
 				limit,
 				offset,
+				orderBy: [orderBy],
 				orgs,
 			});
 
@@ -74,10 +85,26 @@ export const UserAttestations = ({
 			currentPage * ITEMS_PER_PAGE,
 			orgs?.length > 0 ? orgs : undefined,
 		);
-	}, [currentPage, address, sourceFilterValues]);
+	}, [currentPage, address, orderBy, sourceFilterValues]);
 
 	const handlePageChange = (newPage: number) => {
 		setCurrentPage(newPage);
+	};
+
+	const handleOrderByProjectChange = () => {
+		setOrderBy(prevOrderBy =>
+			prevOrderBy === orderByOptions.PROJECT_TITLE_ASC
+				? orderByOptions.PROJECT_TITLE_DESC
+				: orderByOptions.PROJECT_TITLE_ASC,
+		);
+	};
+
+	const handleOrderByDateChange = () => {
+		setOrderBy(prevOrderBy =>
+			prevOrderBy === orderByOptions.ATTEST_TIMESTAMP_DESC
+				? orderByOptions.ATTEST_TIMESTAMP_ASC
+				: orderByOptions.ATTEST_TIMESTAMP_DESC,
+		);
 	};
 
 	const filteredAttestations = attestations?.filter((attestation: any) => {
@@ -203,6 +230,8 @@ export const UserAttestations = ({
 						itemsPerPage={ITEMS_PER_PAGE}
 						currentPage={currentPage}
 						onPageChange={handlePageChange}
+						onOrderByProjectChange={handleOrderByProjectChange}
+						onOrderByDateChange={handleOrderByDateChange}
 						isOwner={!!isOwner}
 					/>
 				)}

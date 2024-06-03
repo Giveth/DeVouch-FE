@@ -16,7 +16,7 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
       where: {attestorOrganisation: {organisation: {id_in: $orgs}}},
       limit: $limit, 
       offset: $offset, 
-      orderBy: attestTimestamp_ASC
+      orderBy: attestTimestamp_DESC
     ) {
       vouch
       txHash
@@ -66,10 +66,10 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int) {
+query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!]!) {
   projectAttestations(
     where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $orgs}}},
-    orderBy: attestTimestamp_DESC,
+    orderBy: $orderBy,
     limit: $limit,
     offset: $offset
   ) {

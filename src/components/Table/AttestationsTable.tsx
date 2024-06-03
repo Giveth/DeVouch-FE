@@ -11,6 +11,8 @@ interface AttestationsTableProps {
 	itemsPerPage?: number;
 	currentPage: number;
 	onPageChange: (page: number) => void;
+	onOrderByProjectChange?: () => void;
+	onOrderByDateChange?: () => void;
 	totalAttests: number;
 	isOwner?: boolean;
 }
@@ -23,6 +25,8 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 	itemsPerPage = ITEMS_PER_PAGE_DEFAULT,
 	currentPage,
 	onPageChange,
+	onOrderByProjectChange,
+	onOrderByDateChange,
 	totalAttests,
 	isOwner,
 }) => {
@@ -68,19 +72,37 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 				<table className='min-w-full table-auto text-left relative'>
 					<thead>
 						<tr className='bg-transparent'>
+							{isOwner && (
+								<th
+									onClick={() => onOrderByProjectChange?.()}
+									className='flex flex-arrow gap-2 px-4 py-2 font-semibold text-left text-gray-600 cursor-pointer'
+								>
+									<Image
+										src={'/images/icons/two-arrows.svg'}
+										alt={'arrow'}
+										width={24}
+										height={24}
+									/>{' '}
+									Projects
+								</th>
+							)}
 							{!isOwner && (
 								<th className='px-4 py-2 font-semibold text-left text-gray-600'>
 									Attesters
 								</th>
 							)}
-							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
-								Attested As
-							</th>
 							{isOwner && (
-								<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+								<th
+									onClick={() => onOrderByDateChange?.()}
+									className=' px-4 py-2 font-semibold text-gray-600 cursor-pointer'
+								>
 									Date Attested
 								</th>
 							)}
+							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+								Attested As
+							</th>
+
 							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
 								Comments
 							</th>
@@ -101,6 +123,11 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 								index: number,
 							) => (
 								<tr key={index} className='border-t relative'>
+									{isOwner && (
+										<td className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
+											{attestation.project.title}
+										</td>
+									)}
 									{!isOwner && (
 										<td className='px-4 py-6 align-top text-gray-800'>
 											{ensNames[
@@ -124,14 +151,6 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 											</span>
 										</td>
 									)}
-									<td className='flex px-4 py-6 align-top text-gray-800 items-center'>
-										<span className='bg-[#f7f7f9] px-2 py-1'>
-											{
-												attestation.attestorOrganisation
-													.organisation.name
-											}
-										</span>
-									</td>
 									{isOwner && (
 										<td className='px-4 py-6 align-top text-gray-800'>
 											{new Date(
@@ -143,6 +162,14 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 											})}
 										</td>
 									)}
+									<td className='flex px-4 py-6 align-top text-gray-800 items-center'>
+										<span className='bg-[#f7f7f9] px-2 py-1'>
+											{
+												attestation.attestorOrganisation
+													.organisation.name
+											}
+										</span>
+									</td>
 									<td className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
 										{attestation.comment ? (
 											<Tooltip
