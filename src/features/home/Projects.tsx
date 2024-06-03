@@ -46,6 +46,7 @@ const options = {
 const limit = 10;
 
 export const Projects = () => {
+	const [term, setTerm] = useState<string>();
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
@@ -56,13 +57,14 @@ export const Projects = () => {
 		const organisationId = filterValues['Attested By'];
 
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(projectSource, organisationId),
+			generateFetchProjectsQuery(projectSource, organisationId, term),
 			{
 				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
 				project_source: projectSource,
 				organisation_id: organisationId,
+				term,
 			},
 		);
 
@@ -81,7 +83,7 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sort.key],
+		queryKey: ['projects', filterValues, sort.key, term],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -102,11 +104,16 @@ export const Projects = () => {
 					/>
 				</div>
 				<div className='flex gap-4 items-center'>
+					<input
+						placeholder='Search for projects'
+						className='inline-block py-2 px-2 border border-white mb-2 outline-none focus:border-black'
+						value={term}
+						onChange={e => setTerm(e.target.value)}
+					></input>
 					<FilterMenu
 						options={options}
 						value={filterValues}
 						setValues={setFilterValues}
-						className='custom-class'
 						label='Custom Filter'
 						stickToRight={true}
 					/>
