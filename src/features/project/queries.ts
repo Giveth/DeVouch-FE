@@ -26,6 +26,9 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
       comment
       attestTimestamp
       attestorOrganisation {
+        attestor {
+          id
+        }
         organisation {
           id
           name
@@ -63,31 +66,44 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $orgs: [String!]) {
-  projects(where: {attests_some: {attestorOrganisation: {attestor: {id_eq: $address}}}}) {
-    title
+query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int) {
+  projectAttestations(
+    where: {attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $orgs}}},
+    orderBy: attestTimestamp_ASC,
+    limit: $limit,
+    offset: $offset
+  ) {
     id
-    totalAttests
-    attests(
-      where: {attestorOrganisation: {organisation: {id_in: $orgs}}}
-      orderBy: attestTimestamp_ASC
-    ) {
-      vouch
-      txHash
-      revoked
-      recipient
-      id
-      comment
-      attestTimestamp
-      attestorOrganisation {
-        organisation {
+    vouch
+    txHash
+    revoked
+    recipient
+    comment
+    attestTimestamp
+    attestorOrganisation {
+      organisation {
+        id
+        name
+        attestors {
           id
-          name
-          attestors {
-            id
-          }
         }
       }
+      attestor {
+        id
+      }
+    }
+    project {
+      totalVouches
+      totalFlags
+      totalAttests
+      title
+      source
+      slug
+      projectId
+      lastUpdatedTimestamp
+      image
+      id
+      description
     }
   }
 }

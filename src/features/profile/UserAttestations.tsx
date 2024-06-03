@@ -7,6 +7,7 @@ import { FETCH_USER_ATTESTATIONS } from '@/features/project/queries';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
+import { Spinner } from '@/components/Loading/Spinner';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -31,34 +32,30 @@ export const UserAttestations = ({
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
-
+	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 	const fetchUserAttestations = async (
 		address: string,
-		// limit: number,
-		// offset: number,
+		limit: number,
+		offset: number,
 		orgs?: string[],
 	) => {
 		try {
 			setLoading(true);
-			const data = await fetchGraphQL<{ projects: IProject[] }>(
-				FETCH_USER_ATTESTATIONS,
-				{
-					address,
-					// limit,
-					// offset,
-					orgs,
-				},
-			);
-			const attests = data.projects.flatMap(
-				(project: IProject) => project.attests,
-			);
-
-			const totalAttests = data.projects.reduce(
-				(total: number, project: IProject) =>
-					total + project.totalAttests,
-				0,
-			);
-			setTotalAttests(totalAttests);
+			const data = await fetchGraphQL<{
+				projectAttestations: ProjectAttestation[];
+			}>(FETCH_USER_ATTESTATIONS, {
+				address,
+				limit,
+				offset,
+				orgs,
+			});
+			const attests = data?.projectAttestations;
+			// const totalAttests = attests.reduce(
+			// 	(total: number, attestation: ProjectAttestation) =>
+			// 		total + attestation.project?.totalAttests,
+			// 	0,
+			// );
+			// setTotalAttests(totalAttests);
 			setAttestations(attests);
 		} catch (e) {
 			console.log({ e });
@@ -72,8 +69,8 @@ export const UserAttestations = ({
 		const orgs = sourceFilterValues['Attested By'];
 		fetchUserAttestations(
 			address || '',
-			// ITEMS_PER_PAGE,
-			// currentPage * ITEMS_PER_PAGE,
+			ITEMS_PER_PAGE,
+			currentPage * ITEMS_PER_PAGE,
 			orgs?.length > 0 ? orgs : undefined,
 		);
 	}, [currentPage, address, sourceFilterValues]);
@@ -91,7 +88,6 @@ export const UserAttestations = ({
 		return match;
 	});
 
-	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
 
 	return (
@@ -101,11 +97,11 @@ export const UserAttestations = ({
 					<h1 className='text-2xl font-bold mb-6'>
 						{isExternal ? 'All' : 'My'} Attestations
 					</h1>
-					<h1 className='text-md mb-6'>{address}</h1>
+					<h1 className='text-xs md:text-lg mb-6'>{address}</h1>
 				</div>
 
-				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
-					<div className='flex flex-col lg:flex-row gap-4 w-full'>
+				<div className='flex flex-col w-full lg:flex-row justify-between items-center mb-4 gap-2'>
+					<div className='flex flex-col lg:flex-row gap-4 w-full mb-4 md:mb-0'>
 						<button
 							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
 								filter === 'all'
@@ -118,15 +114,17 @@ export const UserAttestations = ({
 								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
 							)}
 							All Attestations{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'all'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								({totalAttests})
-							</span>
+							{totalAttests > 0 && (
+								<span
+									className={`ml-2 text-white rounded-full px-2 ${
+										filter === 'all'
+											? 'bg-black'
+											: 'bg-[#82899a]'
+									}`}
+								>
+									({totalAttests})
+								</span>
+							)}
 						</button>
 						<button
 							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
@@ -187,19 +185,30 @@ export const UserAttestations = ({
 						options={filterOptions}
 						value={sourceFilterValues}
 						setValues={setSourceFilterValues}
-						className='custom-class'
-						label='Source Filter'
+						className='w-full md:w-[150px]'
+						label='Filters'
 						stickToRight={true}
 					/>
 				</div>
-				<AttestationsTable
-					attests={filteredAttestations}
-					filter={filter}
-					totalAttests={totalAttests}
-					itemsPerPage={ITEMS_PER_PAGE}
-					currentPage={currentPage}
-					onPageChange={handlePageChange}
-				/>
+				{loading ? (
+					<div className='flex items-center justify-center'>
+						<Spinner
+							size={32}
+							color='blue'
+							secondaryColor='lightgray'
+						/>
+					</div>
+				) : (
+					<AttestationsTable
+						attests={filteredAttestations}
+						filter={filter}
+						totalAttests={totalAttests}
+						itemsPerPage={ITEMS_PER_PAGE}
+						currentPage={currentPage}
+						onPageChange={handlePageChange}
+						isOwner={!!isOwner}
+					/>
+				)}
 			</div>
 		</div>
 	);

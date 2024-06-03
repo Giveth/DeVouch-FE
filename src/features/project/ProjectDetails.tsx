@@ -14,6 +14,7 @@ import {
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
+import { Spinner } from '@/components/Loading/Spinner';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,6 +28,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	const router = useRouter();
 	const { address } = useAccount();
 	const [project, setProject] = useState<any | null>(null);
+	const [attestations, setAttestations] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
@@ -50,6 +52,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 				{ slug, limit, offset, orgs },
 			);
 			setProject(data.projects[0]);
+			setAttestations(data.projects[0].attests);
 		} catch (e) {
 			setError('Failed to fetch project data.');
 		} finally {
@@ -71,12 +74,18 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 		setCurrentPage(newPage);
 	};
 
-	if (loading) return <p>Loading...</p>;
+	const LoadingComponent = () => (
+		<div className='flex items-center justify-center my-24 h-full'>
+			<Spinner size={32} color='blue' secondaryColor='lightgray' />
+		</div>
+	);
+
 	if (error) return <p>Error: {error}</p>;
-	if (!project) return <p>Project not found.</p>;
+	if (loading && !project) return <LoadingComponent />;
+	if (!loading && !project) return <p>Project not found.</p>;
 
 	return (
-		<div className='container mx-auto flex flex-col gap-8 p-4'>
+		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
 			<div className='bg-white shadow rounded-lg p-6'>
 				<h1 className='flex flex-row gap-6 text-2xl font-bold mb-6 border-b-2 pb-4 border-[#dbdbdb]'>
 					<Image
@@ -137,7 +146,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 				</div>
 			</div>
 
-			<div className='bg-white shadow p-6'>
+			<div className='relative bg-white shadow p-6'>
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
 					<div className='flex flex-col lg:flex-row gap-4 w-full'>
 						<button
@@ -254,18 +263,22 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 						value={sourceFilterValues}
 						setValues={setSourceFilterValues}
 						className='custom-class'
-						label='Source Filter'
+						label='Filters'
 						stickToRight={true}
 					/>
 				</div>
-				<AttestationsTable
-					attests={project.attests}
-					filter={filter}
-					totalAttests={project.totalAttests}
-					itemsPerPage={ITEMS_PER_PAGE}
-					currentPage={currentPage}
-					onPageChange={handlePageChange}
-				/>
+				{loading ? (
+					<LoadingComponent />
+				) : (
+					<AttestationsTable
+						attests={attestations}
+						filter={filter}
+						totalAttests={project.totalAttests}
+						itemsPerPage={ITEMS_PER_PAGE}
+						currentPage={currentPage}
+						onPageChange={handlePageChange}
+					/>
+				)}
 			</div>
 
 			<div className='flex flex-col sm:flex-row bg-transparent rounded-lg p-6 justify-end items-center text-center gap-2 mt-[-20px]'>

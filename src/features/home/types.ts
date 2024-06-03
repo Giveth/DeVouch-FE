@@ -44,7 +44,7 @@ interface ProjectAttestation {
 	txHash?: string;
 	revoked?: boolean;
 	attestorOrganisation: IAttestorOrganisation;
-	project?: IProject;
+	project: IProject;
 	attestTimestamp: Date;
 	comment: string;
 }
