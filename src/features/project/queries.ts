@@ -68,8 +68,8 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
 export const FETCH_USER_ATTESTATIONS = `
 query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int) {
   projectAttestations(
-    where: {attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $orgs}}},
-    orderBy: attestTimestamp_ASC,
+    where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $orgs}}},
+    orderBy: attestTimestamp_DESC,
     limit: $limit,
     offset: $offset
   ) {
@@ -105,6 +105,9 @@ query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $of
       id
       description
     }
+  }
+  projectAttestationsConnection(first:5, orderBy: project_totalAttests_DESC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
+    totalCount
   }
 }
 `;

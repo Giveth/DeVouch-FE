@@ -200,7 +200,7 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 										: 'bg-[#82899a]'
 								}`}
 							>
-								({project.totalAttests})
+								{project.totalAttests}
 							</span>
 						</button>
 						<button
@@ -222,12 +222,10 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 										: 'bg-[#82899a]'
 								}`}
 							>
-								(
 								{
 									project.attests.filter((a: any) => a.vouch)
 										.length
 								}
-								)
 							</span>
 						</button>
 						<button
@@ -249,12 +247,10 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 										: 'bg-[#82899a]'
 								}`}
 							>
-								(
 								{
 									project.attests.filter((a: any) => !a.vouch)
 										.length
 								}
-								)
 							</span>
 						</button>
 					</div>

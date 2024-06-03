@@ -43,19 +43,20 @@ export const UserAttestations = ({
 			setLoading(true);
 			const data = await fetchGraphQL<{
 				projectAttestations: ProjectAttestation[];
+				projectAttestationsConnection: {
+					totalCount: number;
+				};
 			}>(FETCH_USER_ATTESTATIONS, {
-				address,
+				address: !!address ? address : null,
 				limit,
 				offset,
 				orgs,
 			});
+
 			const attests = data?.projectAttestations;
-			// const totalAttests = attests.reduce(
-			// 	(total: number, attestation: ProjectAttestation) =>
-			// 		total + attestation.project?.totalAttests,
-			// 	0,
-			// );
-			// setTotalAttests(totalAttests);
+			const totalAttests =
+				data?.projectAttestationsConnection?.totalCount;
+			setTotalAttests(totalAttests);
 			setAttestations(attests);
 		} catch (e) {
 			console.log({ e });
@@ -122,7 +123,7 @@ export const UserAttestations = ({
 											: 'bg-[#82899a]'
 									}`}
 								>
-									({totalAttests})
+									{totalAttests}
 								</span>
 							)}
 						</button>
@@ -145,12 +146,10 @@ export const UserAttestations = ({
 										: 'bg-[#82899a]'
 								}`}
 							>
-								(
 								{
 									attestations.filter((a: any) => a.vouch)
 										.length
 								}
-								)
 							</span>
 						</button>
 						<button
@@ -172,12 +171,10 @@ export const UserAttestations = ({
 										: 'bg-[#82899a]'
 								}`}
 							>
-								(
 								{
 									attestations.filter((a: any) => !a.vouch)
 										.length
 								}
-								)
 							</span>
 						</button>
 					</div>

@@ -68,12 +68,19 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 				<table className='min-w-full table-auto text-left relative'>
 					<thead>
 						<tr className='bg-transparent'>
-							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
-								Attesters
-							</th>
+							{!isOwner && (
+								<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+									Attesters
+								</th>
+							)}
 							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
 								Attested As
 							</th>
+							{isOwner && (
+								<th className='px-4 py-2 font-semibold text-left text-gray-600'>
+									Date Attested
+								</th>
+							)}
 							<th className='px-4 py-2 font-semibold text-left text-gray-600'>
 								Comments
 							</th>
@@ -94,22 +101,29 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 								index: number,
 							) => (
 								<tr key={index} className='border-t relative'>
-									<td className='px-4 py-6 align-top text-gray-800'>
-										{ensNames[
-											attestation.attestorOrganisation
-												.attestor?.id
-										] ||
-											summarizeAddress(
+									{!isOwner && (
+										<td className='px-4 py-6 align-top text-gray-800'>
+											{ensNames[
 												attestation.attestorOrganisation
-													.attestor?.id,
-											)}
-										<br />
-										<span className='text-gray-500 text-sm'>
-											{new Date(
-												attestation.attestTimestamp,
-											).toLocaleDateString()}
-										</span>
-									</td>
+													.attestor?.id
+											] ||
+												summarizeAddress(
+													attestation
+														.attestorOrganisation
+														.attestor?.id,
+												)}
+											<br />
+											<span className='text-gray-500 text-sm'>
+												{new Date(
+													attestation.attestTimestamp,
+												).toLocaleDateString('en-US', {
+													day: 'numeric',
+													month: 'long',
+													year: 'numeric',
+												})}
+											</span>
+										</td>
+									)}
 									<td className='flex px-4 py-6 align-top text-gray-800 items-center'>
 										<span className='bg-[#f7f7f9] px-2 py-1'>
 											{
@@ -118,6 +132,17 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 											}
 										</span>
 									</td>
+									{isOwner && (
+										<td className='px-4 py-6 align-top text-gray-800'>
+											{new Date(
+												attestation.attestTimestamp,
+											).toLocaleDateString('en-US', {
+												day: 'numeric',
+												month: 'short',
+												year: 'numeric',
+											})}
+										</td>
+									)}
 									<td className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
 										{attestation.comment ? (
 											<Tooltip
