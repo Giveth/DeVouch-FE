@@ -84,7 +84,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 			<div
 				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white mb-2 hover:border-black ${isOpen ? '!border-black' : ''} `}
 			>
-				<div>{label}</div>
+				<div className='w-full'>{label}</div>
 				{showChevron && (
 					<Image
 						src='/images/icons/chevron-down.svg'

@@ -113,6 +113,7 @@ export const Projects = () => {
 						setValues={setFilterValues}
 						label='Custom Filter'
 						stickToRight={true}
+						className='w-full'
 					/>
 				</div>
 			</div>
