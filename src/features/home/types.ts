@@ -28,6 +28,7 @@ interface IAttestorOrganisation {
 interface IOrganisation {
 	id: string;
 	name: string;
+	color: string;
 	attestors?: IAttestor[];
 }
 
