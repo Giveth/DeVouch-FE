@@ -45,13 +45,17 @@ const analyzeAttests = (
 	attests?: ProjectAttestation[],
 	address?: Address,
 ): {
-	vouches: { id: string; count: number }[];
-	flags: { id: string; count: number }[];
+	vouches: { id: string; info: AttestInfo }[];
+	flags: { id: string; info: AttestInfo }[];
 	attestedByMe: ProjectAttestation | undefined;
 } => {
 	const res: {
-		vouches: { [key: string]: number };
-		flags: { [key: string]: number };
+		vouches: {
+			[key: string]: AttestInfo;
+		};
+		flags: {
+			[key: string]: AttestInfo;
+		};
 	} = {
 		vouches: {},
 		flags: {},
@@ -60,10 +64,15 @@ const analyzeAttests = (
 	let attestedByMe: ProjectAttestation | undefined = undefined;
 	attests.forEach(attest => {
 		const label = attest.vouch ? 'vouches' : 'flags';
-		if (res[label][attest.attestorOrganisation.organisation.name]) {
-			res[label][attest.attestorOrganisation.organisation.name]++;
+		const organisation = attest.attestorOrganisation.organisation;
+		if (res[label][attest.attestorOrganisation.organisation.id]) {
+			res[label][attest.attestorOrganisation.organisation.id].count++;
 		} else {
-			res[label][attest.attestorOrganisation.organisation.name] = 1;
+			res[label][attest.attestorOrganisation.organisation.id] = {
+				count: 1,
+				color: organisation.color,
+				name: organisation.name,
+			};
 		}
 		if (attestedByMe || !address) return;
 		attestedByMe =
@@ -73,11 +82,11 @@ const analyzeAttests = (
 				: undefined;
 	});
 	return {
-		vouches: Object.entries(res.vouches).map(([id, count]) => ({
+		vouches: Object.entries(res.vouches).map(([id, info]) => ({
 			id,
-			count,
+			info,
 		})),
-		flags: Object.entries(res.flags).map(([id, count]) => ({ id, count })),
+		flags: Object.entries(res.flags).map(([id, info]) => ({ id, info })),
 		attestedByMe,
 	};
 };
@@ -118,8 +127,8 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	);
 
 	return (
-		<div className='relative group'>
-			<div className='absolute w-full h-full top-0 left-0 group-hover:top-2 group-hover:-left-2 bg-black transition-all '></div>
+		<div className='relative group/card'>
+			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all '></div>
 			<div className='p-8 border h-full border-gray-100 bg-white hover:border-black flex flex-col gap-6 relative'>
 				<Link href={`/project/${project.slug}`}>
 					<div className='h-56 bg-blue-100 relative'>
@@ -174,11 +183,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					<div className='flex gap-2'>
 						{vouches.length > 0 ? (
 							vouches.map(vouch => (
-								<AttestInfo
-									key={vouch.id}
-									count={vouch.count}
-									organization={vouch.id}
-								/>
+								<AttestInfo key={vouch.id} info={vouch.info} />
 							))
 						) : (
 							<div className='bg-gray-100 py-1 px-2 w-full text-center'>
@@ -192,11 +197,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					<div className='flex gap-2'>
 						{flags?.length > 0 ? (
 							flags.map(flag => (
-								<AttestInfo
-									key={flag.id}
-									count={flag.count}
-									organization={flag.id}
-								/>
+								<AttestInfo key={flag.id} info={flag.info} />
 							))
 						) : (
 							<div className='bg-gray-100 py-1 px-2 w-full text-center'>
