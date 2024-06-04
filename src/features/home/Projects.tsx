@@ -9,6 +9,7 @@ import { Button, ButtonType } from '@/components/Button/Button';
 import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
+import { SearchInput } from './SearchInput';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -46,6 +47,7 @@ const options = {
 const limit = 10;
 
 export const Projects = () => {
+	const [term, setTerm] = useState<string>();
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
@@ -56,13 +58,14 @@ export const Projects = () => {
 		const organisationId = filterValues['Attested By'];
 
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(projectSource, organisationId),
+			generateFetchProjectsQuery(projectSource, organisationId, term),
 			{
 				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
 				project_source: projectSource,
 				organisation_id: organisationId,
+				term,
 			},
 		);
 
@@ -81,7 +84,7 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sort.key],
+		queryKey: ['projects', filterValues, sort.key, term],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -91,8 +94,8 @@ export const Projects = () => {
 
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex justify-between'>
-				<div className='flex gap-4 items-center'>
+			<div className='flex flex-col md:flex-row gap-4'>
+				<div className='flex gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
 						options={sortOptions}
@@ -101,14 +104,16 @@ export const Projects = () => {
 						className='w-60'
 					/>
 				</div>
+				<div className='flex-1' />
+				<SearchInput setTerm={setTerm} />
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
 						options={options}
 						value={filterValues}
 						setValues={setFilterValues}
-						className='custom-class'
 						label='Custom Filter'
 						stickToRight={true}
+						className='w-full'
 					/>
 				</div>
 			</div>

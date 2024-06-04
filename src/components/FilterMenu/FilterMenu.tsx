@@ -92,7 +92,7 @@ const FilterMenu: FC<FilterMenuProps> = ({
 				</div>,
 			]}
 			label={
-				<div className='flex flex-row items-center gap-6'>
+				<div className='flex flex-row items-center gap-6 justify-between'>
 					<div>{label}</div>
 					<Image src={OptionsIcon} alt='' width={24} height={24} />
 				</div>
