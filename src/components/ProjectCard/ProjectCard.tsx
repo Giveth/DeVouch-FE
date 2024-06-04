@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
+import { IProject, ProjectAttestation } from '@/features/home/types';
 
 interface IProjectCardProps {
 	project: IProject;
