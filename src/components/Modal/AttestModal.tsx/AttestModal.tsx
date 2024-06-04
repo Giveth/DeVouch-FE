@@ -137,6 +137,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					},
 					attestTimestamp: new Date(),
 					comment: comment,
+					project: _project,
 				};
 				_project.attests = [...(_project.attests || []), attest];
 			}
