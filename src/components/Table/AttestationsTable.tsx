@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Tooltip from './Tooltip';
-import { getEnsName, summarizeAddress } from '@/helpers/wallet';
+import { AddressName } from '../AddressName';
+import { type ProjectAttestation } from '@/features/home/types';
 
 interface AttestationsTableProps {
 	attests: any[];
@@ -19,7 +20,7 @@ interface AttestationsTableProps {
 
 const ITEMS_PER_PAGE_DEFAULT = 10;
 
-const AttestationsTable: React.FC<AttestationsTableProps> = ({
+const AttestationsTable: FC<AttestationsTableProps> = ({
 	attests,
 	filter,
 	itemsPerPage = ITEMS_PER_PAGE_DEFAULT,
@@ -31,7 +32,6 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 	isOwner,
 }) => {
 	const [filteredAttests, setFilteredAttests] = useState<any[]>([]);
-	const [ensNames, setEnsNames] = useState<{ [key: string]: string }>({});
 
 	useEffect(() => {
 		let filtered = attests;
@@ -42,23 +42,6 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 		}
 		setFilteredAttests(filtered);
 	}, [attests, filter]);
-
-	useEffect(() => {
-		const fetchEnsNames = async () => {
-			const names: { [key: string]: string } = {};
-			for (const attestation of filteredAttests) {
-				const attestor =
-					attestation?.attestorOrganisation?.attestor?.id;
-				const name = await getEnsName(attestor);
-				if (name) {
-					names[attestor] = name;
-				}
-			}
-			setEnsNames(names);
-		};
-
-		fetchEnsNames();
-	}, [filteredAttests]);
 
 	const totalPages = Math.ceil(totalAttests / itemsPerPage);
 
@@ -130,15 +113,13 @@ const AttestationsTable: React.FC<AttestationsTableProps> = ({
 									)}
 									{!isOwner && (
 										<td className='px-4 py-6 align-top text-gray-800'>
-											{ensNames[
-												attestation.attestorOrganisation
-													.attestor?.id
-											] ||
-												summarizeAddress(
+											<AddressName
+												address={
 													attestation
 														.attestorOrganisation
-														.attestor?.id,
-												)}
+														.attestor?.id
+												}
+											/>
 											<br />
 											<span className='text-gray-500 text-sm'>
 												{new Date(

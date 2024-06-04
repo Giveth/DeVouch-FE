@@ -1,8 +1,8 @@
-import { type ButtonHTMLAttributes, type FC } from 'react';
+import { type ReactNode, type ButtonHTMLAttributes, type FC } from 'react';
 import { Spinner } from '../Loading/Spinner';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	children: React.ReactNode;
+	children: ReactNode;
 	buttonType?: ButtonType;
 	loading?: boolean;
 }

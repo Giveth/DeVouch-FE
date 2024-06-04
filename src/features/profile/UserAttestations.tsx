@@ -8,6 +8,7 @@ import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
+import { type ProjectAttestation } from '../home/types';
 
 const ITEMS_PER_PAGE = 10;
 

@@ -1,17 +1,14 @@
 import { useWalletInfo } from '@web3modal/wagmi/react';
 import Image from 'next/image';
 import React from 'react';
-import { Address } from 'viem';
 import { useAccount } from 'wagmi';
-import { summarizeAddress } from '@/helpers/wallet';
 import { ChainIcon } from '../ChainIcon';
-import useEnsName from '@/lib/useEnsName';
+import { AddressName } from '../AddressName';
 
 export const ConnectedWalletInfo = () => {
 	const { walletInfo } = useWalletInfo();
 	console.log(walletInfo?.name, walletInfo?.icon);
-	const { address, isConnected, isConnecting, chainId } = useAccount();
-	const ensName = useEnsName(address as Address);
+	const { address, chainId } = useAccount();
 
 	return address ? (
 		<div className='flex gap-3'>
@@ -30,7 +27,9 @@ export const ConnectedWalletInfo = () => {
 					)}
 				</div>
 			)}
-			<div>{ensName || summarizeAddress(address)}</div>
+			<div>
+				<AddressName address={address} />
+			</div>
 		</div>
 	) : (
 		<div>Not Connected</div>

@@ -5,28 +5,10 @@ import {
 	JsonRpcSigner,
 } from 'ethers';
 import { useMemo } from 'react';
-import { getEnsName as _getEnsName } from 'wagmi/actions';
 import { type Config, useClient, useConnectorClient } from 'wagmi';
-import { wagmiConfig } from '@/config/wagmi';
-import type { Chain, Client, Transport, Account, Address } from 'viem';
+import type { Chain, Client, Transport, Account } from 'viem';
 
-export const getEnsName = async (
-	address: Address,
-	chainId?: number,
-): Promise<string | null> => {
-	try {
-		const ensName = await _getEnsName(wagmiConfig, {
-			address,
-			chainId: chainId || 1, // defaults to mainnet
-		});
-		return ensName;
-	} catch (e) {
-		console.log({ e });
-		return null;
-	}
-};
-
-export const summarizeAddress = (address: string) => {
+export const summarizeAddress = (address?: string) => {
 	if (!address) return '';
 	return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };

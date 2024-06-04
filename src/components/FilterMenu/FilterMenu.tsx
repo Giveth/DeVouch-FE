@@ -1,4 +1,9 @@
-import { type FC, type HTMLAttributes } from 'react';
+import {
+	type Dispatch,
+	type SetStateAction,
+	type FC,
+	type HTMLAttributes,
+} from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
 import Checkbox from '../CheckBox/CheckBox';
@@ -8,9 +13,7 @@ import TrashIcon from '../../../public/images/icons/trash.svg';
 interface FilterMenuProps {
 	options: IOptions;
 	value: { [key: string]: string[] };
-	setValues: React.Dispatch<
-		React.SetStateAction<{ [key: string]: string[] }>
-	>;
+	setValues: Dispatch<SetStateAction<{ [key: string]: string[] }>>;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 	label?: string;
 	stickToRight?: boolean;
