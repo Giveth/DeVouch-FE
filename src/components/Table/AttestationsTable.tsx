@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Tooltip from './Tooltip';
 import { AddressName } from '../AddressName';
@@ -20,7 +20,7 @@ interface AttestationsTableProps {
 
 const ITEMS_PER_PAGE_DEFAULT = 10;
 
-const AttestationsTable: React.FC<AttestationsTableProps> = ({
+const AttestationsTable: FC<AttestationsTableProps> = ({
 	attests,
 	filter,
 	itemsPerPage = ITEMS_PER_PAGE_DEFAULT,

@@ -8,6 +8,7 @@ import {
 	type ReactNode,
 	Fragment,
 	type HTMLAttributes,
+	type FC,
 } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -20,7 +21,7 @@ export interface DropdownProps {
 	showChevron?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({
+const Dropdown: FC<DropdownProps> = ({
 	label,
 	options,
 	stickToRight,

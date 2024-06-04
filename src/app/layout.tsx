@@ -2,6 +2,7 @@ import './globals.css';
 import { Space_Grotesk } from 'next/font/google';
 import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
+import { type ReactNode } from 'react';
 import Web3ModalProvider from '@/context';
 import { wagmiConfig } from '@/config/wagmi';
 import { Header } from '@/components/Header/Header';
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
 	children,
 }: Readonly<{
-	children: React.ReactNode;
+	children: ReactNode;
 }>) {
 	const initialState = cookieToInitialState(
 		wagmiConfig,

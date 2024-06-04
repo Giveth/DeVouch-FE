@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type FC } from 'react';
+import { type ReactNode, type ButtonHTMLAttributes, type FC } from 'react';
 import { Spinner } from '../Loading/Spinner';
 
 export enum OutlineButtonType {
@@ -7,7 +7,7 @@ export enum OutlineButtonType {
 }
 
 interface OutlineButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	children: React.ReactNode;
+	children: ReactNode;
 	buttonType?: OutlineButtonType;
 	loading?: boolean;
 }
