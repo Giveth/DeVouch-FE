@@ -10,6 +10,7 @@ import { generateFetchProjectsQuery } from './query-genrator';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
+import { IProject } from './types';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',

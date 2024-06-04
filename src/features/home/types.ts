@@ -1,6 +1,6 @@
 import { Address } from 'viem';
 
-interface IProject {
+export interface IProject {
 	id: string;
 	projectId: string;
 	title: string;
