@@ -11,6 +11,7 @@ import { fetchGraphQL } from '@/helpers/request';
 import { OutlineButton } from '@/components/Button/OutlineButton';
 import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
+import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 
 interface IOrganisation {
 	id: string;
@@ -130,6 +131,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 						organisation: {
 							id: selectedOrg.organisation.id,
 							name: selectedOrg.organisation.name,
+							color: DEFAULT_ORGANISATION_COLOR,
 						},
 						attestTimestamp: new Date(),
 					},
