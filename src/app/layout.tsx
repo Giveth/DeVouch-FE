@@ -35,7 +35,7 @@ export default function RootLayout({
 			</head>
 			<body className={spaceGrotesk.className}>
 				<Web3ModalProvider initialState={initialState}>
-					<div className='min-h-screen flex flex-col gap-24 relative'>
+					<div className='min-h-screen flex flex-col gap-24 relative overflow-x-hidden'>
 						<Header />
 						<div className='min-h-[80vh]'>{children}</div>
 						<Footer />
