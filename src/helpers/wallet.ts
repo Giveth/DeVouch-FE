@@ -8,7 +8,8 @@ import { useMemo } from 'react';
 import { type Config, useClient, useConnectorClient } from 'wagmi';
 import type { Chain, Client, Transport, Account } from 'viem';
 
-export const summarizeAddress = (address: string) => {
+export const summarizeAddress = (address?: string) => {
+	if (!address) return '';
 	return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 

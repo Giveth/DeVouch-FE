@@ -1,4 +1,9 @@
-import { type FC, type HTMLAttributes } from 'react';
+import {
+	type Dispatch,
+	type SetStateAction,
+	type FC,
+	type HTMLAttributes,
+} from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
 import Checkbox from '../CheckBox/CheckBox';
@@ -8,9 +13,7 @@ import TrashIcon from '../../../public/images/icons/trash.svg';
 interface FilterMenuProps {
 	options: IOptions;
 	value: { [key: string]: string[] };
-	setValues: React.Dispatch<
-		React.SetStateAction<{ [key: string]: string[] }>
-	>;
+	setValues: Dispatch<SetStateAction<{ [key: string]: string[] }>>;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 	label?: string;
 	stickToRight?: boolean;
@@ -53,14 +56,9 @@ const FilterMenu: FC<FilterMenuProps> = ({
 		setValues({});
 	};
 
-	const selectedCount = Object.values(value).reduce(
-		(acc, selectedOptions) => acc + selectedOptions.length,
-		0,
-	);
-
 	return (
 		<Dropdown
-			className={className}
+			className={`relative ${className}`}
 			options={[
 				...Object.entries(options).map(([key, optionList]) => (
 					<div key={key}>
@@ -97,9 +95,9 @@ const FilterMenu: FC<FilterMenuProps> = ({
 				</div>,
 			]}
 			label={
-				<div className='flex gap-6 justify-between'>
-					<span>Filter</span>
-					<Image src={OptionsIcon} alt='' />
+				<div className='flex flex-row items-center gap-6 justify-between'>
+					<div>{label}</div>
+					<Image src={OptionsIcon} alt='' width={24} height={24} />
 				</div>
 			}
 			showChevron={false}

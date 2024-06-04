@@ -1,3 +1,5 @@
+import { Address } from 'viem';
+
 interface IProject {
 	id: string;
 	projectId: string;
@@ -33,18 +35,18 @@ interface IOrganisation {
 }
 
 interface IAttestor {
-	id: string;
+	id: Address;
 	organisations?: IAttestorOrganisation[];
 }
 
-interface ProjectAttestation {
+export interface ProjectAttestation {
 	id: string;
 	recipient?: string;
 	vouch: boolean;
 	txHash?: string;
 	revoked?: boolean;
 	attestorOrganisation: IAttestorOrganisation;
-	project?: IProject;
+	project: IProject;
 	attestTimestamp: Date;
 	comment: string;
 }

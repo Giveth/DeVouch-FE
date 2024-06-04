@@ -16,7 +16,7 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
       where: {attestorOrganisation: {organisation: {id_in: $orgs}}},
       limit: $limit, 
       offset: $offset, 
-      orderBy: attestTimestamp_ASC
+      orderBy: attestTimestamp_DESC
     ) {
       vouch
       txHash
@@ -26,6 +26,9 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
       comment
       attestTimestamp
       attestorOrganisation {
+        attestor {
+          id
+        }
         organisation {
           id
           name
@@ -63,32 +66,48 @@ query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [Stri
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $orgs: [String!]) {
-  projects(where: {attests_some: {attestorOrganisation: {attestor: {id_eq: $address}}}}) {
-    title
+query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!]!) {
+  projectAttestations(
+    where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $orgs}}},
+    orderBy: $orderBy,
+    limit: $limit,
+    offset: $offset
+  ) {
     id
-    totalAttests
-    attests(
-      where: {attestorOrganisation: {organisation: {id_in: $orgs}}}
-      orderBy: attestTimestamp_ASC
-    ) {
-      vouch
-      txHash
-      revoked
-      recipient
-      id
-      comment
-      attestTimestamp
-      attestorOrganisation {
-        organisation {
+    vouch
+    txHash
+    revoked
+    recipient
+    comment
+    attestTimestamp
+    attestorOrganisation {
+      organisation {
+        id
+        name
+        attestors {
           id
-          name
-          attestors {
-            id
-          }
         }
       }
+      attestor {
+        id
+      }
     }
+    project {
+      totalVouches
+      totalFlags
+      totalAttests
+      title
+      source
+      slug
+      projectId
+      lastUpdatedTimestamp
+      image
+      id
+      description
+    }
+  }
+  projectAttestationsConnection(first:5, orderBy: project_totalAttests_DESC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
+    totalCount
   }
 }
 `;
