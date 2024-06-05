@@ -1,211 +1,133 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { fetchGraphQL } from '@/helpers/request';
-import { FETCH_USER_ATTESTATIONS } from '@/features/project/queries';
+import { Address } from 'viem';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Image from 'next/image';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
-import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
+import { AddressName } from '@/components/AddressName';
+import { Tabs } from '@/components/Tabs';
+import { VouchFilter } from './types';
+import { UserAttestationsInfo, fetchUserAttestations } from './service';
+import Tooltip from '@/components/Table/Tooltip';
+import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
-
-const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
 };
 
-enum orderByOptions {
-	'ATTEST_TIMESTAMP_DESC' = 'attestTimestamp_DESC',
-	'ATTEST_TIMESTAMP_ASC' = 'attestTimestamp_ASC',
-	'PROJECT_TITLE_ASC' = 'project_title_ASC_NULLS_LAST',
-	'PROJECT_TITLE_DESC' = 'project_title_DESC_NULLS_LAST',
+enum OrderByOptions {
+	NEWEST = 'attestTimestamp_DESC',
+	OLDEST = 'attestTimestamp_ASC',
+	PROJECT_TITLE_ASC = 'project_title_ASC_NULLS_LAST',
+	PROJECT_TITLE_DESC = 'project_title_DESC_NULLS_LAST',
 }
+
+const headers = [
+	{ key: 'project.title', label: 'Projects' },
+	{ key: 'name', label: 'Date Attested' },
+	{ key: 'age', label: 'Attested As' },
+	{ key: 'email', label: 'Comments' },
+	{ key: 'email', label: 'Signal' },
+	{ key: 'email', label: 'Actions' },
+];
 
 export const UserAttestations = ({
 	address: externalAddress,
 }: {
-	address?: string;
+	address?: Address;
 }) => {
 	const { address: connectedAddress } = useAccount();
 	const isExternal = !!externalAddress;
-	const address = externalAddress || connectedAddress;
-	const [attestations, setAttestations] = useState<any[]>([]);
-	const [totalAttests, setTotalAttests] = useState(0);
-	const [orderBy, setOrderBy] = useState(
-		orderByOptions.ATTEST_TIMESTAMP_DESC,
-	);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const address = externalAddress || connectedAddress || '0x000';
+	const [orderBy, setOrderBy] = useState(OrderByOptions.NEWEST);
 	const [currentPage, setCurrentPage] = useState(0);
-	const [filter, setFilter] = useState<'all' | 'vouched' | 'flagged'>('all');
+	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const queryClient = useQueryClient();
+	const attestOnAction = useRef<ProjectAttestation>();
+
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
-	const fetchUserAttestations = async (
-		address: string,
-		limit: number,
-		offset: number,
-		orgs?: string[],
-	) => {
-		try {
-			setLoading(true);
-			const data = await fetchGraphQL<{
-				projectAttestations: ProjectAttestation[];
-				projectAttestationsConnection: {
-					totalCount: number;
-				};
-			}>(FETCH_USER_ATTESTATIONS, {
-				address: !!address ? address : null,
-				limit,
-				offset,
-				orderBy: [orderBy],
-				orgs,
-			});
 
-			const attests = data?.projectAttestations;
-			const totalAttests =
-				data?.projectAttestationsConnection?.totalCount;
-			setTotalAttests(totalAttests);
-			setAttestations(attests);
-		} catch (e) {
-			console.log({ e });
-			setError('Failed to fetch user attestations.');
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		const orgs = sourceFilterValues['Attested By'];
-		fetchUserAttestations(
-			address || '',
-			ITEMS_PER_PAGE,
-			currentPage * ITEMS_PER_PAGE,
-			orgs?.length > 0 ? orgs : undefined,
-		);
-	}, [currentPage, address, orderBy, sourceFilterValues]);
-
-	const handlePageChange = (newPage: number) => {
-		setCurrentPage(newPage);
-	};
-
-	const handleOrderByProjectChange = () => {
-		setOrderBy(prevOrderBy =>
-			prevOrderBy === orderByOptions.PROJECT_TITLE_ASC
-				? orderByOptions.PROJECT_TITLE_DESC
-				: orderByOptions.PROJECT_TITLE_ASC,
-		);
-	};
-
-	const handleOrderByDateChange = () => {
-		setOrderBy(prevOrderBy =>
-			prevOrderBy === orderByOptions.ATTEST_TIMESTAMP_DESC
-				? orderByOptions.ATTEST_TIMESTAMP_ASC
-				: orderByOptions.ATTEST_TIMESTAMP_DESC,
-		);
-	};
-
-	const filteredAttestations = attestations?.filter((attestation: any) => {
-		let match = true;
-
-		if (filter === 'vouched') match = match && attestation.vouch;
-		if (filter === 'flagged') match = match && !attestation.vouch;
-
-		return match;
+	const { data, error, isLoading } = useQuery({
+		queryKey: [
+			'userAttestations',
+			address,
+			currentPage,
+			orderBy,
+			sourceFilterValues['Attested By'],
+			activeTab,
+		],
+		queryFn: fetchUserAttestations,
+		enabled: !!address,
 	});
 
-	if (error) return <p>Error: {error}</p>;
+	const tabs = [
+		{
+			key: VouchFilter.ALL_ATTESTATIONS,
+			label: 'All Attestations',
+			count: data?.totalAttests,
+		},
+		{
+			key: VouchFilter.VOUCHED,
+			label: 'Vouched',
+			count: data?.totalVouches,
+		},
+		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: data?.totalFlags },
+	];
+
+	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
+		const vouch = attestation.vouch;
+		queryClient.setQueryData(
+			[
+				'userAttestations',
+				address,
+				currentPage,
+				orderBy,
+				sourceFilterValues['Attested By'],
+				activeTab,
+			],
+			(oldData: UserAttestationsInfo) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+				const newData = {
+					attestations: oldData.attestations.filter(
+						attest =>
+							attest.id.toLowerCase() !==
+							attestation.id.toLowerCase(),
+					),
+					totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
+					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
+					totalAttests: oldData.totalVouches - 1,
+				};
+				return newData;
+			},
+		);
+	}, []);
 
 	return (
-		<div className='container mx-auto flex flex-col gap-8 p-4'>
-			<div className='bg-white shadow rounded-lg p-6'>
-				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
-					<h1 className='text-2xl font-bold mb-6'>
-						{isExternal ? 'All' : 'My'} Attestations
-					</h1>
-					<h1 className='text-xs md:text-lg mb-6'>{address}</h1>
-				</div>
-
+		<div className='container'>
+			<div className='bg-white p-6 flex flex-col lg:flex-row justify-between items-center mb-6 gap-2'>
+				<h1 className='text-2xl font-bold '>
+					{isExternal ? 'All' : 'My'} Attestations
+				</h1>
+				<h1 className='text-xs md:text-lg'>
+					<AddressName address={address} />{' '}
+				</h1>
+			</div>
+			<div className='bg-white p-6 '>
 				<div className='flex flex-col w-full lg:flex-row justify-between items-center mb-4 gap-2'>
-					<div className='flex flex-col lg:flex-row gap-4 w-full mb-4 md:mb-0'>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'all'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('all')}
-						>
-							{filter === 'all' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							All Attestations{' '}
-							{totalAttests > 0 && (
-								<span
-									className={`ml-2 text-white rounded-full px-2 ${
-										filter === 'all'
-											? 'bg-black'
-											: 'bg-[#82899a]'
-									}`}
-								>
-									{totalAttests}
-								</span>
-							)}
-						</button>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'vouched'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('vouched')}
-						>
-							{filter === 'vouched' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							Vouched{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'vouched'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								{
-									attestations.filter((a: any) => a.vouch)
-										.length
-								}
-							</span>
-						</button>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'flagged'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('flagged')}
-						>
-							{filter === 'flagged' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							Flagged{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'flagged'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								{
-									attestations.filter((a: any) => !a.vouch)
-										.length
-								}
-							</span>
-						</button>
-					</div>
+					<Tabs
+						tabs={tabs}
+						activeTab={activeTab}
+						onTabChange={setActiveTab}
+					/>
 					<FilterMenu
 						options={filterOptions}
 						value={sourceFilterValues}
@@ -215,7 +137,7 @@ export const UserAttestations = ({
 						stickToRight={true}
 					/>
 				</div>
-				{loading ? (
+				{isLoading ? (
 					<div className='flex items-center justify-center'>
 						<Spinner
 							size={32}
@@ -224,18 +146,125 @@ export const UserAttestations = ({
 						/>
 					</div>
 				) : (
-					<AttestationsTable
-						filteredAttests={filteredAttestations}
-						totalAttests={totalAttests}
-						itemsPerPage={ITEMS_PER_PAGE}
-						currentPage={currentPage}
-						onPageChange={handlePageChange}
-						onOrderByProjectChange={handleOrderByProjectChange}
-						onOrderByDateChange={handleOrderByDateChange}
-						isOwner={!!isOwner}
-					/>
+					<div className='overflow-x-auto'>
+						<div className='grid grid-cols-6 items-center min-w-[900px] text-left relative'>
+							{headers.map((header, id) => (
+								<div
+									className='px-4 py-2 font-semibold text-left text-gray-600'
+									key={id}
+								>
+									{header.label}
+								</div>
+							))}
+							{data?.attestations.map((attest, id) => (
+								<React.Fragment key={id}>
+									<div className='col-span-6 border-b'></div>{' '}
+									{/* Divider line */}
+									<div className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
+										{attest.project.title}
+									</div>
+									<div>
+										{new Date(
+											attest.attestTimestamp,
+										).toLocaleDateString('en-US', {
+											day: 'numeric',
+											month: 'long',
+											year: 'numeric',
+										})}
+									</div>
+									<div className='bg-[#f7f7f9] px-2 py-1'>
+										{
+											attest.attestorOrganisation
+												.organisation.name
+										}
+									</div>
+									<div className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
+										{attest.comment ? (
+											<Tooltip
+												message={attest.comment}
+												direction='right'
+											>
+												<Image
+													src={
+														'/images/icons/msg.svg'
+													}
+													alt={'comment'}
+													width={18}
+													height={18}
+													className='cursor-pointer mx-auto'
+												/>
+											</Tooltip>
+										) : (
+											<b>-</b>
+										)}
+									</div>
+									<div>
+										{attest.vouch ? (
+											<span className='flex gap-2 items-center'>
+												<Image
+													src={
+														'/images/icons/vouched.svg'
+													}
+													alt={'vouched'}
+													width={24}
+													height={24}
+												/>
+												Vouched
+											</span>
+										) : (
+											<span className='gap-4 flex items-center'>
+												<Image
+													src={
+														'/images/icons/red-flag.svg'
+													}
+													alt={'red-flag'}
+													width={18}
+													height={18}
+												/>
+												Flagged
+											</span>
+										)}
+									</div>
+									<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
+										<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+											Edit{' '}
+											<Image
+												src={'/images/icons/edit.svg'}
+												alt={'edit'}
+												width={16}
+												height={16}
+											/>
+										</button>
+										<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+											<Image
+												src={
+													'/images/icons/trash-black.svg'
+												}
+												alt={'edit'}
+												width={18}
+												height={18}
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowDeleteModal(true);
+												}}
+											/>
+										</button>
+									</div>
+								</React.Fragment>
+							))}
+						</div>
+					</div>
 				)}
 			</div>
+			{showDeleteModal && attestOnAction.current && (
+				<DeleteAttestModal
+					attestation={attestOnAction.current}
+					showModal={showDeleteModal}
+					setShowModal={setShowDeleteModal}
+					onSuccess={onSuccessDelete}
+				/>
+			)}
 		</div>
 	);
 };

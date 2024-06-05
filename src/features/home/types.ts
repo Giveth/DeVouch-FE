@@ -42,7 +42,7 @@ export interface IAttestor {
 }
 
 export interface ProjectAttestation {
-	id: string;
+	id: Address;
 	recipient?: string;
 	vouch: boolean;
 	txHash?: string;

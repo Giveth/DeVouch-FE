@@ -17,7 +17,7 @@ import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
-import { Tabs } from './Tabs';
+import { Tabs } from '@/components/Tabs';
 import { IProject, ProjectAttestation } from '../home/types';
 
 export enum Tab {
