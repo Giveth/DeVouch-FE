@@ -75,13 +75,16 @@ query fetchUserAttestations($address: String, $vouch: Boolean, $organisation: [S
     comment
     attestTimestamp
     attestorOrganisation {
+      id
       organisation {
         id
         name
       }
     }
     project {
+      projectId
       title
+      source
     }
   }
   vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: true, revoked_eq: false}}) {

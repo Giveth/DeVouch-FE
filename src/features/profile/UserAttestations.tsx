@@ -15,6 +15,7 @@ import { UserAttestationsInfo, fetchUserAttestations } from './service';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
+import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -56,6 +57,7 @@ export const UserAttestations = ({
 		[key: string]: string[];
 	}>({});
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
 	const queryClient = useQueryClient();
 	const attestOnAction = useRef<ProjectAttestation>();
 
@@ -115,6 +117,96 @@ export const UserAttestations = ({
 			},
 		);
 	}, []);
+
+	const onSuccessEdit = useCallback(
+		(attestation: ProjectAttestation, oldAttestId: Address) => {
+			const vouch = attestation.vouch;
+			queryClient.setQueryData(
+				[
+					'userAttestations',
+					address,
+					currentPage,
+					orderBy,
+					sourceFilterValues['Attested By'],
+					activeTab,
+				],
+				(oldData: UserAttestationsInfo | undefined) => {
+					if (!oldData) return oldData; // In case oldData is undefined or null
+
+					let {
+						attestations,
+						totalVouches,
+						totalFlags,
+						totalAttests,
+					} = oldData;
+
+					// Find the existing attestation in the old data
+					const existingAttestationIndex = attestations.findIndex(
+						attest =>
+							attest.id.toLowerCase() ===
+							oldAttestId.toLowerCase(),
+					);
+					const existingAttestation =
+						attestations[existingAttestationIndex];
+
+					if (!existingAttestation) {
+						// If the attestation doesn't exist in the current data, return old data
+						return oldData;
+					}
+
+					// Update counts based on the change in vouch status
+					if (existingAttestation.vouch !== vouch) {
+						if (vouch) {
+							totalVouches += 1;
+							totalFlags -= 1;
+						} else {
+							totalVouches -= 1;
+							totalFlags += 1;
+						}
+					}
+
+					totalAttests = totalVouches + totalFlags;
+
+					// Handle active tab filtering
+					const shouldRemoveAttestation =
+						(activeTab === VouchFilter.VOUCHED && !vouch) ||
+						(activeTab === VouchFilter.FLAGGED && vouch);
+
+					let newAttestations;
+
+					if (shouldRemoveAttestation) {
+						newAttestations = attestations.filter(
+							attest =>
+								attest.id.toLowerCase() !==
+								oldAttestId.toLowerCase(),
+						);
+					} else {
+						newAttestations = attestations.map(attest =>
+							attest.id.toLowerCase() ===
+							oldAttestId.toLowerCase()
+								? attestation
+								: attest,
+						);
+					}
+
+					return {
+						attestations: newAttestations,
+						totalVouches,
+						totalFlags,
+						totalAttests,
+					};
+				},
+			);
+		},
+		[
+			address,
+			currentPage,
+			orderBy,
+			sourceFilterValues,
+			activeTab,
+			queryClient,
+		],
+	);
 
 	return (
 		<div className='container'>
@@ -236,7 +328,14 @@ export const UserAttestations = ({
 									</div>
 									{isOwner && (
 										<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
-											<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+											<button
+												className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowEditModal(true);
+												}}
+											>
 												Edit{' '}
 												<Image
 													src={
@@ -247,7 +346,14 @@ export const UserAttestations = ({
 													height={16}
 												/>
 											</button>
-											<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+											<button
+												className='mr-2 border border-gray text-black font-bold px-4 py-2'
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowDeleteModal(true);
+												}}
+											>
 												<Image
 													src={
 														'/images/icons/trash-black.svg'
@@ -255,13 +361,6 @@ export const UserAttestations = ({
 													alt={'edit'}
 													width={18}
 													height={18}
-													onClick={() => {
-														attestOnAction.current =
-															attest;
-														setShowDeleteModal(
-															true,
-														);
-													}}
 												/>
 											</button>
 										</div>
@@ -278,6 +377,14 @@ export const UserAttestations = ({
 					showModal={showDeleteModal}
 					setShowModal={setShowDeleteModal}
 					onSuccess={onSuccessDelete}
+				/>
+			)}
+			{showEditModal && attestOnAction.current && (
+				<EditAttestModal
+					attestation={attestOnAction.current}
+					showModal={showEditModal}
+					setShowModal={setShowEditModal}
+					onSuccess={onSuccessEdit}
 				/>
 			)}
 		</div>
