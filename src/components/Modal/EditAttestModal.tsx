@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useRef, useState, type FC } from 'react';
 import { useAccount } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
@@ -34,8 +34,9 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
+	const isVouching = useRef(false);
 
-	const handleConfirm = async (vouch: boolean) => {
+	const handleConfirm = async () => {
 		if (!address || !signer) return;
 
 		try {
@@ -58,7 +59,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					value: attestation.project.projectId,
 					type: 'string',
 				},
-				{ name: 'vouch', value: vouch, type: 'bool' },
+				{ name: 'vouch', value: isVouching.current, type: 'bool' },
 				{ name: 'comment', value: comment, type: 'string' },
 			]);
 
@@ -83,7 +84,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 			// Update Project Data
 			const _attestation = structuredClone(attestation);
 			_attestation.id = newAttestationUID as Address;
-			_attestation.vouch = vouch;
+			_attestation.vouch = isVouching.current;
 			_attestation.attestTimestamp = new Date();
 			onSuccess(_attestation, attestation.id);
 
@@ -148,15 +149,30 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					<div className='flex gap-8'>
 						<OutlineButton
 							className='flex-1'
-							onClick={() => handleConfirm(true)}
-							loading={step === AttestSteps.ATTESTING}
+							onClick={() => {
+								isVouching.current = true;
+								handleConfirm();
+							}}
+							loading={
+								step === AttestSteps.ATTESTING &&
+								isVouching.current === true
+							}
+							disabled={step === AttestSteps.ATTESTING}
 						>
 							Vouch
 						</OutlineButton>
 						<OutlineButton
 							className='flex-1'
-							onClick={() => handleConfirm(false)}
+							onClick={() => {
+								isVouching.current = false;
+								handleConfirm();
+							}}
 							buttonType={OutlineButtonType.RED}
+							loading={
+								step === AttestSteps.ATTESTING &&
+								isVouching.current === false
+							}
+							disabled={step === AttestSteps.ATTESTING}
 						>
 							Flag
 						</OutlineButton>
