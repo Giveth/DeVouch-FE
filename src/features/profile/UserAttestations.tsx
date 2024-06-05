@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Address } from 'viem';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
@@ -11,9 +11,10 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
-import { fetchUserAttestations } from './service';
+import { UserAttestationsInfo, fetchUserAttestations } from './service';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
+import { type ProjectAttestation } from '../home/types';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -50,6 +51,8 @@ export const UserAttestations = ({
 		[key: string]: string[];
 	}>({});
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const queryClient = useQueryClient();
+	const attestOnAction = useRef<ProjectAttestation>();
 
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
@@ -79,6 +82,34 @@ export const UserAttestations = ({
 		},
 		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: data?.totalFlags },
 	];
+
+	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
+		const vouch = attestation.vouch;
+		queryClient.setQueryData(
+			[
+				'userAttestations',
+				address,
+				currentPage,
+				orderBy,
+				sourceFilterValues['Attested By'],
+				activeTab,
+			],
+			(oldData: UserAttestationsInfo) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+				const newData = {
+					attestations: oldData.attestations.filter(
+						attest =>
+							attest.id.toLowerCase() !==
+							attestation.id.toLowerCase(),
+					),
+					totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
+					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
+					totalAttests: oldData.totalVouches - 1,
+				};
+				return newData;
+			},
+		);
+	}, []);
 
 	return (
 		<div className='container'>
@@ -212,28 +243,28 @@ export const UserAttestations = ({
 												alt={'edit'}
 												width={18}
 												height={18}
-												onClick={() =>
-													setShowDeleteModal(true)
-												}
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowDeleteModal(true);
+												}}
 											/>
 										</button>
 									</div>
-									{showDeleteModal && (
-										<DeleteAttestModal
-											attestation={attest}
-											showModal={showDeleteModal}
-											setShowModal={setShowDeleteModal}
-											onSuccess={() => {
-												console.log('yess');
-											}}
-										/>
-									)}
 								</React.Fragment>
 							))}
 						</div>
 					</div>
 				)}
 			</div>
+			{showDeleteModal && attestOnAction.current && (
+				<DeleteAttestModal
+					attestation={attestOnAction.current}
+					showModal={showDeleteModal}
+					setShowModal={setShowDeleteModal}
+					onSuccess={onSuccessDelete}
+				/>
+			)}
 		</div>
 	);
 };
