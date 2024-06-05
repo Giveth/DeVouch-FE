@@ -172,7 +172,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 									i =>
 										i.key.toLowerCase() ===
 										project?.source.toLowerCase(),
-								)?.value
+								)?.key
 							}
 						</span>
 					</a>
