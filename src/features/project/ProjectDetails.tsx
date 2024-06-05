@@ -3,7 +3,7 @@ import { useCallback, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -16,6 +16,14 @@ import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
+import { Tabs } from './Tabs';
+
+enum Tab {
+	YourAttestations = 'yours',
+	AllAttestations = 'all',
+	Vouched = 'vouched',
+	Flagged = 'flagged',
+}
 
 const ITEMS_PER_PAGE = 10;
 
@@ -60,15 +68,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const router = useRouter();
 	const { address } = useAccount();
 	const [currentPage, setCurrentPage] = useState(0);
-	const [filter, setFilter] = useState<
-		'all' | 'vouched' | 'flagged' | 'yours'
-	>('all');
+	const [activeTab, setActiveTab] = useState<Tab>(Tab.AllAttestations);
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
 	const [showAttestModal, setShowAttestModal] = useState(false);
-
-	const queryClient = useQueryClient();
 	const isVouching = useRef(true);
 
 	const {
@@ -116,6 +120,30 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
 	if (!isLoading && !project) return <p>Project not found.</p>;
+
+	const allAttestsCount = project.totalAttests;
+	const allVouchesCount = project.totalVouches;
+	const allFlagsCount = project.totalFlags;
+	const userAttestsCount = project.attests.filter((attestation: any) =>
+		attestation.attestorOrganisation.organisation.attestors.find(
+			(i: any) => i.id?.toLowerCase() === address?.toLowerCase(),
+		),
+	).length;
+
+	const tabs = [
+		{
+			key: Tab.YourAttestations,
+			label: 'Your Attestations',
+			count: userAttestsCount,
+		},
+		{
+			key: Tab.AllAttestations,
+			label: 'All Attestations',
+			count: allAttestsCount,
+		},
+		{ key: Tab.Vouched, label: 'Vouched', count: allVouchesCount },
+		{ key: Tab.Flagged, label: 'Flagged', count: allFlagsCount },
+	];
 
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
@@ -183,112 +211,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 			<div className='relative bg-white shadow p-6'>
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
-					<div className='flex flex-col lg:flex-row gap-4 w-full'>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'yours'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('yours')}
-						>
-							{filter === 'yours' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							Your Attestations{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'yours'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								(
-								{
-									project.attests.filter((attestation: any) =>
-										attestation.attestorOrganisation.organisation.attestors.find(
-											(i: any) =>
-												i.id?.toLowerCase() ===
-												address?.toLowerCase(),
-										),
-									).length
-								}
-								)
-							</span>
-						</button>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'all'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('all')}
-						>
-							{filter === 'all' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							All Attestations{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'all'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								{project.totalAttests}
-							</span>
-						</button>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'vouched'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('vouched')}
-						>
-							{filter === 'vouched' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							Vouched{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'vouched'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								{
-									project.attests.filter((a: any) => a.vouch)
-										.length
-								}
-							</span>
-						</button>
-						<button
-							className={`relative w-full sm:w-auto px-4 py-2 flex items-center ${
-								filter === 'flagged'
-									? 'bg-[#d7ddea] font-bold'
-									: 'bg-gray-100 hover:bg-gray-200'
-							}`}
-							onClick={() => setFilter('flagged')}
-						>
-							{filter === 'flagged' && (
-								<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>
-							)}
-							Flagged{' '}
-							<span
-								className={`ml-2 text-white rounded-full px-2 ${
-									filter === 'flagged'
-										? 'bg-black'
-										: 'bg-[#82899a]'
-								}`}
-							>
-								{
-									project.attests.filter((a: any) => !a.vouch)
-										.length
-								}
-							</span>
-						</button>
-					</div>
+					<Tabs
+						tabs={tabs}
+						activeTab={activeTab}
+						onTabChange={setActiveTab}
+					/>
 					<FilterMenu
 						options={filterOptions}
 						value={sourceFilterValues}
@@ -303,7 +230,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				) : (
 					<AttestationsTable
 						attests={project.attests}
-						filter={filter}
+						filter={activeTab}
 						totalAttests={project.totalAttests}
 						itemsPerPage={ITEMS_PER_PAGE}
 						currentPage={currentPage}
