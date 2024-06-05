@@ -27,13 +27,18 @@ enum OrderByOptions {
 	PROJECT_TITLE_DESC = 'project_title_DESC_NULLS_LAST',
 }
 
+enum ColumnType {
+	PRIVATE,
+	PUBLIC,
+}
+
 const headers = [
-	{ key: 'project.title', label: 'Projects' },
-	{ key: 'name', label: 'Date Attested' },
-	{ key: 'age', label: 'Attested As' },
-	{ key: 'email', label: 'Comments' },
-	{ key: 'email', label: 'Signal' },
-	{ key: 'email', label: 'Actions' },
+	{ key: 'project.title', label: 'Projects', type: ColumnType.PUBLIC },
+	{ key: 'name', label: 'Date Attested', type: ColumnType.PUBLIC },
+	{ key: 'age', label: 'Attested As', type: ColumnType.PUBLIC },
+	{ key: 'email', label: 'Comments', type: ColumnType.PUBLIC },
+	{ key: 'email', label: 'Signal', type: ColumnType.PUBLIC },
+	{ key: 'email', label: 'Actions', type: ColumnType.PRIVATE },
 ];
 
 export const UserAttestations = ({
@@ -147,15 +152,19 @@ export const UserAttestations = ({
 					</div>
 				) : (
 					<div className='overflow-x-auto'>
-						<div className='grid grid-cols-6 items-center min-w-[900px] text-left relative'>
-							{headers.map((header, id) => (
-								<div
-									className='px-4 py-2 font-semibold text-left text-gray-600'
-									key={id}
-								>
-									{header.label}
-								</div>
-							))}
+						<div
+							className={`grid ${isOwner ? 'grid-cols-6' : 'grid-cols-5'} items-center min-w-[900px] text-left relative`}
+						>
+							{headers.map((header, id) =>
+								header.type === ColumnType.PUBLIC || isOwner ? (
+									<div
+										className='px-4 py-2 font-semibold text-left text-gray-600'
+										key={id}
+									>
+										{header.label}
+									</div>
+								) : null,
+							)}
 							{data?.attestations.map((attest, id) => (
 								<React.Fragment key={id}>
 									<div className='col-span-6 border-b'></div>{' '}
@@ -225,32 +234,38 @@ export const UserAttestations = ({
 											</span>
 										)}
 									</div>
-									<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
-										<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
-											Edit{' '}
-											<Image
-												src={'/images/icons/edit.svg'}
-												alt={'edit'}
-												width={16}
-												height={16}
-											/>
-										</button>
-										<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
-											<Image
-												src={
-													'/images/icons/trash-black.svg'
-												}
-												alt={'edit'}
-												width={18}
-												height={18}
-												onClick={() => {
-													attestOnAction.current =
-														attest;
-													setShowDeleteModal(true);
-												}}
-											/>
-										</button>
-									</div>
+									{isOwner && (
+										<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
+											<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+												Edit{' '}
+												<Image
+													src={
+														'/images/icons/edit.svg'
+													}
+													alt={'edit'}
+													width={16}
+													height={16}
+												/>
+											</button>
+											<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+												<Image
+													src={
+														'/images/icons/trash-black.svg'
+													}
+													alt={'edit'}
+													width={18}
+													height={18}
+													onClick={() => {
+														attestOnAction.current =
+															attest;
+														setShowDeleteModal(
+															true,
+														);
+													}}
+												/>
+											</button>
+										</div>
+									)}
 								</React.Fragment>
 							))}
 						</div>
