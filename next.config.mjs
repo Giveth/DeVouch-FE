@@ -27,6 +27,10 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'content.optimism.io',
 			},
+			{
+				protocol: 'https',
+				hostname: 'storage.googleapis.com',
+			},
 		],
 	},
 };

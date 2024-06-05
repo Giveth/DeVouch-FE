@@ -1,5 +1,8 @@
-export const getSourceLink = (source: string) => {
-	switch (source) {
+import { IProject } from '@/features/home/types';
+
+export const getSourceLink = (project?: IProject) => {
+	if (!project) return '/';
+	switch (project.source) {
 		case 'giveth':
 			return 'https://www.giveth.io';
 		case 'retro_funding':
