@@ -11,6 +11,7 @@ import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 import { type IProject, type ProjectAttestation } from '@/features/home/types';
 import { SourceBadge } from '../SourceBadge';
 import { ROUTES } from '@/config/routes';
+import { PROJECT_DESC_LIMIT } from './constant';
 
 interface IProjectCardProps {
 	project: IProject;
@@ -177,7 +178,15 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 							{project.title || NO_DATA}
 						</h3>
 						<p className='text-gray-400'>
-							{project.description || NO_DATA}
+							{project.description
+								? project.description.length >
+									PROJECT_DESC_LIMIT
+									? project.description.substring(
+											0,
+											PROJECT_DESC_LIMIT,
+										) + '...'
+									: project.description
+								: NO_DATA}
 						</p>
 					</div>
 					<div>
