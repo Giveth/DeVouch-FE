@@ -4,7 +4,10 @@ import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
 import Modal, { IModal } from './Modal';
 import { Button } from '@/components/Button/Button';
-import { OutlineButton } from '@/components/Button/OutlineButton';
+import {
+	OutlineButton,
+	OutlineButtonType,
+} from '@/components/Button/OutlineButton';
 import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
 import { ProjectAttestation } from '@/features/home/types';
@@ -67,7 +70,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					expirationTime: 0n,
 					revocable: true,
 					data: encodedData,
-					refUID: attestation.attestorOrganisation.organisation.id,
+					refUID: attestation.attestorOrganisation.id,
 				},
 			});
 
@@ -115,7 +118,9 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 			) : (
 				<div className='flex flex-col gap-6'>
 					<div>
-						<div>Attesting As Optimism Badgeholder</div>
+						<div className='mb-1 text-gray-700 font-bold'>
+							Attesting As Optimism Badgeholder
+						</div>
 						<div className='mb-2 text-gray-500'>
 							You already vouched for this project. You can update
 							your sentiment on this project which will create a
@@ -138,17 +143,18 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					<div className='flex gap-8'>
 						<OutlineButton
 							className='flex-1'
-							onClick={() => props.setShowModal(false)}
-						>
-							Cancel
-						</OutlineButton>
-						<Button
-							className='flex-1'
 							onClick={() => handleConfirm(true)}
 							loading={step === AttestSteps.ATTESTING}
 						>
-							Confirm
-						</Button>
+							Vouch
+						</OutlineButton>
+						<OutlineButton
+							className='flex-1'
+							onClick={() => handleConfirm(false)}
+							buttonType={OutlineButtonType.RED}
+						>
+							Flag
+						</OutlineButton>
 					</div>
 				</div>
 			)}
