@@ -144,7 +144,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 						)}
 						<SourceBadge
 							source={project.source}
-							className='top-2 left-2'
+							className='absolute top-2 left-2'
 						/>
 						{attestedByMe && (
 							<div className='absolute flex gap-1 bg-white py-1 px-2 bottom-2 right-2 z-auto'>
