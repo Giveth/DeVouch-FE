@@ -3,6 +3,7 @@ import { useAccount } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
+import { Address } from 'viem';
 import Modal, { IModal } from '../Modal';
 import { Button } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
@@ -121,7 +122,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 				const oldVouch = attest.vouch;
 				attest.vouch = vouch;
 				attest.comment = comment;
-				attest.id = newAttestationUID;
+				attest.id = newAttestationUID as Address;
 				//old attest was attest and now user flagged
 				if (oldVouch && !vouch) {
 					_project.totalVouches--;
@@ -134,7 +135,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 				}
 			} else {
 				const _attest = {
-					id: newAttestationUID,
+					id: newAttestationUID as Address,
 					vouch,
 					attestorOrganisation: {
 						attestor: {

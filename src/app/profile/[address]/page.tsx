@@ -1,3 +1,4 @@
+import { Address } from 'viem';
 import { UserAttestations } from '@/features/profile/UserAttestations';
 
 export default function Page({
@@ -5,5 +6,5 @@ export default function Page({
 }: {
 	params: { address: string };
 }) {
-	return <UserAttestations address={address} />;
+	return <UserAttestations address={address as Address} />;
 }
