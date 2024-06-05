@@ -1,16 +1,9 @@
 import { FC } from 'react';
 
-enum Tab {
-	YourAttestations = 'yours',
-	AllAttestations = 'all',
-	Vouched = 'vouched',
-	Flagged = 'flagged',
-}
-
 interface TabProps {
-	tabs: { key: Tab; label: string; count: number }[];
-	activeTab: Tab;
-	onTabChange: (tab: Tab) => void;
+	tabs: { key: number; label: string; count?: number }[];
+	activeTab: number;
+	onTabChange: (tab: number) => void;
 }
 
 export const Tabs: FC<TabProps> = ({ tabs, activeTab, onTabChange }) => {
@@ -33,7 +26,7 @@ export const Tabs: FC<TabProps> = ({ tabs, activeTab, onTabChange }) => {
 					<span
 						className={`ml-2 text-white rounded-full px-2 ${activeTab === tab.key ? 'bg-black' : 'bg-[#82899a]'}`}
 					>
-						{tab.count}
+						{tab.count || 0}
 					</span>
 				</button>
 			))}

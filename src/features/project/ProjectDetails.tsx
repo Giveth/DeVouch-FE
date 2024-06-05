@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -17,15 +17,16 @@ import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 import { Tabs } from './Tabs';
+import { IProject, ProjectAttestation } from '../home/types';
 
-enum Tab {
-	YourAttestations = 'yours',
-	AllAttestations = 'all',
-	Vouched = 'vouched',
-	Flagged = 'flagged',
+export enum Tab {
+	YourAttestations,
+	AllAttestations,
+	Vouched,
+	Flagged,
 }
 
-const ITEMS_PER_PAGE = 10;
+export const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -58,7 +59,7 @@ const fetchProjectData = async (
 		offset,
 		orgs,
 	});
-	return data.projects[0];
+	return data.projects[0] as IProject;
 };
 
 export const ProjectDetails: FC<ProjectDetailsProps> = ({
@@ -72,6 +73,9 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
+	const [filteredAttests, setFilteredAttests] = useState<
+		ProjectAttestation[]
+	>([]);
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const isVouching = useRef(true);
 
@@ -100,6 +104,38 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			),
 	});
 
+	useEffect(() => {
+		if (!project || !project?.attests) return;
+
+		switch (activeTab) {
+			case Tab.AllAttestations:
+				setFilteredAttests(project?.attests);
+				break;
+			case Tab.Vouched:
+				const vouches = project.attests.filter(
+					attestation => attestation.vouch,
+				);
+				setFilteredAttests(vouches);
+				break;
+			case Tab.Flagged:
+				const flags = project.attests.filter(
+					attestation => !attestation.vouch,
+				);
+				setFilteredAttests(flags);
+				break;
+			case Tab.YourAttestations:
+				const att = project.attests.filter(
+					attestation =>
+						attestation?.attestorOrganisation?.attestor.id.toLowerCase() ===
+						address?.toLowerCase(),
+				);
+				setFilteredAttests(att);
+				break;
+			default:
+				break;
+		}
+	}, [activeTab, address, project]);
+
 	const handlePageChange = (newPage: number) => {
 		setCurrentPage(newPage);
 	};
@@ -121,13 +157,13 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	if (isLoading && !project) return <LoadingComponent />;
 	if (!isLoading && !project) return <p>Project not found.</p>;
 
-	const allAttestsCount = project.totalAttests;
-	const allVouchesCount = project.totalVouches;
-	const allFlagsCount = project.totalFlags;
-	const userAttestsCount = project.attests.filter((attestation: any) =>
-		attestation.attestorOrganisation.organisation.attestors.find(
-			(i: any) => i.id?.toLowerCase() === address?.toLowerCase(),
-		),
+	const allAttestsCount = project?.totalAttests;
+	const allVouchesCount = project?.totalVouches;
+	const allFlagsCount = project?.totalFlags;
+	const userAttestsCount = project?.attests?.filter(
+		(attestation: any) =>
+			attestation?.attestorOrganisation?.attestor.id.toLowerCase() ===
+			address?.toLowerCase(),
 	).length;
 
 	const tabs = [
@@ -157,12 +193,12 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						width={24}
 						height={24}
 					/>
-					{project.title}
+					{project?.title}
 				</h1>
 
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
 					<a
-						href={getSourceLink(project.source)}
+						href={getSourceLink(project?.source || '')}
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
 						<span className='bg-white text-black px-2 py-1 rounded'>
@@ -176,17 +212,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							}
 						</span>
 					</a>
-					{project.image && (
+					{project?.image && (
 						<Image
-							src={project.image}
-							alt={project.title}
+							src={project?.image}
+							alt={project?.title}
 							layout='fill'
 							objectFit='cover'
 							className='rounded-lg'
 						/>
 					)}
 				</div>
-				<p className='text-black mb-4'>{project.description}</p>
+				<p className='text-black mb-4'>{project?.description}</p>
 				<div className='flex flex-col sm:flex-row gap-2 justify-between items-center border-t border-[rgba(219, 219, 219, 1)] pt-4'>
 					<span className='text-gray-500'>
 						Do You Trust This Project?
@@ -229,10 +265,8 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						attests={project.attests}
-						filter={activeTab}
-						totalAttests={project.totalAttests}
-						itemsPerPage={ITEMS_PER_PAGE}
+						filteredAttests={filteredAttests}
+						totalAttests={project?.totalAttests || 0}
 						currentPage={currentPage}
 						onPageChange={handlePageChange}
 					/>
@@ -254,7 +288,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					/>
 				</button>
 			</div>
-			{showAttestModal && (
+			{showAttestModal && project && (
 				<AttestModal
 					setShowModal={setShowAttestModal}
 					showModal={showAttestModal}
