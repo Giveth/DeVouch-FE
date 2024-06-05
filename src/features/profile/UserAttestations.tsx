@@ -7,7 +7,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
-import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
@@ -18,9 +17,11 @@ import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
 import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 import { ROUTES } from '@/config/routes';
+import { fetchOrganization } from '@/services/organization';
+import { IOption } from '@/components/Select/Select';
 
 const filterOptions = {
-	'Attested By': config.ATTESTOR_GROUPS,
+	'Attested By': [] as IOption[],
 };
 
 enum OrderByOptions {
@@ -77,6 +78,16 @@ export const UserAttestations = ({
 		queryFn: fetchUserAttestations,
 		enabled: !!address,
 	});
+
+	const { data: attestorGroups } = useQuery({
+		queryKey: ['fetchOrganisations'],
+		queryFn: fetchOrganization,
+		staleTime: 3000_000,
+	});
+
+	filterOptions['Attested By'] =
+		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
+		[];
 
 	const tabs = [
 		{

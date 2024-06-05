@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
@@ -11,6 +11,7 @@ import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
 import { IProject } from './types';
+import { fetchOrganization } from '@/services/organization';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -42,7 +43,7 @@ const sortOptions: IOption[] = [
 
 const options = {
 	'Source Platform': config.SOURCE_PLATFORMS,
-	'Attested By': config.ATTESTOR_GROUPS,
+	'Attested By': [] as IOption[],
 };
 
 const limit = 10;
@@ -90,6 +91,16 @@ export const Projects = () => {
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
 	});
+
+	const { data: attestorGroups } = useQuery({
+		queryKey: ['fetchOrganisations'],
+		queryFn: fetchOrganization,
+		staleTime: 3000_000,
+	});
+
+	options['Attested By'] =
+		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
+		[];
 
 	const projects = data?.pages.flatMap(page => page.projects) || [];
 
