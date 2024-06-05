@@ -120,7 +120,6 @@ export const UserAttestations = ({
 
 	const onSuccessEdit = useCallback(
 		(attestation: ProjectAttestation, oldAttestId: Address) => {
-			console.log('attestation', attestation);
 			const vouch = attestation.vouch;
 			queryClient.setQueryData(
 				[
@@ -132,7 +131,6 @@ export const UserAttestations = ({
 					activeTab,
 				],
 				(oldData: UserAttestationsInfo | undefined) => {
-					console.log('oldData', oldData);
 					if (!oldData) return oldData; // In case oldData is undefined or null
 
 					let {
@@ -151,17 +149,10 @@ export const UserAttestations = ({
 					const existingAttestation =
 						attestations[existingAttestationIndex];
 
-					console.log('existingAttestation', existingAttestation);
-
 					if (!existingAttestation) {
 						// If the attestation doesn't exist in the current data, return old data
 						return oldData;
 					}
-
-					console.log(
-						'existingAttestation.vouch !== vouch',
-						existingAttestation.vouch !== vouch,
-					);
 
 					// Update counts based on the change in vouch status
 					if (existingAttestation.vouch !== vouch) {
@@ -180,11 +171,6 @@ export const UserAttestations = ({
 					const shouldRemoveAttestation =
 						(activeTab === VouchFilter.VOUCHED && !vouch) ||
 						(activeTab === VouchFilter.FLAGGED && vouch);
-
-					console.log(
-						'shouldRemoveAttestation',
-						shouldRemoveAttestation,
-					);
 
 					let newAttestations;
 
