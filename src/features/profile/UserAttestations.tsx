@@ -13,8 +13,8 @@ import { AddressName } from '@/components/AddressName';
 import { Address } from 'viem';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs } from '@/components/Tabs';
-
-const ITEMS_PER_PAGE = 10;
+import { VouchFilter } from './types';
+import { fetchUserAttestations } from './service';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -27,12 +27,6 @@ enum OrderByOptions {
 	'PROJECT_TITLE_DESC' = 'project_title_DESC_NULLS_LAST',
 }
 
-enum Tab {
-	ALL_ATTESTATIONS,
-	VOUCHED,
-	FLAGGED,
-}
-
 export const UserAttestations = ({
 	address: externalAddress,
 }: {
@@ -40,25 +34,38 @@ export const UserAttestations = ({
 }) => {
 	const { address: connectedAddress } = useAccount();
 	const isExternal = !!externalAddress;
-	const address = externalAddress || connectedAddress;
+	const address = externalAddress || connectedAddress || '0x000';
 	const [orderBy, setOrderBy] = useState(
 		OrderByOptions.ATTEST_TIMESTAMP_DESC,
 	);
 	const [currentPage, setCurrentPage] = useState(0);
-	const [activeTab, setActiveTab] = useState(Tab.ALL_ATTESTATIONS);
+	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
+	const { data, error, isLoading } = useQuery({
+		queryKey: [
+			'userAttestations',
+			address,
+			currentPage,
+			orderBy,
+			sourceFilterValues['Attested By'],
+			activeTab,
+		],
+		queryFn: fetchUserAttestations,
+		enabled: !!address,
+	});
+
 	const tabs = [
 		{
-			key: Tab.ALL_ATTESTATIONS,
+			key: VouchFilter.ALL_ATTESTATIONS,
 			label: 'All Attestations',
 			count: 0,
 		},
-		{ key: Tab.VOUCHED, label: 'Vouched', count: 0 },
-		{ key: Tab.FLAGGED, label: 'Flagged', count: 0 },
+		{ key: VouchFilter.VOUCHED, label: 'Vouched', count: 0 },
+		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: 0 },
 	];
 
 	return (
