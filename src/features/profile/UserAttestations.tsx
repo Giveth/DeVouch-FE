@@ -2,30 +2,37 @@
 
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
-import { fetchGraphQL } from '@/helpers/request';
-import { FETCH_USER_ATTESTATIONS } from '@/features/project/queries';
-import FilterMenu from '@/components/FilterMenu/FilterMenu';
-import config from '@/config/configuration';
-import AttestationsTable from '@/components/Table/AttestationsTable';
-import { Spinner } from '@/components/Loading/Spinner';
-import { type ProjectAttestation } from '../home/types';
-import { AddressName } from '@/components/AddressName';
 import { Address } from 'viem';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
+import FilterMenu from '@/components/FilterMenu/FilterMenu';
+import config from '@/config/configuration';
+import { Spinner } from '@/components/Loading/Spinner';
+import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
 import { fetchUserAttestations } from './service';
+import Tooltip from '@/components/Table/Tooltip';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
 };
 
 enum OrderByOptions {
-	'ATTEST_TIMESTAMP_DESC' = 'attestTimestamp_DESC',
-	'ATTEST_TIMESTAMP_ASC' = 'attestTimestamp_ASC',
-	'PROJECT_TITLE_ASC' = 'project_title_ASC_NULLS_LAST',
-	'PROJECT_TITLE_DESC' = 'project_title_DESC_NULLS_LAST',
+	NEWEST = 'attestTimestamp_DESC',
+	OLDEST = 'attestTimestamp_ASC',
+	PROJECT_TITLE_ASC = 'project_title_ASC_NULLS_LAST',
+	PROJECT_TITLE_DESC = 'project_title_DESC_NULLS_LAST',
 }
+
+const headers = [
+	{ key: 'project.title', label: 'Projects' },
+	{ key: 'name', label: 'Date Attested' },
+	{ key: 'age', label: 'Attested As' },
+	{ key: 'email', label: 'Comments' },
+	{ key: 'email', label: 'Signal' },
+	{ key: 'email', label: 'Actions' },
+];
 
 export const UserAttestations = ({
 	address: externalAddress,
@@ -35,9 +42,7 @@ export const UserAttestations = ({
 	const { address: connectedAddress } = useAccount();
 	const isExternal = !!externalAddress;
 	const address = externalAddress || connectedAddress || '0x000';
-	const [orderBy, setOrderBy] = useState(
-		OrderByOptions.ATTEST_TIMESTAMP_DESC,
-	);
+	const [orderBy, setOrderBy] = useState(OrderByOptions.NEWEST);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
@@ -62,10 +67,14 @@ export const UserAttestations = ({
 		{
 			key: VouchFilter.ALL_ATTESTATIONS,
 			label: 'All Attestations',
-			count: 0,
+			count: data?.totalAttests,
 		},
-		{ key: VouchFilter.VOUCHED, label: 'Vouched', count: 0 },
-		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: 0 },
+		{
+			key: VouchFilter.VOUCHED,
+			label: 'Vouched',
+			count: data?.totalVouches,
+		},
+		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: data?.totalFlags },
 	];
 
 	return (
@@ -94,7 +103,7 @@ export const UserAttestations = ({
 						stickToRight={true}
 					/>
 				</div>
-				{/* {isLoading ? (
+				{isLoading ? (
 					<div className='flex items-center justify-center'>
 						<Spinner
 							size={32}
@@ -103,17 +112,100 @@ export const UserAttestations = ({
 						/>
 					</div>
 				) : (
-					<AttestationsTable
-						filteredAttests={filteredAttestations}
-						totalAttests={totalAttests}
-						itemsPerPage={ITEMS_PER_PAGE}
-						currentPage={currentPage}
-						onPageChange={handlePageChange}
-						onOrderByProjectChange={handleOrderByProjectChange}
-						onOrderByDateChange={handleOrderByDateChange}
-						isOwner={!!isOwner}
-					/>
-				)} */}
+					<div className='grid grid-cols-6 items-center'>
+						{headers.map((header, id) => (
+							<div key={id}>{header.label}</div>
+						))}
+						{data?.attestations.map((attest, id) => (
+							<div key={id} className='contents'>
+								<div className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
+									{attest.project.title}
+								</div>
+								<div>
+									{new Date(
+										attest.attestTimestamp,
+									).toLocaleDateString('en-US', {
+										day: 'numeric',
+										month: 'long',
+										year: 'numeric',
+									})}
+								</div>
+								<div className='bg-[#f7f7f9] px-2 py-1'>
+									{
+										attest.attestorOrganisation.organisation
+											.name
+									}
+								</div>
+								<div className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
+									{attest.comment ? (
+										<Tooltip
+											message={attest.comment}
+											direction='right'
+										>
+											<Image
+												src={'/images/icons/msg.svg'}
+												alt={'comment'}
+												width={18}
+												height={18}
+												className='cursor-pointer mx-auto'
+											/>
+										</Tooltip>
+									) : (
+										<b>-</b>
+									)}
+								</div>
+								<div>
+									{attest.vouch ? (
+										<span className='flex gap-2 items-center'>
+											<Image
+												src={
+													'/images/icons/vouched.svg'
+												}
+												alt={'vouched'}
+												width={24}
+												height={24}
+											/>
+											Vouched
+										</span>
+									) : (
+										<span className='gap-4 flex items-center'>
+											<Image
+												src={
+													'/images/icons/red-flag.svg'
+												}
+												alt={'red-flag'}
+												width={18}
+												height={18}
+											/>
+											Flagged
+										</span>
+									)}
+								</div>
+								<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
+									<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+										Edit{' '}
+										<Image
+											src={'/images/icons/edit.svg'}
+											alt={'edit'}
+											width={16}
+											height={16}
+										/>
+									</button>
+									<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+										<Image
+											src={
+												'/images/icons/trash-black.svg'
+											}
+											alt={'edit'}
+											width={18}
+											height={18}
+										/>
+									</button>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);
