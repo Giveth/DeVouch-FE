@@ -19,6 +19,7 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 import { Tabs } from '@/components/Tabs';
 import { IProject, ProjectAttestation } from '../home/types';
+import { SourceBadge } from '@/components/SourceBadge';
 
 export enum Tab {
 	YourAttestations,
@@ -215,18 +216,10 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
 					<a
 						href={getSourceLink(project?.source || '')}
+						target='blank'
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
-						<span className='bg-white text-black px-2 py-1 rounded'>
-							From{' '}
-							{
-								sourcePlatforms?.find(
-									i =>
-										i.key.toLowerCase() ===
-										project?.source.toLowerCase(),
-								)?.key
-							}
-						</span>
+						<SourceBadge source={project?.source} />
 					</a>
 					{project?.image && (
 						<Image
