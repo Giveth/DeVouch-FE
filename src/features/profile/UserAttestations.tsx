@@ -287,8 +287,10 @@ export const UserAttestations = ({
 									<div className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
 										{attest.comment ? (
 											<Tooltip
-												message={attest.comment}
-												direction='right'
+												content={
+													'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus tristique et urna at scelerisque. Nunc eget justo est. Nam egestas turpis sed luctus congue. Phasellus rutrum massa nec felis eleifend vehicula vitae id nibh. Nunc nisi est, tristique cras.'
+												}
+												direction='bottom'
 											>
 												<Image
 													src={
