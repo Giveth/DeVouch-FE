@@ -112,7 +112,7 @@ export const Projects = () => {
 						options={options}
 						value={filterValues}
 						setValues={setFilterValues}
-						label='Custom Filter'
+						label='Filter'
 						stickToRight={true}
 						className='w-full'
 					/>
