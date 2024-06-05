@@ -48,7 +48,7 @@ const options = {
 const limit = 10;
 
 export const Projects = () => {
-	const [term, setTerm] = useState<string>();
+	const [term, setTerm] = useState<string>('');
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
@@ -124,7 +124,7 @@ export const Projects = () => {
 					<ProjectCard
 						key={project.id}
 						project={project}
-						queryKey={['projects', filterValues, sort.key]}
+						queryKey={['projects', filterValues, sort.key, term]}
 					/>
 				))}
 			</div>
