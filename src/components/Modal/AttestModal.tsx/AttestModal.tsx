@@ -68,7 +68,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 	});
 
 	const handleConfirm = async () => {
-		if (!signer || !selectedOrg) return;
+		if (!address || !signer || !selectedOrg) return;
 
 		try {
 			setStep(AttestSteps.ATTESTING);
@@ -108,7 +108,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 			const newAttestationUID = await tx.wait();
 			console.log('newAttestationUID', newAttestationUID);
 
-			// find the project to updating the UI
+			// Update Project Data
 			const _project = structuredClone(project);
 			let attest = _project.attests?.find(
 				_attest =>
@@ -118,18 +118,27 @@ export const AttestModal: FC<AttestModalProps> = ({
 						address?.toLowerCase(),
 			);
 			if (attest) {
+				const oldVouch = attest.vouch;
 				attest.vouch = vouch;
 				attest.comment = comment;
 				attest.id = newAttestationUID;
+				//old attest was attest and now user flagged
+				if (oldVouch && !vouch) {
+					_project.totalVouches--;
+					_project.totalFlags++;
+				}
+				//old attest was flag and now user vouched
+				if (!oldVouch && vouch) {
+					_project.totalVouches++;
+					_project.totalFlags--;
+				}
 			} else {
-				attest = {
+				const _attest = {
 					id: newAttestationUID,
 					vouch,
 					attestorOrganisation: {
 						attestor: {
-							// TODO: @Cherik not sure how to solve this one
-							// @ts-ignore
-							id: address || '',
+							id: address,
 						},
 						organisation: {
 							id: selectedOrg.organisation.id,
@@ -142,9 +151,9 @@ export const AttestModal: FC<AttestModalProps> = ({
 					comment: comment,
 					project: _project,
 				};
-				// TODO: @Cherik not sure how to solve this one - commenting for fix build
-				// @ts-ignore
-				_project.attests = [...(_project.attests || []), attest];
+				_project.totalAttests++;
+				vouch ? _project.totalVouches++ : _project.totalFlags++;
+				_project.attests = [_attest];
 			}
 			onSuccess(_project);
 
