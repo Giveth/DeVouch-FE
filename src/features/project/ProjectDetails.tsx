@@ -13,7 +13,6 @@ import {
 	OutlineButtonType,
 } from '@/components/Button/OutlineButton';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
-import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
@@ -35,8 +34,6 @@ export const ITEMS_PER_PAGE = 10;
 const filterOptions = {
 	'Attested By': [] as IOption[],
 };
-
-const sourcePlatforms = config.SOURCE_PLATFORMS;
 
 export interface ProjectDetailsProps {
 	source: string;
@@ -226,7 +223,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
 					<a
-						href={getSourceLink(project?.source || '')}
+						href={getSourceLink(project)}
 						target='blank'
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
