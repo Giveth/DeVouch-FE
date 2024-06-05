@@ -66,8 +66,8 @@ query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String,$vouch: Boolean, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!] = null) {
-  projectAttestations(where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch}, orderBy: $orderBy, limit: $limit, offset: $offset) {
+query fetchUserAttestations($address: String, $vouch: Boolean, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!] = null) {
+  projectAttestations(where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch, revoked_eq: false}, orderBy: $orderBy, limit: $limit, offset: $offset) {
     id
     vouch
     txHash
