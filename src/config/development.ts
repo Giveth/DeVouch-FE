@@ -11,7 +11,8 @@ const config = {
 	SOURCE_PLATFORMS: [
 		{ key: 'Giveth', value: 'giveth' },
 		{ key: 'Gitcoin', value: 'gitcoin' },
-		{ key: 'Retro Funding', value: 'rpgf3' },
+		// { key: 'RPGF 3', value: 'rpgf3' },
+		{ key: 'Retro Funding 4', value: 'rf4' },
 	],
 	ATTESTOR_GROUPS: [
 		{
