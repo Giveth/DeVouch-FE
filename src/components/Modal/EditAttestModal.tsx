@@ -95,6 +95,9 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 		}
 	};
 
+	const isCommentExceed = comment.length > 256;
+	const disableCondition = isCommentExceed || step === AttestSteps.ATTESTING;
+
 	return (
 		<Modal
 			{...props}
@@ -145,6 +148,11 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 							value={comment}
 							onChange={e => setComment(e.target.value)}
 						></textarea>
+						{isCommentExceed && (
+							<div className='text-red-600 text-sm'>
+								Comment must be less than 256 characters.
+							</div>
+						)}
 					</div>
 					<div className='flex gap-8'>
 						<OutlineButton
@@ -157,7 +165,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 								step === AttestSteps.ATTESTING &&
 								isVouching.current === true
 							}
-							disabled={step === AttestSteps.ATTESTING}
+							disabled={disableCondition}
 						>
 							Vouch
 						</OutlineButton>
@@ -172,7 +180,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 								step === AttestSteps.ATTESTING &&
 								isVouching.current === false
 							}
-							disabled={step === AttestSteps.ATTESTING}
+							disabled={disableCondition}
 						>
 							Flag
 						</OutlineButton>

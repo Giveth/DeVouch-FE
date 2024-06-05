@@ -165,6 +165,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 		}
 	};
 
+	const isCommentExceed = comment.length > 256;
+
 	return (
 		<Modal
 			{...props}
@@ -242,6 +244,11 @@ export const AttestModal: FC<AttestModalProps> = ({
 							value={comment}
 							onChange={e => setComment(e.target.value)}
 						></textarea>
+						{isCommentExceed && (
+							<div className='text-red-600 text-sm'>
+								Comment must be less than 256 characters.
+							</div>
+						)}
 					</div>
 					<div className='flex gap-8'>
 						<OutlineButton
@@ -254,7 +261,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 							className='flex-1'
 							onClick={handleConfirm}
 							loading={step === AttestSteps.ATTESTING}
-							disabled={!selectedOrg}
+							disabled={!selectedOrg || isCommentExceed}
 						>
 							Confirm
 						</Button>
