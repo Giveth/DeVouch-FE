@@ -15,7 +15,7 @@ import { ProjectAttestation } from '@/features/home/types';
 
 interface AttestModalProps extends IModal {
 	attestation: ProjectAttestation;
-	onSuccess: (project: ProjectAttestation) => void;
+	onSuccess: (attestation: ProjectAttestation, oldAttestId: Address) => void;
 }
 
 enum AttestSteps {
@@ -85,7 +85,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 			_attestation.id = newAttestationUID as Address;
 			_attestation.vouch = vouch;
 			_attestation.attestTimestamp = new Date();
-			onSuccess(_attestation);
+			onSuccess(_attestation, attestation.id);
 
 			setStep(AttestSteps.SUCCESS);
 		} catch (error: any) {

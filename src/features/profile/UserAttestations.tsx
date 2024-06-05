@@ -118,33 +118,109 @@ export const UserAttestations = ({
 		);
 	}, []);
 
-	const onSuccessEdit = useCallback((attestation: ProjectAttestation) => {
-		const vouch = attestation.vouch;
-		queryClient.setQueryData(
-			[
-				'userAttestations',
-				address,
-				currentPage,
-				orderBy,
-				sourceFilterValues['Attested By'],
-				activeTab,
-			],
-			(oldData: UserAttestationsInfo) => {
-				if (!oldData) return oldData; // In case oldData is undefined or null
-				const newData = {
-					attestations: oldData.attestations.map(attest =>
-						attest.id.toLowerCase() === attestation.id.toLowerCase()
-							? attest
-							: attestation,
-					),
-					totalVouches: oldData.totalVouches,
-					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
-					totalAttests: oldData.totalVouches - 1,
-				};
-				return newData;
-			},
-		);
-	}, []);
+	const onSuccessEdit = useCallback(
+		(attestation: ProjectAttestation, oldAttestId: Address) => {
+			console.log('attestation', attestation);
+			const vouch = attestation.vouch;
+			queryClient.setQueryData(
+				[
+					'userAttestations',
+					address,
+					currentPage,
+					orderBy,
+					sourceFilterValues['Attested By'],
+					activeTab,
+				],
+				(oldData: UserAttestationsInfo | undefined) => {
+					console.log('oldData', oldData);
+					if (!oldData) return oldData; // In case oldData is undefined or null
+
+					let {
+						attestations,
+						totalVouches,
+						totalFlags,
+						totalAttests,
+					} = oldData;
+
+					// Find the existing attestation in the old data
+					const existingAttestationIndex = attestations.findIndex(
+						attest =>
+							attest.id.toLowerCase() ===
+							oldAttestId.toLowerCase(),
+					);
+					const existingAttestation =
+						attestations[existingAttestationIndex];
+
+					console.log('existingAttestation', existingAttestation);
+
+					if (!existingAttestation) {
+						// If the attestation doesn't exist in the current data, return old data
+						return oldData;
+					}
+
+					console.log(
+						'existingAttestation.vouch !== vouch',
+						existingAttestation.vouch !== vouch,
+					);
+
+					// Update counts based on the change in vouch status
+					if (existingAttestation.vouch !== vouch) {
+						if (vouch) {
+							totalVouches += 1;
+							totalFlags -= 1;
+						} else {
+							totalVouches -= 1;
+							totalFlags += 1;
+						}
+					}
+
+					totalAttests = totalVouches + totalFlags;
+
+					// Handle active tab filtering
+					const shouldRemoveAttestation =
+						(activeTab === VouchFilter.VOUCHED && !vouch) ||
+						(activeTab === VouchFilter.FLAGGED && vouch);
+
+					console.log(
+						'shouldRemoveAttestation',
+						shouldRemoveAttestation,
+					);
+
+					let newAttestations;
+
+					if (shouldRemoveAttestation) {
+						newAttestations = attestations.filter(
+							attest =>
+								attest.id.toLowerCase() !==
+								oldAttestId.toLowerCase(),
+						);
+					} else {
+						newAttestations = attestations.map(attest =>
+							attest.id.toLowerCase() ===
+							oldAttestId.toLowerCase()
+								? attestation
+								: attest,
+						);
+					}
+
+					return {
+						attestations: newAttestations,
+						totalVouches,
+						totalFlags,
+						totalAttests,
+					};
+				},
+			);
+		},
+		[
+			address,
+			currentPage,
+			orderBy,
+			sourceFilterValues,
+			activeTab,
+			queryClient,
+		],
+	);
 
 	return (
 		<div className='container'>
@@ -322,7 +398,7 @@ export const UserAttestations = ({
 					attestation={attestOnAction.current}
 					showModal={showEditModal}
 					setShowModal={setShowEditModal}
-					onSuccess={onSuccessDelete}
+					onSuccess={onSuccessEdit}
 				/>
 			)}
 		</div>
