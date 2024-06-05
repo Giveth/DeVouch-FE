@@ -114,10 +114,8 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				</h1>
 
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
-					<div
-						onClick={() =>
-							router.push(getSourceLink(project.source))
-						}
+					<a
+						href={getSourceLink(project.source)}
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
 						<span className='bg-white text-black px-2 py-1 rounded'>
@@ -130,7 +128,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 								)?.value
 							}
 						</span>
-					</div>
+					</a>
 					{project.image && (
 						<Image
 							src={project.image}
