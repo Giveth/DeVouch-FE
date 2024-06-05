@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
+import { type IProject, type ProjectAttestation } from '@/features/home/types';
 
 interface IProjectCardProps {
 	project: IProject;
@@ -130,7 +131,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 		<div className='relative group/card'>
 			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all '></div>
 			<div className='p-8 border h-full border-gray-100 bg-white hover:border-black flex flex-col gap-6 relative'>
-				<Link href={`/project/${project.slug}`}>
+				<Link href={`/project/${project.source}/${project.projectId}`}>
 					<div className='h-56 bg-blue-100 relative'>
 						{project.image && (
 							<Image
