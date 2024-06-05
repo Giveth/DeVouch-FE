@@ -1,9 +1,9 @@
 'use client';
-import { useState, type FC } from 'react';
+import { useCallback, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -15,6 +15,7 @@ import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
+import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -28,6 +29,12 @@ export interface ProjectDetailsProps {
 	source: string;
 	projectId: string;
 }
+
+const LoadingComponent = () => (
+	<div className='flex items-center justify-center my-24 h-full'>
+		<Spinner size={32} color='blue' secondaryColor='lightgray' />
+	</div>
+);
 
 const fetchProjectData = async (
 	source: string,
@@ -59,11 +66,16 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
+	const [showAttestModal, setShowAttestModal] = useState(false);
+
+	const queryClient = useQueryClient();
+	const isVouching = useRef(true);
 
 	const {
 		data: project,
 		error,
 		isLoading,
+		refetch,
 	} = useQuery({
 		queryKey: [
 			'project',
@@ -88,11 +100,18 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		setCurrentPage(newPage);
 	};
 
-	const LoadingComponent = () => (
-		<div className='flex items-center justify-center my-24 h-full'>
-			<Spinner size={32} color='blue' secondaryColor='lightgray' />
-		</div>
-	);
+	const onAttestClick = (_vouch: boolean) => {
+		if (address) {
+			isVouching.current = _vouch;
+			setShowAttestModal(true);
+		} else {
+			open();
+		}
+	};
+
+	const onAttestSuccess = useCallback(() => {
+		refetch();
+	}, [refetch]);
 
 	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
@@ -148,10 +167,14 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						<OutlineButton
 							buttonType={OutlineButtonType.BLUE}
 							className='flex-1'
+							onClick={() => onAttestClick(true)}
 						>
 							Vouch For Project
 						</OutlineButton>
-						<OutlineButton buttonType={OutlineButtonType.RED}>
+						<OutlineButton
+							buttonType={OutlineButtonType.RED}
+							onClick={() => onAttestClick(false)}
+						>
 							Flag Project
 						</OutlineButton>
 					</div>
@@ -304,6 +327,15 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					/>
 				</button>
 			</div>
+			{showAttestModal && (
+				<AttestModal
+					setShowModal={setShowAttestModal}
+					showModal={showAttestModal}
+					project={project}
+					vouch={isVouching.current}
+					onSuccess={onAttestSuccess}
+				/>
+			)}
 		</div>
 	);
 };
