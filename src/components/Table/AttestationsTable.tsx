@@ -5,11 +5,13 @@ import Image from 'next/image';
 import Tooltip from './Tooltip';
 import { AddressName } from '../AddressName';
 import { type ProjectAttestation } from '@/features/home/types';
-import { ITEMS_PER_PAGE } from '@/features/project/ProjectDetails';
+
+const DefaultItemPerPage = 10;
 
 interface AttestationsTableProps {
 	filteredAttests: ProjectAttestation[];
 	currentPage: number;
+	itemsPerPage?: number;
 	onPageChange: (page: number) => void;
 	onOrderByProjectChange?: () => void;
 	onOrderByDateChange?: () => void;
@@ -20,13 +22,14 @@ interface AttestationsTableProps {
 const AttestationsTable: FC<AttestationsTableProps> = ({
 	filteredAttests,
 	currentPage,
+	itemsPerPage = DefaultItemPerPage,
 	onPageChange,
 	onOrderByProjectChange,
 	onOrderByDateChange,
 	totalAttests,
 	isOwner,
 }) => {
-	const totalPages = Math.ceil(totalAttests / ITEMS_PER_PAGE);
+	const totalPages = Math.ceil(totalAttests / itemsPerPage);
 
 	return (
 		<div className='overflow-x-auto relative'>

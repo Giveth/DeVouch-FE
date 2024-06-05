@@ -225,8 +225,7 @@ export const UserAttestations = ({
 					</div>
 				) : (
 					<AttestationsTable
-						attests={filteredAttestations}
-						filter={filter}
+						filteredAttests={filteredAttestations}
 						totalAttests={totalAttests}
 						itemsPerPage={ITEMS_PER_PAGE}
 						currentPage={currentPage}

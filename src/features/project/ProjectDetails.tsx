@@ -282,6 +282,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						filteredAttests={filteredAttests}
 						totalAttests={project?.totalAttests || 0}
 						currentPage={currentPage}
+						itemsPerPage={ITEMS_PER_PAGE}
 						onPageChange={handlePageChange}
 					/>
 				)}
