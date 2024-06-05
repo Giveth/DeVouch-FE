@@ -1,10 +1,9 @@
 'use client';
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { FETCH_PROJECT_BY_SLUG } from '@/features/project/queries';
+import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
 import {
@@ -24,7 +23,15 @@ const filterOptions = {
 
 const sourcePlatforms = config.SOURCE_PLATFORMS;
 
-export const ProjectDetails = ({ slug }: { slug: string }) => {
+export interface ProjectDetailsProps {
+	source: string;
+	projectId: string;
+}
+
+export const ProjectDetails: FC<ProjectDetailsProps> = ({
+	source,
+	projectId,
+}) => {
 	const router = useRouter();
 	const { address } = useAccount();
 	const [project, setProject] = useState<any | null>(null);
@@ -40,16 +47,18 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	}>({});
 
 	const fetchProjectData = async (
-		slug: string,
+		source: string,
+		projectId: string,
 		limit: number,
 		offset: number,
 		orgs?: string[],
 	) => {
 		try {
 			setLoading(true);
+			const id = `${source}-${projectId}`;
 			const data = await fetchGraphQL<{ projects: any[] }>(
-				FETCH_PROJECT_BY_SLUG,
-				{ slug, limit, offset, orgs },
+				FETCH_PROJECT_BY_ID,
+				{ id, limit, offset, orgs },
 			);
 			setProject(data.projects[0]);
 			setAttestations(data.projects[0].attests);
@@ -63,12 +72,13 @@ export const ProjectDetails = ({ slug }: { slug: string }) => {
 	useEffect(() => {
 		const orgs = sourceFilterValues['Attested By'];
 		fetchProjectData(
-			slug,
+			source,
+			projectId,
 			ITEMS_PER_PAGE,
 			currentPage * ITEMS_PER_PAGE,
 			orgs?.length > 0 ? orgs : undefined,
 		);
-	}, [currentPage, slug, sourceFilterValues]);
+	}, [currentPage, source, projectId, sourceFilterValues]);
 
 	const handlePageChange = (newPage: number) => {
 		setCurrentPage(newPage);

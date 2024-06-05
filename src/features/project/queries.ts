@@ -1,6 +1,6 @@
-export const FETCH_PROJECT_BY_SLUG = `
-query fetchProjectBySlug($slug: String!, $limit: Int, $offset: Int, $orgs: [String!]) {
-  projects(where: {slug_eq: $slug}) {
+export const FETCH_PROJECT_BY_ID = `
+query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]) {
+  projects(where: {id_eq: $id}) {
     id
     slug
     image
