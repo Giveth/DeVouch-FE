@@ -66,9 +66,9 @@ query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $orgs: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!]!) {
+query fetchUserAttestations($address: String, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!]!) {
   projectAttestations(
-    where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $orgs}}},
+    where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $organisation}}},
     orderBy: $orderBy,
     limit: $limit,
     offset: $offset
