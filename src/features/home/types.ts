@@ -1,6 +1,6 @@
 import { Address } from 'viem';
 
-interface IProject {
+export interface IProject {
 	id: string;
 	projectId: string;
 	title: string;
@@ -13,13 +13,13 @@ interface IProject {
 	attests?: ProjectAttestation[];
 }
 
-interface IAttestedOrganisation {
+export interface IAttestedOrganisation {
 	id: string;
 	vouch: boolean;
 	organisation: IOrganisation;
 }
 
-interface IAttestorOrganisation {
+export interface IAttestorOrganisation {
 	id?: string;
 	attestor: IAttestor;
 	organisation: IOrganisation;
@@ -27,14 +27,14 @@ interface IAttestorOrganisation {
 	revoked?: boolean;
 }
 
-interface IOrganisation {
+export interface IOrganisation {
 	id: string;
 	name: string;
 	color: string;
 	attestors?: IAttestor[];
 }
 
-interface IAttestor {
+export interface IAttestor {
 	id: Address;
 	organisations?: IAttestorOrganisation[];
 }
