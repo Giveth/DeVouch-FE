@@ -97,7 +97,7 @@ const NO_DATA = 'No data available to show here!';
 export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const { address } = useAccount();
-	const { open } = useWeb3Modal();
+	const { open: openWeb3Modal } = useWeb3Modal();
 	const queryClient = useQueryClient();
 
 	const { vouches, flags, attestedByMe } = useMemo(
@@ -111,7 +111,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			open();
+			openWeb3Modal();
 		}
 	};
 
