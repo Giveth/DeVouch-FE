@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect, type FC } from 'react';
+import { useState, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
+import { useQuery } from '@tanstack/react-query';
 import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -28,16 +29,29 @@ export interface ProjectDetailsProps {
 	projectId: string;
 }
 
+const fetchProjectData = async (
+	source: string,
+	projectId: string,
+	limit: number,
+	offset: number,
+	orgs?: string[],
+) => {
+	const id = `${source}-${projectId}`;
+	const data = await fetchGraphQL<{ projects: any[] }>(FETCH_PROJECT_BY_ID, {
+		id,
+		limit,
+		offset,
+		orgs,
+	});
+	return data.projects[0];
+};
+
 export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	source,
 	projectId,
 }) => {
 	const router = useRouter();
 	const { address } = useAccount();
-	const [project, setProject] = useState<any | null>(null);
-	const [attestations, setAttestations] = useState<any[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [filter, setFilter] = useState<
 		'all' | 'vouched' | 'flagged' | 'yours'
@@ -46,39 +60,29 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		[key: string]: string[];
 	}>({});
 
-	const fetchProjectData = async (
-		source: string,
-		projectId: string,
-		limit: number,
-		offset: number,
-		orgs?: string[],
-	) => {
-		try {
-			setLoading(true);
-			const id = `${source}-${projectId}`;
-			const data = await fetchGraphQL<{ projects: any[] }>(
-				FETCH_PROJECT_BY_ID,
-				{ id, limit, offset, orgs },
-			);
-			setProject(data.projects[0]);
-			setAttestations(data.projects[0].attests);
-		} catch (e) {
-			setError('Failed to fetch project data.');
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		const orgs = sourceFilterValues['Attested By'];
-		fetchProjectData(
+	const {
+		data: project,
+		error,
+		isLoading,
+	} = useQuery({
+		queryKey: [
+			'project',
 			source,
 			projectId,
-			ITEMS_PER_PAGE,
-			currentPage * ITEMS_PER_PAGE,
-			orgs?.length > 0 ? orgs : undefined,
-		);
-	}, [currentPage, source, projectId, sourceFilterValues]);
+			currentPage,
+			sourceFilterValues,
+		],
+		queryFn: () =>
+			fetchProjectData(
+				source,
+				projectId,
+				ITEMS_PER_PAGE,
+				currentPage * ITEMS_PER_PAGE,
+				sourceFilterValues['Attested By']?.length
+					? sourceFilterValues['Attested By']
+					: undefined,
+			),
+	});
 
 	const handlePageChange = (newPage: number) => {
 		setCurrentPage(newPage);
@@ -90,9 +94,9 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		</div>
 	);
 
-	if (error) return <p>Error: {error}</p>;
-	if (loading && !project) return <LoadingComponent />;
-	if (!loading && !project) return <p>Project not found.</p>;
+	if (error) return <p>Error: {error.message}</p>;
+	if (isLoading && !project) return <LoadingComponent />;
+	if (!isLoading && !project) return <p>Project not found.</p>;
 
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
@@ -273,11 +277,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						stickToRight={true}
 					/>
 				</div>
-				{loading ? (
+				{isLoading ? (
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						attests={attestations}
+						attests={project.attests}
 						filter={filter}
 						totalAttests={project.totalAttests}
 						itemsPerPage={ITEMS_PER_PAGE}
