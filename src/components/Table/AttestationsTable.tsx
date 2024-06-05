@@ -1,16 +1,17 @@
 'use client';
 
-import { type FC, useEffect, useState } from 'react';
+import { type FC } from 'react';
 import Image from 'next/image';
 import Tooltip from './Tooltip';
 import { AddressName } from '../AddressName';
 import { type ProjectAttestation } from '@/features/home/types';
 
+const DefaultItemPerPage = 10;
+
 interface AttestationsTableProps {
-	attests: any[];
-	filter: 'all' | 'vouched' | 'flagged' | 'yours';
-	itemsPerPage?: number;
+	filteredAttests: ProjectAttestation[];
 	currentPage: number;
+	itemsPerPage?: number;
 	onPageChange: (page: number) => void;
 	onOrderByProjectChange?: () => void;
 	onOrderByDateChange?: () => void;
@@ -18,31 +19,16 @@ interface AttestationsTableProps {
 	isOwner?: boolean;
 }
 
-const ITEMS_PER_PAGE_DEFAULT = 10;
-
 const AttestationsTable: FC<AttestationsTableProps> = ({
-	attests,
-	filter,
-	itemsPerPage = ITEMS_PER_PAGE_DEFAULT,
+	filteredAttests,
 	currentPage,
+	itemsPerPage = DefaultItemPerPage,
 	onPageChange,
 	onOrderByProjectChange,
 	onOrderByDateChange,
 	totalAttests,
 	isOwner,
 }) => {
-	const [filteredAttests, setFilteredAttests] = useState<any[]>([]);
-
-	useEffect(() => {
-		let filtered = attests;
-		if (filter === 'vouched') {
-			filtered = attests.filter(attestation => attestation.vouch);
-		} else if (filter === 'flagged') {
-			filtered = attests.filter(attestation => !attestation.vouch);
-		}
-		setFilteredAttests(filtered);
-	}, [attests, filter]);
-
 	const totalPages = Math.ceil(totalAttests / itemsPerPage);
 
 	return (
