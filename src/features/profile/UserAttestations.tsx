@@ -13,6 +13,7 @@ import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
 import { fetchUserAttestations } from './service';
 import Tooltip from '@/components/Table/Tooltip';
+import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -48,6 +49,8 @@ export const UserAttestations = ({
 	const [sourceFilterValues, setSourceFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
 	const { data, error, isLoading } = useQuery({
@@ -209,9 +212,22 @@ export const UserAttestations = ({
 												alt={'edit'}
 												width={18}
 												height={18}
+												onClick={() =>
+													setShowDeleteModal(true)
+												}
 											/>
 										</button>
 									</div>
+									{showDeleteModal && (
+										<DeleteAttestModal
+											attestation={attest}
+											showModal={showDeleteModal}
+											setShowModal={setShowDeleteModal}
+											onSuccess={() => {
+												console.log('yess');
+											}}
+										/>
+									)}
 								</React.Fragment>
 							))}
 						</div>
