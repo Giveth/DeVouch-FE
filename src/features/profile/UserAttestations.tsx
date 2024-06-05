@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { Address } from 'viem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
+import Link from 'next/link';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
@@ -16,6 +17,7 @@ import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
 import { EditAttestModal } from '@/components/Modal/EditAttestModal';
+import { ROUTES } from '@/config/routes';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -259,11 +261,14 @@ export const UserAttestations = ({
 							)}
 							{data?.attestations.map((attest, id) => (
 								<React.Fragment key={id}>
-									<div className='col-span-6 border-b'></div>{' '}
-									{/* Divider line */}
-									<div className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
-										{attest.project.title}
-									</div>
+									<div className='col-span-6 border-b'></div>
+									<Link
+										href={`${ROUTES.PROJECT}/${attest.project.source}/${attest.project.projectId}`}
+									>
+										<div className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
+											{attest.project.title}
+										</div>
+									</Link>
 									<div>
 										{new Date(
 											attest.attestTimestamp,
