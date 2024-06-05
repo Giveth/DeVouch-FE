@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -79,6 +80,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const isVouching = useRef(true);
 	const queryClient = useQueryClient();
+	const { open: openWeb3Modal } = useWeb3Modal();
 
 	const {
 		data: project,
@@ -146,7 +148,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			open();
+			openWeb3Modal();
 		}
 	};
 

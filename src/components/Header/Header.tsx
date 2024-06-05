@@ -14,7 +14,7 @@ const optionClasses: HTMLAttributes<HTMLDivElement>['className'] =
 	'text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100';
 
 export const Header = () => {
-	const { open } = useWeb3Modal();
+	const { open: openWeb3Modal } = useWeb3Modal();
 	const { disconnect } = useDisconnect();
 	const { address } = useAccount();
 	return (
@@ -55,7 +55,7 @@ export const Header = () => {
 					stickToRight
 				/>
 			) : (
-				<Button onClick={() => open()}>Connect Wallet</Button>
+				<Button onClick={() => openWeb3Modal()}>Connect Wallet</Button>
 			)}
 		</div>
 	);
