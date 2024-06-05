@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
@@ -78,6 +78,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	>([]);
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const isVouching = useRef(true);
+	const queryClient = useQueryClient();
 
 	const {
 		data: project,
@@ -149,9 +150,22 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		}
 	};
 
-	const onAttestSuccess = useCallback(() => {
-		refetch();
-	}, [refetch]);
+	const onAttestSuccess = useCallback(
+		(updatedProject: IProject) => {
+			const queryKey = [
+				'project',
+				source,
+				projectId,
+				currentPage,
+				sourceFilterValues,
+			];
+			queryClient.setQueryData(queryKey, (oldData: any) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+				return updatedProject;
+			});
+		},
+		[currentPage, projectId, queryClient, source, sourceFilterValues],
+	);
 
 	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
