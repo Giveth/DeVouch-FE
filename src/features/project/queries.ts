@@ -66,47 +66,31 @@ query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]
 `;
 
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!]!) {
-  projectAttestations(
-    where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $organisation}}},
-    orderBy: $orderBy,
-    limit: $limit,
-    offset: $offset
-  ) {
+query fetchUserAttestations($address: String,$vouch: Boolean, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!] = null) {
+  projectAttestations(where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch}, orderBy: $orderBy, limit: $limit, offset: $offset) {
     id
     vouch
     txHash
     revoked
-    recipient
     comment
     attestTimestamp
     attestorOrganisation {
       organisation {
         id
         name
-        attestors {
-          id
-        }
-      }
-      attestor {
-        id
       }
     }
     project {
-      totalVouches
-      totalFlags
-      totalAttests
       title
-      source
-      slug
-      projectId
-      lastUpdatedTimestamp
-      image
-      id
-      description
     }
   }
-  projectAttestationsConnection(first:5, orderBy: project_totalAttests_DESC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
+  Vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: true}}) {
+    totalCount
+  }
+  Flags: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: false}}) {
+    totalCount
+  }
+  Attests: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
     totalCount
   }
 }
