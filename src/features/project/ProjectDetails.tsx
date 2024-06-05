@@ -20,6 +20,8 @@ import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 import { Tabs } from '@/components/Tabs';
 import { IProject, ProjectAttestation } from '../home/types';
 import { SourceBadge } from '@/components/SourceBadge';
+import { fetchOrganization } from '@/services/organization';
+import { IOption } from '@/components/Select/Select';
 
 export enum Tab {
 	YourAttestations,
@@ -31,7 +33,7 @@ export enum Tab {
 export const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
-	'Attested By': config.ATTESTOR_GROUPS,
+	'Attested By': [] as IOption[],
 };
 
 const sourcePlatforms = config.SOURCE_PLATFORMS;
@@ -87,7 +89,6 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		data: project,
 		error,
 		isLoading,
-		refetch,
 	} = useQuery({
 		queryKey: [
 			'project',
@@ -107,6 +108,16 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					: undefined,
 			),
 	});
+
+	const { data: attestorGroups } = useQuery({
+		queryKey: ['fetchOrganisations'],
+		queryFn: fetchOrganization,
+		staleTime: 3000_000,
+	});
+
+	filterOptions['Attested By'] =
+		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
+		[];
 
 	useEffect(() => {
 		if (!project || !project?.attests) return;
