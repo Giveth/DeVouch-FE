@@ -17,6 +17,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 	const [visible, setVisible] = useState(false);
 	const [position, setPosition] = useState({ top: 0, left: 0 });
 	const [adjustedDirection, setAdjustedDirection] = useState(direction);
+	const [initialRender, setInitialRender] = useState(true);
 	const ref = useRef<HTMLDivElement | null>(null);
 	const tooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,6 +67,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 			}
 
 			setPosition({ top, left });
+			setInitialRender(false); // Position calculated, set initialRender to false
 		}
 	}, [direction]);
 
@@ -83,9 +85,15 @@ const Tooltip: React.FC<TooltipProps> = ({
 	return (
 		<div
 			className='relative inline-block'
-			onMouseEnter={() => setVisible(true)}
+			onMouseEnter={() => {
+				setInitialRender(true); // Reset initialRender when showing the tooltip
+				setVisible(true);
+			}}
 			onMouseLeave={() => setVisible(false)}
-			onFocus={() => setVisible(true)}
+			onFocus={() => {
+				setInitialRender(true); // Reset initialRender when showing the tooltip
+				setVisible(true);
+			}}
 			onBlur={() => setVisible(false)}
 			ref={ref}
 		>
@@ -94,7 +102,9 @@ const Tooltip: React.FC<TooltipProps> = ({
 				ReactDOM.createPortal(
 					<div
 						ref={tooltipRef}
-						className={`fixed z-50 py-2 px-3 text-xs text-white bg-black rounded shadow-lg transition-opacity duration-300`}
+						className={`fixed z-50 py-2 px-3 text-xs text-white bg-black rounded shadow-lg transition-opacity duration-300 ${
+							initialRender ? 'opacity-0' : 'opacity-100'
+						}`}
 						style={{
 							top: position.top,
 							left: position.left,
