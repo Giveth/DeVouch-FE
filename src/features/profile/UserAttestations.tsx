@@ -15,6 +15,7 @@ import { UserAttestationsInfo, fetchUserAttestations } from './service';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
+import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 
 const filterOptions = {
 	'Attested By': config.ATTESTOR_GROUPS,
@@ -56,6 +57,7 @@ export const UserAttestations = ({
 		[key: string]: string[];
 	}>({});
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
 	const queryClient = useQueryClient();
 	const attestOnAction = useRef<ProjectAttestation>();
 
@@ -108,6 +110,34 @@ export const UserAttestations = ({
 							attestation.id.toLowerCase(),
 					),
 					totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
+					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
+					totalAttests: oldData.totalVouches - 1,
+				};
+				return newData;
+			},
+		);
+	}, []);
+
+	const onSuccessEdit = useCallback((attestation: ProjectAttestation) => {
+		const vouch = attestation.vouch;
+		queryClient.setQueryData(
+			[
+				'userAttestations',
+				address,
+				currentPage,
+				orderBy,
+				sourceFilterValues['Attested By'],
+				activeTab,
+			],
+			(oldData: UserAttestationsInfo) => {
+				if (!oldData) return oldData; // In case oldData is undefined or null
+				const newData = {
+					attestations: oldData.attestations.map(attest =>
+						attest.id.toLowerCase() === attestation.id.toLowerCase()
+							? attest
+							: attestation,
+					),
+					totalVouches: oldData.totalVouches,
 					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
 					totalAttests: oldData.totalVouches - 1,
 				};
@@ -236,7 +266,14 @@ export const UserAttestations = ({
 									</div>
 									{isOwner && (
 										<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
-											<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+											<button
+												className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowEditModal(true);
+												}}
+											>
 												Edit{' '}
 												<Image
 													src={
@@ -247,7 +284,14 @@ export const UserAttestations = ({
 													height={16}
 												/>
 											</button>
-											<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+											<button
+												className='mr-2 border border-gray text-black font-bold px-4 py-2'
+												onClick={() => {
+													attestOnAction.current =
+														attest;
+													setShowDeleteModal(true);
+												}}
+											>
 												<Image
 													src={
 														'/images/icons/trash-black.svg'
@@ -255,13 +299,6 @@ export const UserAttestations = ({
 													alt={'edit'}
 													width={18}
 													height={18}
-													onClick={() => {
-														attestOnAction.current =
-															attest;
-														setShowDeleteModal(
-															true,
-														);
-													}}
 												/>
 											</button>
 										</div>
@@ -277,6 +314,14 @@ export const UserAttestations = ({
 					attestation={attestOnAction.current}
 					showModal={showDeleteModal}
 					setShowModal={setShowDeleteModal}
+					onSuccess={onSuccessDelete}
+				/>
+			)}
+			{showEditModal && attestOnAction.current && (
+				<EditAttestModal
+					attestation={attestOnAction.current}
+					showModal={showEditModal}
+					setShowModal={setShowEditModal}
 					onSuccess={onSuccessDelete}
 				/>
 			)}
