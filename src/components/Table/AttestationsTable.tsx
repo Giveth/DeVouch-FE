@@ -2,9 +2,11 @@
 
 import { type FC } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Tooltip from './Tooltip';
 import { AddressName } from '../AddressName';
 import { type ProjectAttestation } from '@/features/home/types';
+import { ROUTES } from '@/config/routes';
 
 const DefaultItemPerPage = 10;
 
@@ -99,13 +101,18 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 									)}
 									{!isOwner && (
 										<td className='px-4 py-6 align-top text-gray-800'>
-											<AddressName
-												address={
-													attestation
-														.attestorOrganisation
-														.attestor?.id
-												}
-											/>
+											<Link
+												href={`${ROUTES.PROFILE}/${attestation.attestorOrganisation.attestor?.id}`}
+											>
+												<AddressName
+													address={
+														attestation
+															.attestorOrganisation
+															.attestor?.id
+													}
+												/>
+											</Link>
+
 											<br />
 											<span className='text-gray-500 text-sm'>
 												{new Date(
