@@ -84,13 +84,13 @@ query fetchUserAttestations($address: String,$vouch: Boolean, $organisation: [St
       title
     }
   }
-  Vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: true}}) {
+  vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: true}}) {
     totalCount
   }
-  Flags: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: false}}) {
+  flags: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}, AND: {vouch_eq: false}}) {
     totalCount
   }
-  Attests: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
+  attests: projectAttestationsConnection(first: 5, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_containsInsensitive: $address}}}) {
     totalCount
   }
 }

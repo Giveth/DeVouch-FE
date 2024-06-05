@@ -13,9 +13,9 @@ export const fetchUserAttestations = async ({
 	const [, address, page, orderBy, organisation, vouch] = queryKey;
 	const data = await fetchGraphQL<{
 		projectAttestations: ProjectAttestation[];
-		Vouches: { totalCount: number };
-		Flags: { totalCount: number };
-		Attests: { totalCount: number };
+		vouches: { totalCount: number };
+		flags: { totalCount: number };
+		attests: { totalCount: number };
 	}>(FETCH_USER_ATTESTATIONS, {
 		address: (address as Address).toLowerCase(),
 		limit: ITEMS_PER_PAGE,
@@ -32,8 +32,8 @@ export const fetchUserAttestations = async ({
 
 	return {
 		attestations: data?.projectAttestations,
-		totalVouches: data?.Vouches.totalCount,
-		totalFlags: data?.Flags.totalCount,
-		totalAttests: data?.Attests.totalCount,
+		totalVouches: data?.vouches.totalCount,
+		totalFlags: data?.flags.totalCount,
+		totalAttests: data?.attests.totalCount,
 	};
 };
