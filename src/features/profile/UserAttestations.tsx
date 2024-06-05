@@ -115,7 +115,12 @@ export const UserAttestations = ({
 					<div className='overflow-x-auto'>
 						<div className='grid grid-cols-6 items-center min-w-[900px] text-left relative'>
 							{headers.map((header, id) => (
-								<div key={id}>{header.label}</div>
+								<div
+									className='px-4 py-2 font-semibold text-left text-gray-600'
+									key={id}
+								>
+									{header.label}
+								</div>
 							))}
 							{data?.attestations.map((attest, id) => (
 								<React.Fragment key={id}>
