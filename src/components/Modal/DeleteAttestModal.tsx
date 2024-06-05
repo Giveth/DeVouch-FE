@@ -47,8 +47,12 @@ export const DeleteAttestModal: FC<DeleteAttestModalProps> = ({
 
 			const newAttestationUID = await transaction.wait();
 			console.log('newAttestationUID', newAttestationUID);
+			onSuccess(attestation);
 			setStep(DeleteSteps.SUCCESS);
-		} catch (error) {}
+		} catch (error: any) {
+			console.log('error on DeleteAttestModal', error.message);
+			setStep(DeleteSteps.DELETE);
+		}
 	};
 
 	return (
