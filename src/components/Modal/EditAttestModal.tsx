@@ -2,6 +2,7 @@ import { useState, type FC } from 'react';
 import { useAccount } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
+import { Address } from 'viem';
 import Modal, { IModal } from './Modal';
 import { Button } from '@/components/Button/Button';
 import {
@@ -80,7 +81,11 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 			console.log('newAttestationUID', newAttestationUID);
 
 			// Update Project Data
-			// onSuccess(_project);
+			const _attestation = structuredClone(attestation);
+			_attestation.id = newAttestationUID as Address;
+			_attestation.vouch = vouch;
+			_attestation.attestTimestamp = new Date();
+			onSuccess(_attestation);
 
 			setStep(AttestSteps.SUCCESS);
 		} catch (error: any) {
