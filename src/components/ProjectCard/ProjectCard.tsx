@@ -9,6 +9,7 @@ import { AttestInfo } from './AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 import { type IProject, type ProjectAttestation } from '@/features/home/types';
+import { SourceBadge } from '../SourceBadge';
 
 interface IProjectCardProps {
 	project: IProject;
@@ -141,12 +142,10 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 								className='object-cover'
 							/>
 						)}
-						<div className='absolute flex gap-1 bg-white py-1 px-2 top-2 left-2 z-auto'>
-							<span className='text-gray-300 font-light'>
-								From
-							</span>
-							<span className='text-black'>{project.source}</span>
-						</div>
+						<SourceBadge
+							source={project.source}
+							className='top-2 left-2'
+						/>
 						{attestedByMe && (
 							<div className='absolute flex gap-1 bg-white py-1 px-2 bottom-2 right-2 z-auto'>
 								<span className='text-gray-800 font-light'>
