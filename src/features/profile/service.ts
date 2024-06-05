@@ -5,6 +5,13 @@ import { FETCH_USER_ATTESTATIONS } from '../project/queries';
 import { ITEMS_PER_PAGE } from './constants';
 import { VouchFilter } from './types';
 
+export interface UserAttestationsInfo {
+	attestations: ProjectAttestation[];
+	totalVouches: number;
+	totalFlags: number;
+	totalAttests: number;
+}
+
 export const fetchUserAttestations = async ({
 	queryKey,
 }: {
