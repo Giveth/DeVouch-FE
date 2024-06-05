@@ -147,7 +147,7 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 									<td className='relative text-center w-[106px] px-4 py-6 align-top text-gray-800 z-50'>
 										{attestation.comment ? (
 											<Tooltip
-												message={attestation.comment}
+												content={attestation.comment}
 												direction='right'
 											>
 												<Image
