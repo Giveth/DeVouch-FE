@@ -9,6 +9,8 @@ import config from '@/config/configuration';
 import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { type ProjectAttestation } from '../home/types';
+import { AddressName } from '@/components/AddressName';
+import { Address } from 'viem';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -26,7 +28,7 @@ enum orderByOptions {
 export const UserAttestations = ({
 	address: externalAddress,
 }: {
-	address?: string;
+	address?: Address;
 }) => {
 	const { address: connectedAddress } = useAccount();
 	const isExternal = !!externalAddress;
@@ -120,15 +122,16 @@ export const UserAttestations = ({
 	if (error) return <p>Error: {error}</p>;
 
 	return (
-		<div className='container mx-auto flex flex-col gap-8 p-4'>
-			<div className='bg-white shadow rounded-lg p-6'>
-				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
-					<h1 className='text-2xl font-bold mb-6'>
-						{isExternal ? 'All' : 'My'} Attestations
-					</h1>
-					<h1 className='text-xs md:text-lg mb-6'>{address}</h1>
-				</div>
-
+		<div className='container'>
+			<div className='bg-white p-6 flex flex-col lg:flex-row justify-between items-center mb-6 gap-2'>
+				<h1 className='text-2xl font-bold '>
+					{isExternal ? 'All' : 'My'} Attestations
+				</h1>
+				<h1 className='text-xs md:text-lg'>
+					<AddressName address={address} />{' '}
+				</h1>
+			</div>
+			<div className='bg-white p-6 '>
 				<div className='flex flex-col w-full lg:flex-row justify-between items-center mb-4 gap-2'>
 					<div className='flex flex-col lg:flex-row gap-4 w-full mb-4 md:mb-0'>
 						<button
