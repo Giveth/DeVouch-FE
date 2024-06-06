@@ -280,22 +280,39 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
-			<div className='bg-white shadow rounded-lg p-6'>
-				<h1 className='flex flex-row gap-6 text-2xl font-bold mb-6 border-b-2 pb-4 border-[#dbdbdb]'>
-					<Image
-						onClick={() => router.back()}
-						src={'/images/icons/left-arrow.svg'}
-						style={{ cursor: 'pointer' }}
-						alt={'arrow'}
-						width={24}
-						height={24}
-					/>
-					{project?.title}
-				</h1>
+			<div className='bg-white p-6 '>
+				<div className='flex items-center gap-6 mb-6 border-b-2 py-2 justify-between'>
+					<div className='flex items-center gap-6'>
+						<Image
+							onClick={() => router.back()}
+							src={'/images/icons/left-arrow.svg'}
+							style={{ cursor: 'pointer' }}
+							alt={'arrow'}
+							width={24}
+							height={24}
+						/>
+						<h1 className='text-2xl font-bold'>{project?.title}</h1>
+					</div>
+					<div className='flex items-center gap-6'>
+						<a
+							href={`${getSourceLink(project)}${project?.url}`}
+							target='_blank'
+							rel='noopener noreferrer'
+						>
+							<Image
+								src={'/images/icons/external.svg'}
+								style={{ cursor: 'pointer' }}
+								alt={'arrow'}
+								width={24}
+								height={24}
+							/>
+						</a>
+					</div>
+				</div>
 
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
 					<a
-						href={`${getSourceLink(project)}${project?.url}`}
+						href={getSourceLink(project)}
 						target='blank'
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
