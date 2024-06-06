@@ -68,7 +68,7 @@ query fetchProjectAttestations($projectId: String, $address: String, $attestorAd
       }
     }
   }
-  userAttestations: projectAttestationsConnection(where: {project: {id_eq: $projectId}, attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch}, orderBy: $orderBy, first: 0) {
+  userAttestations: projectAttestationsConnection(where: {project: {id_eq: $projectId}, attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}}, orderBy: $orderBy, first: 0) {
     totalCount
   }
   vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {project: {id_eq: $projectId}, attestorOrganisation: {organisation: {id_in: $organisation}}, AND: {vouch_eq: true}}) {
