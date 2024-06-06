@@ -126,7 +126,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	);
 
 	return (
-		<div className='relative group/card'>
+		<div className='relative group/card max-w-full'>
 			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all '></div>
 			<Link
 				href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
@@ -169,10 +169,10 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 						)}
 					</div>
 					<div className='flex-1'>
-						<h3 className='text-2xl font-bold mb-2'>
+						<h3 className='text-2xl font-bold mb-2  max-w-full break-word'>
 							{project.title || NO_DATA}
 						</h3>
-						<p className='text-gray-400'>
+						<p className='text-gray-400 max-w-full break-all'>
 							{project.description
 								? project.description.length >
 									PROJECT_DESC_LIMIT
@@ -186,7 +186,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					</div>
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
-						<div className='flex gap-2'>
+						<div className='flex gap-2 flex-wrap'>
 							{vouches.length > 0 ? (
 								vouches.map(vouch => (
 									<AttestInfo
@@ -203,7 +203,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					</div>
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
-						<div className='flex gap-2'>
+						<div className='flex gap-2 flex-wrap'>
 							{flags?.length > 0 ? (
 								flags.map(flag => (
 									<AttestInfo
@@ -218,7 +218,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 							)}
 						</div>
 					</div>
-					<div className='flex gap-6'>
+					<div className='flex flex-col md:flex-row gap-6'>
 						<OutlineButton
 							buttonType={OutlineButtonType.BLUE}
 							className='flex-1'
