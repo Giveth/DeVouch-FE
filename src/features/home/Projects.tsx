@@ -42,14 +42,19 @@ const sortOptions: IOption[] = [
 	},
 ];
 
+enum FilterKey {
+	SOURCE = 'source',
+	ORGANIZATION = 'organization',
+}
+
 const options = {
-	source: config.SOURCE_PLATFORMS,
-	organization: [] as IOption[],
+	[FilterKey.SOURCE]: config.SOURCE_PLATFORMS,
+	[FilterKey.ORGANIZATION]: [] as IOption[],
 };
 
 const optionSectionLabel = {
-	source: 'Source Platform',
-	organization: 'Attested By',
+	[FilterKey.SOURCE]: 'Source Platform',
+	[FilterKey.ORGANIZATION]: 'Attested By',
 };
 
 const limit = 10;
@@ -60,8 +65,8 @@ export const Projects = () => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
-	const sourceParams = searchParams.getAll('source');
-	const organisationParams = searchParams.getAll('organisation');
+	const sourceParams = searchParams.getAll(FilterKey.SOURCE);
+	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
 	const sortParam = searchParams.get('sort') || defaultSort.key;
 	const termParam = searchParams.get('term') || '';
 
