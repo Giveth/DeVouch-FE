@@ -8,31 +8,25 @@ import { AddressName } from '../AddressName';
 import { type ProjectAttestation } from '@/features/home/types';
 import { ROUTES } from '@/config/routes';
 
-const DefaultItemPerPage = 10;
-
 interface AttestationsTableProps {
 	filteredAttests: ProjectAttestation[];
 	currentPage: number;
-	itemsPerPage?: number;
+	totalPages: number;
 	onPageChange: (page: number) => void;
 	onOrderByProjectChange?: () => void;
 	onOrderByDateChange?: () => void;
-	totalAttests: number;
 	isOwner?: boolean;
 }
 
 const AttestationsTable: FC<AttestationsTableProps> = ({
 	filteredAttests,
 	currentPage,
-	itemsPerPage = DefaultItemPerPage,
+	totalPages,
 	onPageChange,
 	onOrderByProjectChange,
 	onOrderByDateChange,
-	totalAttests,
 	isOwner,
 }) => {
-	const totalPages = Math.ceil(totalAttests / itemsPerPage);
-
 	return (
 		<div className='overflow-x-auto relative'>
 			{filteredAttests.length === 0 ? (

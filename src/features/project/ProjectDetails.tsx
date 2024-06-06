@@ -1,11 +1,14 @@
 'use client';
-import { useCallback, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { FETCH_PROJECT_BY_ID } from '@/features/project/queries';
+import {
+	FETCH_PROJECT_ATTESTATIONS,
+	FETCH_PROJECT_BY_ID,
+} from '@/features/project/queries';
 import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
 import {
@@ -22,6 +25,8 @@ import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
 import { FilterKey } from '../home/Projects';
+import { VouchFilter } from '../profile/types';
+import { ITEMS_PER_PAGE } from '../profile/constants';
 
 export enum Tab {
 	YourAttestations,
@@ -29,8 +34,6 @@ export enum Tab {
 	Vouched,
 	Flagged,
 }
-
-export const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
 	[FilterKey.ORGANIZATION]: [] as IOption[],
@@ -47,21 +50,43 @@ const LoadingComponent = () => (
 	</div>
 );
 
-const fetchProjectData = async (
-	source: string,
-	projectId: string,
-	limit: number,
-	offset: number,
-	orgs?: string[],
-) => {
+const fetchProjectData = async (source: string, projectId: string) => {
 	const id = `${source}-${projectId}`;
 	const data = await fetchGraphQL<{ projects: any[] }>(FETCH_PROJECT_BY_ID, {
 		id,
-		limit,
-		offset,
-		orgs,
 	});
 	return data.projects[0] as IProject;
+};
+
+const fetchProjectAttestationsData = async (
+	source: string,
+	projectId: string,
+	limit: number,
+	page: number,
+	organisation?: string[],
+	address?: string,
+	attestorAddressFilter?: string,
+	vouch?: VouchFilter | undefined,
+) => {
+	const id = `${source}-${projectId}`;
+	const data = await fetchGraphQL<{ projects: any[] }>(
+		FETCH_PROJECT_ATTESTATIONS,
+		{
+			projectId: id,
+			limit,
+			offset: page * ITEMS_PER_PAGE,
+			organisation,
+			address: address?.toLowerCase(),
+			attestorAddressFilter: attestorAddressFilter?.toLowerCase(),
+			vouch:
+				vouch === VouchFilter.VOUCHED
+					? true
+					: vouch === VouchFilter.FLAGGED
+						? false
+						: undefined,
+		},
+	);
+	return data;
 };
 
 export const ProjectDetails: FC<ProjectDetailsProps> = ({
@@ -71,6 +96,13 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const [currentPage, setCurrentPage] = useState(0);
 	const [activeTab, setActiveTab] = useState<Tab>(Tab.AllAttestations);
 	const [showAttestModal, setShowAttestModal] = useState(false);
+
+	const [totalAttests, setTotalAttests] = useState(0);
+	const [totalVouches, setTotalVouches] = useState(0);
+	const [totalFlags, setTotalFlags] = useState(0);
+	const [userTotalAttests, setUserTotalAttests] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
+	const [filteredAttests, setFilteredAttests] = useState<any[]>([]);
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
@@ -94,15 +126,81 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			currentPage,
 			organisationParams,
 		],
+		queryFn: () => fetchProjectData(source, projectId),
+	});
+
+	const attestation_data = useQuery({
+		queryKey: [
+			'projectAttests',
+			source,
+			projectId,
+			currentPage,
+			organisationParams,
+			address,
+			activeTab,
+		],
 		queryFn: () =>
-			fetchProjectData(
+			fetchProjectAttestationsData(
 				source,
 				projectId,
 				ITEMS_PER_PAGE,
-				currentPage * ITEMS_PER_PAGE,
+				currentPage,
 				organisationParams?.length ? organisationParams : undefined,
+				address,
+				activeTab === Tab.YourAttestations ? address : undefined,
+				activeTab === Tab.Vouched
+					? VouchFilter.VOUCHED
+					: activeTab === Tab.Flagged
+						? VouchFilter.FLAGGED
+						: undefined,
 			),
 	});
+
+	useEffect(() => {
+		if (!attestation_data?.data) return;
+		const {
+			attests,
+			vouches,
+			flags,
+			userAttestations,
+			projectAttestations,
+		} = attestation_data.data as any;
+
+		const _totalAttests = attests.totalCount || 0;
+		const _totalVouches = vouches?.totalCount || 0;
+		const _totalFlags = flags?.totalCount || 0;
+		const _totalUserAttests = userAttestations?.totalCount || 0;
+
+		setTotalAttests(_totalAttests);
+		setTotalVouches(_totalVouches);
+		setTotalFlags(_totalFlags);
+		setUserTotalAttests(_totalUserAttests);
+		setFilteredAttests(projectAttestations || []);
+
+		let totalItems = 0;
+
+		switch (activeTab) {
+			case Tab.AllAttestations:
+				totalItems = _totalAttests;
+				break;
+			case Tab.Vouched:
+				totalItems = _totalVouches;
+				break;
+			case Tab.Flagged:
+				totalItems = _totalFlags;
+				break;
+			case Tab.YourAttestations:
+				totalItems = _totalUserAttests;
+				break;
+		}
+		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
+	}, [attestation_data]);
+
+	useEffect(() => {
+		if (currentPage > 0 && currentPage >= totalPages) {
+			setCurrentPage(totalPages - 1);
+		}
+	}, [totalPages]);
 
 	const { data: attestorGroups } = useQuery({
 		queryKey: ['fetchOrganisations'],
@@ -148,28 +246,19 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	if (isLoading && !project) return <LoadingComponent />;
 	if (!isLoading && !project) return <p>Project not found.</p>;
 
-	const allAttestsCount = project?.totalAttests;
-	const allVouchesCount = project?.totalVouches;
-	const allFlagsCount = project?.totalFlags;
-	const userAttestsCount = project?.attests?.filter(
-		(attestation: any) =>
-			attestation?.attestorOrganisation?.attestor.id.toLowerCase() ===
-			address?.toLowerCase(),
-	).length;
-
 	const tabs = [
 		{
 			key: Tab.YourAttestations,
 			label: 'Your Attestations',
-			count: userAttestsCount,
+			count: userTotalAttests,
 		},
 		{
 			key: Tab.AllAttestations,
 			label: 'All Attestations',
-			count: allAttestsCount,
+			count: totalAttests,
 		},
-		{ key: Tab.Vouched, label: 'Vouched', count: allVouchesCount },
-		{ key: Tab.Flagged, label: 'Flagged', count: allFlagsCount },
+		{ key: Tab.Vouched, label: 'Vouched', count: totalVouches },
+		{ key: Tab.Flagged, label: 'Flagged', count: totalFlags },
 	];
 
 	const onSelectOption = (key: string, option: string) => {
@@ -268,10 +357,9 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						filteredAttests={project?.attests || []}
-						totalAttests={project?.totalAttests || 0}
+						filteredAttests={filteredAttests}
+						totalPages={totalPages}
 						currentPage={currentPage}
-						itemsPerPage={ITEMS_PER_PAGE}
 						onPageChange={handlePageChange}
 					/>
 				)}
