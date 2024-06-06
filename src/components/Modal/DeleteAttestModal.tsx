@@ -1,6 +1,6 @@
 import { useState, type FC } from 'react';
 import Image from 'next/image';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS } from '@ethereum-attestation-service/eas-sdk';
 import Modal, { IModal } from './Modal';
 import { Button, ButtonType } from '@/components/Button/Button';
@@ -29,12 +29,19 @@ export const DeleteAttestModal: FC<DeleteAttestModalProps> = ({
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
+	const { switchChainAsync } = useSwitchChain();
 
 	const onDelete = async () => {
 		if (!address || !signer) return;
 
 		try {
 			setStep(DeleteSteps.DELETING);
+
+			// force user to switch to the chain
+			await switchChainAsync({
+				chainId: config.SUPPORTED_CHAINS[0].id,
+			});
+
 			const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
 			eas.connect(signer);
 			const transaction = await eas.revoke({
