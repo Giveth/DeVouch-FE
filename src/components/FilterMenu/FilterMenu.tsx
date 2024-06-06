@@ -1,9 +1,4 @@
-import {
-	type Dispatch,
-	type SetStateAction,
-	type FC,
-	type HTMLAttributes,
-} from 'react';
+import { type FC, type HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
 import Checkbox from '../CheckBox/CheckBox';
@@ -14,7 +9,8 @@ interface FilterMenuProps {
 	options: IOptions;
 	optionSectionLabel?: { [key: string]: string };
 	value: { [key: string]: string[] };
-	setValues: Dispatch<SetStateAction<{ [key: string]: string[] }>>;
+	onSelectOption: (key: string, option: string) => void;
+	onClearOptions: () => void;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 	label?: string;
 	stickToRight?: boolean;
@@ -28,36 +24,12 @@ const FilterMenu: FC<FilterMenuProps> = ({
 	options,
 	optionSectionLabel,
 	value,
-	setValues,
+	onSelectOption,
+	onClearOptions,
 	className,
 	label = 'Filter',
 	stickToRight = false,
 }) => {
-	const handleSetValue = ({
-		key,
-		values,
-	}: {
-		key: string;
-		values: string[];
-	}) => {
-		setValues(prevValues => ({
-			...prevValues,
-			[key]: values,
-		}));
-	};
-
-	const handleCheckboxChange = (key: string, optionValue: string) => {
-		const currentValues = value[key] || [];
-		const newValues = currentValues.includes(optionValue)
-			? currentValues.filter(val => val !== optionValue)
-			: [...currentValues, optionValue];
-		handleSetValue({ key, values: newValues });
-	};
-
-	const handleClearFilters = () => {
-		setValues({});
-	};
-
 	return (
 		<Dropdown
 			className={`relative ${className}`}
@@ -72,7 +44,7 @@ const FilterMenu: FC<FilterMenuProps> = ({
 							<div
 								key={option.value}
 								onClick={() =>
-									handleCheckboxChange(key, option.value)
+									onSelectOption(key, option.value)
 								}
 							>
 								<Checkbox
@@ -91,7 +63,7 @@ const FilterMenu: FC<FilterMenuProps> = ({
 				<div
 					key='clear-filters'
 					className='flex items-center justify-between gap-2 cursor-pointer px-6 py-4 text-gray-600 font-bold hover:bg-gray-100'
-					onClick={handleClearFilters}
+					onClick={onClearOptions}
 				>
 					<p>Clear Filters</p>
 					<Image src={TrashIcon} alt='' />

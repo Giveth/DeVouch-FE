@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Select, type IOption } from '@/components/Select/Select';
@@ -56,11 +56,6 @@ const limit = 10;
 const defaultSort = sortOptions[0];
 
 export const Projects = () => {
-	// const [term, setTerm] = useState<string>('');
-
-	const [filterValues, setFilterValues] = useState<{
-		[key: string]: string[];
-	}>({});
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -149,8 +144,22 @@ export const Projects = () => {
 		router.push(pathname + '?' + createQueryString('sort', sort.key));
 	};
 
-	const handleFilter = (filter: any) => {
-		console.log('filter', filter);
+	const onSelectOption = (key: string, option: string) => {
+		const params = new URLSearchParams(searchParams.toString());
+		const value = params.getAll(key);
+		if (value.includes(option)) {
+			params.delete(key, option);
+		} else {
+			params.append(key, option);
+		}
+		router.push(pathname + '?' + params.toString());
+	};
+
+	const onClearOptions = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('source');
+		params.delete('organisation');
+		router.push(pathname + '?' + params.toString());
 	};
 
 	return (
@@ -174,8 +183,12 @@ export const Projects = () => {
 					<FilterMenu
 						options={options}
 						optionSectionLabel={optionSectionLabel}
-						value={filterValues}
-						setValues={handleFilter}
+						onSelectOption={onSelectOption}
+						onClearOptions={onClearOptions}
+						value={{
+							source: sourceParams,
+							organization: organisationParams,
+						}}
 						label='Filter'
 						stickToRight={true}
 						className='w-full'
