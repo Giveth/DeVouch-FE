@@ -1,6 +1,6 @@
-import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
-
-import { cookieStorage, createStorage } from 'wagmi';
+import { cookieStorage, createConfig, createStorage } from 'wagmi';
+import { walletConnect } from 'wagmi/connectors';
+import { createClient, http } from 'viem';
 import config from './configuration';
 
 // Get projectId at https://cloud.walletconnect.com
@@ -16,13 +16,19 @@ const metadata = {
 };
 
 // Create wagmiConfig
-export const wagmiConfig = defaultWagmiConfig({
+export const wagmiConfig = createConfig({
 	chains: config.SUPPORTED_CHAINS,
-	projectId,
-	metadata,
+	connectors: [
+		walletConnect({
+			projectId,
+			metadata,
+		}),
+	],
 	ssr: true,
 	storage: createStorage({
 		storage: cookieStorage,
 	}),
-	//   ...wagmiOptions, // Optional - Override createConfig parameters
+	client({ chain }) {
+		return createClient({ chain, transport: http() });
+	},
 });
