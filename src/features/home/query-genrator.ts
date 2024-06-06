@@ -3,7 +3,7 @@ export const generateFetchProjectsQuery = (
 	organisationId?: string[],
 	term?: string,
 ) => {
-	const conditions = [];
+	const conditions = ['imported_eq: true'];
 	const props = [];
 	if (projectSource && projectSource.length > 0) {
 		conditions.push('source_in: $project_source');
@@ -22,8 +22,7 @@ export const generateFetchProjectsQuery = (
 		props.push('$term: String');
 	}
 
-	const whereClause =
-		conditions.length > 0 ? `,where: { ${conditions.join(', ')} }` : '';
+	const whereClause = `where: { ${conditions.join(', ')} }`;
 
 	const addedProps = props.length > 0 ? `,${props.join(', ')}` : '';
 
@@ -37,7 +36,7 @@ export const generateFetchProjectsQuery = (
 		projects(
 		  offset: $offset,
 		  limit: $limit,
-		  orderBy: $orderBy
+		  orderBy: $orderBy,
 		  ${whereClause}
 		) {
 		  id
