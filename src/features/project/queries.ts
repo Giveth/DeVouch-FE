@@ -2,7 +2,7 @@ export const FETCH_PROJECT_BY_ID = `
 query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]) {
   projects(where: {id_eq: $id}) {
     id
-    slug
+    url
     image
     lastUpdatedTimestamp
     projectId
@@ -46,7 +46,7 @@ query fetchProjectById($id: String!, $limit: Int, $offset: Int, $orgs: [String!]
         totalAttests
         title
         source
-        slug
+        url
         projectId
         lastUpdatedTimestamp
         image

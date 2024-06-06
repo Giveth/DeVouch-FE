@@ -49,7 +49,7 @@ export const generateFetchProjectsQuery = (
 		  description
 		  image
 		  source
-		  slug
+		  url
 		  attests {
 			id
 			vouch

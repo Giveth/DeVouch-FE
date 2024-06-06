@@ -4,7 +4,7 @@ export interface IProject {
 	id: string;
 	projectId: string;
 	title: string;
-	slug: string;
+	url: string;
 	description: string;
 	image: string;
 	source: string;
