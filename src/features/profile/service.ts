@@ -15,7 +15,7 @@ export interface UserAttestationsInfo {
 export const fetchUserAttestations = async ({
 	queryKey,
 }: {
-	queryKey: (string | number | object)[];
+	queryKey: (string | number | object | string[] | undefined)[];
 }) => {
 	const [, address, page, orderBy, organisation, vouch] = queryKey;
 	const _organisation =
