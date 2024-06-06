@@ -268,7 +268,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						filteredAttests={[]}
+						filteredAttests={project?.attests || []}
 						totalAttests={project?.totalAttests || 0}
 						currentPage={currentPage}
 						itemsPerPage={ITEMS_PER_PAGE}
