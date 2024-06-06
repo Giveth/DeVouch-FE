@@ -40,8 +40,21 @@ enum ColumnType {
 }
 
 const headers = [
-	{ key: 'project.title', label: 'Projects', type: ColumnType.PUBLIC },
-	{ key: 'name', label: 'Date Attested', type: ColumnType.PUBLIC },
+	{
+		key: 'project.title',
+		label: 'Projects',
+		type: ColumnType.PUBLIC,
+		order: [
+			OrderByOptions.PROJECT_TITLE_ASC,
+			OrderByOptions.PROJECT_TITLE_DESC,
+		],
+	},
+	{
+		key: 'name',
+		label: 'Date Attested',
+		type: ColumnType.PUBLIC,
+		order: [OrderByOptions.NEWEST, OrderByOptions.OLDEST],
+	},
 	{ key: 'age', label: 'Attested As', type: ColumnType.PUBLIC },
 	{ key: 'email', label: 'Comments', type: ColumnType.PUBLIC },
 	{ key: 'email', label: 'Signal', type: ColumnType.PUBLIC },
@@ -332,6 +345,31 @@ export const UserAttestations = ({
 									<div
 										className='px-4 py-2 font-semibold text-left text-gray-600'
 										key={id}
+										onClick={() => {
+											const params = new URLSearchParams(
+												searchParams.toString(),
+											);
+											if (!header?.order) return;
+											if (
+												params.get('sort') ===
+												header.order[0]
+											) {
+												params.set(
+													'sort',
+													header.order[1],
+												);
+											} else {
+												params.set(
+													'sort',
+													header.order[0],
+												);
+											}
+											router.push(
+												pathname +
+													'?' +
+													params.toString(),
+											);
+										}}
 									>
 										{header.label}
 									</div>
