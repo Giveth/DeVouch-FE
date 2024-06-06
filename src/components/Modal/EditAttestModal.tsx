@@ -1,5 +1,5 @@
 import { useRef, useState, type FC } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
 import { Address } from 'viem';
@@ -35,12 +35,19 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 	const { address } = useAccount();
 	const signer = useEthersSigner();
 	const isVouching = useRef(false);
+	const { switchChainAsync } = useSwitchChain();
 
 	const handleConfirm = async () => {
 		if (!address || !signer) return;
 
 		try {
 			setStep(AttestSteps.ATTESTING);
+
+			// force user to switch to the chain
+			await switchChainAsync({
+				chainId: config.SUPPORTED_CHAINS[0].id,
+			});
+
 			const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
 			eas.connect(signer);
 
