@@ -6,6 +6,7 @@ import { Address } from 'viem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AddressName } from '@/components/AddressName';
@@ -19,9 +20,10 @@ import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 import { ROUTES } from '@/config/routes';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
+import { FilterKey } from '../home/Projects';
 
 const filterOptions = {
-	'Attested By': [] as IOption[],
+	[FilterKey.ORGANIZATION]: [] as IOption[],
 };
 
 enum OrderByOptions {
@@ -45,34 +47,40 @@ const headers = [
 	{ key: 'email', label: 'Actions', type: ColumnType.PRIVATE },
 ];
 
+const defaultSort = OrderByOptions.NEWEST;
+
 export const UserAttestations = ({
 	address: externalAddress,
 }: {
 	address?: Address;
 }) => {
-	const { address: connectedAddress } = useAccount();
-	const isExternal = !!externalAddress;
-	const address = externalAddress || connectedAddress || '0x000';
-	const [orderBy, setOrderBy] = useState(OrderByOptions.NEWEST);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
-	const [sourceFilterValues, setSourceFilterValues] = useState<{
-		[key: string]: string[];
-	}>({});
+
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const queryClient = useQueryClient();
 	const attestOnAction = useRef<ProjectAttestation>();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
+	const { address: connectedAddress } = useAccount();
 
+	const isExternal = !!externalAddress;
+	const address = externalAddress || connectedAddress || '0x000';
+	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
+	const sortParam = searchParams.get('sort') || defaultSort;
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
+
+	console.log('organisationParams', organisationParams);
 
 	const { data, error, isLoading } = useQuery({
 		queryKey: [
 			'userAttestations',
 			address.toLowerCase(),
 			currentPage,
-			orderBy,
-			sourceFilterValues['Attested By'],
+			sortParam,
+			organisationParams,
 			activeTab,
 		],
 		queryFn: fetchUserAttestations,
@@ -85,7 +93,7 @@ export const UserAttestations = ({
 		staleTime: 3000_000,
 	});
 
-	filterOptions['Attested By'] =
+	filterOptions[FilterKey.ORGANIZATION] =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
 		[];
 
@@ -110,8 +118,8 @@ export const UserAttestations = ({
 				'userAttestations',
 				address.toLocaleLowerCase(),
 				currentPage,
-				orderBy,
-				sourceFilterValues['Attested By'],
+				sortParam,
+				organisationParams,
 				activeTab,
 			],
 			(oldData: UserAttestationsInfo) => {
@@ -139,8 +147,8 @@ export const UserAttestations = ({
 					'userAttestations',
 					address.toLocaleLowerCase(),
 					currentPage,
-					orderBy,
-					sourceFilterValues['Attested By'],
+					sortParam,
+					organisationParams,
 					activeTab,
 				],
 				(oldData: UserAttestationsInfo | undefined) => {
@@ -214,12 +222,32 @@ export const UserAttestations = ({
 		[
 			address.toLowerCase(),
 			currentPage,
-			orderBy,
-			sourceFilterValues,
+			sortParam,
+			organisationParams,
 			activeTab,
 			queryClient,
 		],
 	);
+
+	const onSelectOption = useCallback(
+		(key: string, option: string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			const value = params.getAll(key);
+			if (value.includes(option)) {
+				params.delete(key, option);
+			} else {
+				params.append(key, option);
+			}
+			router.push(pathname + '?' + params.toString());
+		},
+		[searchParams, pathname, router],
+	);
+
+	const onClearOptions = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('organisation');
+		router.push(pathname + '?' + params.toString());
+	};
 
 	return (
 		<div className='container'>
@@ -240,8 +268,11 @@ export const UserAttestations = ({
 					/>
 					<FilterMenu
 						options={filterOptions}
-						value={sourceFilterValues}
-						setValues={setSourceFilterValues}
+						value={{
+							organization: organisationParams,
+						}}
+						onSelectOption={onSelectOption}
+						onClearOptions={onClearOptions}
 						className='w-full md:w-[150px]'
 						label='Filters'
 						stickToRight={true}

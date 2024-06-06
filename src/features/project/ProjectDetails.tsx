@@ -1,7 +1,7 @@
 'use client';
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
@@ -17,10 +17,11 @@ import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 import { Tabs } from '@/components/Tabs';
-import { IProject, ProjectAttestation } from '../home/types';
+import { IProject } from '../home/types';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
+import { FilterKey } from '../home/Projects';
 
 export enum Tab {
 	YourAttestations,
@@ -32,7 +33,7 @@ export enum Tab {
 export const ITEMS_PER_PAGE = 10;
 
 const filterOptions = {
-	'Attested By': [] as IOption[],
+	[FilterKey.ORGANIZATION]: [] as IOption[],
 };
 
 export interface ProjectDetailsProps {
@@ -67,20 +68,19 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	source,
 	projectId,
 }) => {
-	const router = useRouter();
-	const { address } = useAccount();
 	const [currentPage, setCurrentPage] = useState(0);
 	const [activeTab, setActiveTab] = useState<Tab>(Tab.AllAttestations);
-	const [sourceFilterValues, setSourceFilterValues] = useState<{
-		[key: string]: string[];
-	}>({});
-	const [filteredAttests, setFilteredAttests] = useState<
-		ProjectAttestation[]
-	>([]);
 	const [showAttestModal, setShowAttestModal] = useState(false);
+
+	const { address } = useAccount();
 	const isVouching = useRef(true);
 	const queryClient = useQueryClient();
 	const { open: openWeb3Modal } = useWeb3Modal();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
 
 	const {
 		data: project,
@@ -92,7 +92,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			source,
 			projectId,
 			currentPage,
-			sourceFilterValues,
+			organisationParams,
 		],
 		queryFn: () =>
 			fetchProjectData(
@@ -100,9 +100,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				projectId,
 				ITEMS_PER_PAGE,
 				currentPage * ITEMS_PER_PAGE,
-				sourceFilterValues['Attested By']?.length
-					? sourceFilterValues['Attested By']
-					: undefined,
+				organisationParams?.length ? organisationParams : undefined,
 			),
 	});
 
@@ -112,41 +110,9 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		staleTime: 3000_000,
 	});
 
-	filterOptions['Attested By'] =
+	filterOptions[FilterKey.ORGANIZATION] =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
 		[];
-
-	useEffect(() => {
-		if (!project || !project?.attests) return;
-
-		switch (activeTab) {
-			case Tab.AllAttestations:
-				setFilteredAttests(project?.attests);
-				break;
-			case Tab.Vouched:
-				const vouches = project.attests.filter(
-					attestation => attestation.vouch,
-				);
-				setFilteredAttests(vouches);
-				break;
-			case Tab.Flagged:
-				const flags = project.attests.filter(
-					attestation => !attestation.vouch,
-				);
-				setFilteredAttests(flags);
-				break;
-			case Tab.YourAttestations:
-				const att = project.attests.filter(
-					attestation =>
-						attestation?.attestorOrganisation?.attestor.id.toLowerCase() ===
-						address?.toLowerCase(),
-				);
-				setFilteredAttests(att);
-				break;
-			default:
-				break;
-		}
-	}, [activeTab, address, project]);
 
 	const handlePageChange = (newPage: number) => {
 		setCurrentPage(newPage);
@@ -164,18 +130,18 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const onAttestSuccess = useCallback(
 		(updatedProject: IProject) => {
 			const queryKey = [
-				'project',
+				'attestations',
 				source,
 				projectId,
 				currentPage,
-				sourceFilterValues,
+				organisationParams,
 			];
 			queryClient.setQueryData(queryKey, (oldData: any) => {
 				if (!oldData) return oldData; // In case oldData is undefined or null
 				return updatedProject;
 			});
 		},
-		[currentPage, projectId, queryClient, source, sourceFilterValues],
+		[currentPage, projectId, queryClient, source, organisationParams],
 	);
 
 	if (error) return <p>Error: {error.message}</p>;
@@ -205,6 +171,23 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		{ key: Tab.Vouched, label: 'Vouched', count: allVouchesCount },
 		{ key: Tab.Flagged, label: 'Flagged', count: allFlagsCount },
 	];
+
+	const onSelectOption = (key: string, option: string) => {
+		const params = new URLSearchParams(searchParams.toString());
+		const value = params.getAll(key);
+		if (value.includes(option)) {
+			params.delete(key, option);
+		} else {
+			params.append(key, option);
+		}
+		router.push(pathname + '?' + params.toString());
+	};
+
+	const onClearOptions = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('organisation');
+		router.push(pathname + '?' + params.toString());
+	};
 
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
@@ -271,8 +254,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					/>
 					<FilterMenu
 						options={filterOptions}
-						value={sourceFilterValues}
-						setValues={setSourceFilterValues}
+						value={{
+							[FilterKey.ORGANIZATION]: organisationParams,
+						}}
+						onSelectOption={onSelectOption}
+						onClearOptions={onClearOptions}
 						className='custom-class'
 						label='Filters'
 						stickToRight={true}
@@ -282,7 +268,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						filteredAttests={filteredAttests}
+						filteredAttests={project?.attests || []}
 						totalAttests={project?.totalAttests || 0}
 						currentPage={currentPage}
 						itemsPerPage={ITEMS_PER_PAGE}
