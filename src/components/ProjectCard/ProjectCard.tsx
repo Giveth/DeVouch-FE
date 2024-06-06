@@ -15,12 +15,7 @@ import { PROJECT_DESC_LIMIT } from './constant';
 
 interface IProjectCardProps {
 	project: IProject;
-	queryKey?: (
-		| string
-		| {
-				[key: string]: string[];
-		  }
-	)[];
+	queryKey: (string | string[])[];
 }
 
 interface IPage {

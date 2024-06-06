@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
@@ -41,33 +42,48 @@ const sortOptions: IOption[] = [
 	},
 ];
 
+export enum FilterKey {
+	SOURCE = 'source',
+	ORGANIZATION = 'organization',
+}
+
 const options = {
-	'Source Platform': config.SOURCE_PLATFORMS,
-	'Attested By': [] as IOption[],
+	[FilterKey.SOURCE]: config.SOURCE_PLATFORMS,
+	[FilterKey.ORGANIZATION]: [] as IOption[],
+};
+
+const optionSectionLabel = {
+	[FilterKey.SOURCE]: 'Source Platform',
+	[FilterKey.ORGANIZATION]: 'Attested By',
 };
 
 const limit = 10;
+const defaultSort = sortOptions[0];
 
 export const Projects = () => {
-	const [term, setTerm] = useState<string>('');
-	const [sort, setSort] = useState(sortOptions[0]);
-	const [filterValues, setFilterValues] = useState<{
-		[key: string]: string[];
-	}>({});
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	const sourceParams = searchParams.getAll(FilterKey.SOURCE);
+	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
+	const sortParam = searchParams.get('sort') || defaultSort.key;
+	const termParam = searchParams.get('term') || '';
 
 	const fetchProjects = async ({ pageParam = 0 }) => {
-		const projectSource = filterValues['Source Platform'];
-		const organisationId = filterValues['Attested By'];
-
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(projectSource, organisationId, term),
+			generateFetchProjectsQuery(
+				sourceParams,
+				organisationParams,
+				termParam,
+			),
 			{
-				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
+				orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
-				project_source: projectSource,
-				organisation_id: organisationId,
-				term,
+				project_source: sourceParams,
+				organisation_id: organisationParams,
+				term: termParam,
 			},
 		);
 
@@ -86,7 +102,13 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sort.key, term],
+		queryKey: [
+			'projects',
+			sourceParams,
+			organisationParams,
+			sortParam,
+			termParam,
+		],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -95,14 +117,55 @@ export const Projects = () => {
 	const { data: attestorGroups } = useQuery({
 		queryKey: ['fetchOrganisations'],
 		queryFn: fetchOrganization,
-		staleTime: 3000_000,
+		staleTime: 3_600_000,
 	});
 
-	options['Attested By'] =
+	options.organization =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
 		[];
 
 	const projects = data?.pages.flatMap(page => page.projects) || [];
+
+	const createQueryString = useCallback(
+		(name: string, value: string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set(name, value);
+
+			return params.toString();
+		},
+		[searchParams],
+	);
+
+	const handleSearchTerm = (term: string) => {
+		if (term === '' && termParam) {
+			const params = new URLSearchParams(searchParams.toString());
+			params.delete(term);
+			router.push(pathname + '?' + params.toString());
+		}
+		router.push(pathname + '?' + createQueryString('term', term));
+	};
+
+	const HandleSort = (sort: IOption) => {
+		router.push(pathname + '?' + createQueryString('sort', sort.key));
+	};
+
+	const onSelectOption = (key: string, option: string) => {
+		const params = new URLSearchParams(searchParams.toString());
+		const value = params.getAll(key);
+		if (value.includes(option)) {
+			params.delete(key, option);
+		} else {
+			params.append(key, option);
+		}
+		router.push(pathname + '?' + params.toString());
+	};
+
+	const onClearOptions = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('source');
+		params.delete('organisation');
+		router.push(pathname + '?' + params.toString());
+	};
 
 	return (
 		<div className='container flex flex-col gap-10'>
@@ -111,18 +174,26 @@ export const Projects = () => {
 					<p className='text-gray-400'>Sort By</p>
 					<Select
 						options={sortOptions}
-						value={sort}
-						setValue={setSort}
+						value={
+							sortOptions.find(so => so.key === sortParam) ||
+							defaultSort
+						}
+						setValue={HandleSort}
 						className='w-60'
 					/>
 				</div>
 				<div className='flex-1' />
-				<SearchInput setTerm={setTerm} />
+				<SearchInput setTerm={handleSearchTerm} />
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
 						options={options}
-						value={filterValues}
-						setValues={setFilterValues}
+						optionSectionLabel={optionSectionLabel}
+						onSelectOption={onSelectOption}
+						onClearOptions={onClearOptions}
+						value={{
+							[FilterKey.SOURCE]: sourceParams,
+							[FilterKey.ORGANIZATION]: organisationParams,
+						}}
 						label='Filter'
 						stickToRight={true}
 						className='w-full'
@@ -135,7 +206,13 @@ export const Projects = () => {
 					<ProjectCard
 						key={project.id}
 						project={project}
-						queryKey={['projects', filterValues, sort.key, term]}
+						queryKey={[
+							'projects',
+							sourceParams,
+							organisationParams,
+							sortParam,
+							termParam,
+						]}
 					/>
 				))}
 			</div>
