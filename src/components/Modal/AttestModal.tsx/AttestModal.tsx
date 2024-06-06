@@ -59,7 +59,19 @@ export const AttestModal: FC<AttestModalProps> = ({
 		const data = await fetchGraphQL<{
 			attestorOrganisations: IAttestorOrganisation[];
 		}>(FETCH_USER_ORGANISATIONS, { address: address?.toLowerCase() });
-		return data?.attestorOrganisations || [];
+
+		const organisations = new Set<string>();
+
+		const attestorOrganisations = data?.attestorOrganisations || [];
+		const result = [];
+		for (const ao of attestorOrganisations) {
+			if (!organisations.has(ao.organisation.id)) {
+				organisations.add(ao.organisation.id);
+				result.push(ao);
+			}
+		}
+
+		return result;
 	};
 
 	const { data, isLoading } = useQuery({
