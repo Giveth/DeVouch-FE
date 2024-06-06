@@ -126,7 +126,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	);
 
 	return (
-		<div className='relative group/card'>
+		<div className='relative group/card max-w-full'>
 			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all '></div>
 			<Link
 				href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
@@ -218,7 +218,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 							)}
 						</div>
 					</div>
-					<div className='flex gap-6'>
+					<div className='flex flex-col md:flex-row gap-6'>
 						<OutlineButton
 							buttonType={OutlineButtonType.BLUE}
 							className='flex-1'
