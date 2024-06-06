@@ -69,7 +69,7 @@ export const UserAttestations = ({
 	const { data, error, isLoading } = useQuery({
 		queryKey: [
 			'userAttestations',
-			address,
+			address.toLowerCase(),
 			currentPage,
 			orderBy,
 			sourceFilterValues['Attested By'],
@@ -108,7 +108,7 @@ export const UserAttestations = ({
 		queryClient.setQueryData(
 			[
 				'userAttestations',
-				address,
+				address.toLocaleLowerCase(),
 				currentPage,
 				orderBy,
 				sourceFilterValues['Attested By'],
@@ -137,7 +137,7 @@ export const UserAttestations = ({
 			queryClient.setQueryData(
 				[
 					'userAttestations',
-					address,
+					address.toLocaleLowerCase(),
 					currentPage,
 					orderBy,
 					sourceFilterValues['Attested By'],
@@ -212,7 +212,7 @@ export const UserAttestations = ({
 			);
 		},
 		[
-			address,
+			address.toLowerCase(),
 			currentPage,
 			orderBy,
 			sourceFilterValues,
