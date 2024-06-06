@@ -2,12 +2,12 @@ import { optimism } from 'wagmi/chains';
 
 const config = {
 	SUPPORTED_CHAINS: [optimism] as const,
+	GRAPHQL_ENDPOINT:
+		process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+		'https://optimism.backend.devouch.xyz/graphql',
 	EAS_CONTRACT_ADDRESS:
 		process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS ||
-		'0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
-	PROJECT_VERIFY_SCHEMA:
-		process.env.NEXT_PUBLIC_PROJECT_VERIFY_SCHEMA ||
-		'0x97b0c9911936fad57e77857fac6eef6771f8d0bf025be9549214e32bf9e2415a',
+		'0x4200000000000000000000000000000000000021',
 	SOURCE_PLATFORMS: [
 		{ key: 'Giveth', value: 'giveth' },
 		{ key: 'Gitcoin', value: 'gitcoin' },

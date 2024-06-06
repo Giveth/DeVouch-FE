@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
 import { Projects } from '@/features/home/Projects';
+
+export const metadata: Metadata = {
+	title: 'DeVouch',
+	description: 'On-Chain Vouching via Attestations',
+};
 
 export default function Home() {
 	return (
