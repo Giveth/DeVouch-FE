@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Select, type IOption } from '@/components/Select/Select';
 import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
@@ -49,25 +50,37 @@ const options = {
 const limit = 10;
 
 export const Projects = () => {
-	const [term, setTerm] = useState<string>('');
+	// const [term, setTerm] = useState<string>('');
 	const [sort, setSort] = useState(sortOptions[0]);
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	const filterParams = searchParams.getAll('source');
+	const organisationParams = searchParams.getAll('organisation');
+	const sortParam = searchParams.get('sort');
+	const termParam = searchParams.get('term') || '';
 
 	const fetchProjects = async ({ pageParam = 0 }) => {
 		const projectSource = filterValues['Source Platform'];
 		const organisationId = filterValues['Attested By'];
 
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(projectSource, organisationId, term),
+			generateFetchProjectsQuery(
+				projectSource,
+				organisationId,
+				termParam,
+			),
 			{
 				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
 				project_source: projectSource,
 				organisation_id: organisationId,
-				term,
+				term: termParam,
 			},
 		);
 
@@ -86,7 +99,7 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sort.key, term],
+		queryKey: ['projects', filterValues, sort.key, termParam],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -104,6 +117,25 @@ export const Projects = () => {
 
 	const projects = data?.pages.flatMap(page => page.projects) || [];
 
+	const createQueryString = useCallback(
+		(name: string, value: string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set(name, value);
+
+			return params.toString();
+		},
+		[searchParams],
+	);
+
+	const handleSearchTerm = (term: string) => {
+		if (term === '' && termParam) {
+			const params = new URLSearchParams(searchParams.toString());
+			params.delete(term);
+			router.push(pathname + '?' + params.toString());
+		}
+		router.push(pathname + '?' + createQueryString('term', term));
+	};
+
 	return (
 		<div className='container flex flex-col gap-10'>
 			<div className='flex flex-col md:flex-row gap-4'>
@@ -117,7 +149,7 @@ export const Projects = () => {
 					/>
 				</div>
 				<div className='flex-1' />
-				<SearchInput setTerm={setTerm} />
+				<SearchInput setTerm={handleSearchTerm} />
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
 						options={options}
@@ -135,7 +167,12 @@ export const Projects = () => {
 					<ProjectCard
 						key={project.id}
 						project={project}
-						queryKey={['projects', filterValues, sort.key, term]}
+						queryKey={[
+							'projects',
+							filterValues,
+							sort.key,
+							termParam,
+						]}
 					/>
 				))}
 			</div>
