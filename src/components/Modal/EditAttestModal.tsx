@@ -121,7 +121,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 						Check out more projects to Attest to.
 					</div>
 					<Button onClick={() => props.setShowModal(false)}>
-						View Projects
+						Done
 					</Button>
 				</div>
 			) : (
