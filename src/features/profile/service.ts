@@ -15,7 +15,7 @@ export interface UserAttestationsInfo {
 export const fetchUserAttestations = async ({
 	queryKey,
 }: {
-	queryKey: (string | number | object)[];
+	queryKey: (string | number | object | string[] | undefined)[];
 }) => {
 	const [, address, page, orderBy, organisation, vouch] = queryKey;
 	const data = await fetchGraphQL<{
@@ -28,7 +28,10 @@ export const fetchUserAttestations = async ({
 		limit: ITEMS_PER_PAGE,
 		offset: (page as number) * ITEMS_PER_PAGE,
 		orderBy: [orderBy],
-		organisation: organisation as string[] | undefined,
+		organisation:
+			(organisation as string[])?.length > 0
+				? (organisation as string[])
+				: undefined,
 		vouch:
 			vouch === VouchFilter.VOUCHED
 				? true
