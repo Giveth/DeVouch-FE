@@ -186,7 +186,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					</div>
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
-						<div className='flex gap-2'>
+						<div className='flex gap-2 flex-wrap'>
 							{vouches.length > 0 ? (
 								vouches.map(vouch => (
 									<AttestInfo
@@ -203,7 +203,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					</div>
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
-						<div className='flex gap-2'>
+						<div className='flex gap-2 flex-wrap'>
 							{flags?.length > 0 ? (
 								flags.map(flag => (
 									<AttestInfo
