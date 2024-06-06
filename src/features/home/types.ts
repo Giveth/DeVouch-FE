@@ -4,7 +4,7 @@ export interface IProject {
 	id: string;
 	projectId: string;
 	title: string;
-	slug: string;
+	url: string;
 	description: string;
 	image: string;
 	source: string;
@@ -26,7 +26,6 @@ export interface IAttestorOrganisation {
 	attestor: IAttestor;
 	organisation: IOrganisation;
 	attestTimestamp: Date;
-	revoked?: boolean;
 }
 
 export interface IOrganisation {
@@ -46,7 +45,6 @@ export interface ProjectAttestation {
 	recipient?: string;
 	vouch: boolean;
 	txHash?: string;
-	revoked?: boolean;
 	attestorOrganisation: IAttestorOrganisation;
 	project: IProject;
 	attestTimestamp: Date;
