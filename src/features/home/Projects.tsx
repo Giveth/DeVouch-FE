@@ -43,8 +43,13 @@ const sortOptions: IOption[] = [
 ];
 
 const options = {
-	'Source Platform': config.SOURCE_PLATFORMS,
-	'Attested By': [] as IOption[],
+	source: config.SOURCE_PLATFORMS,
+	organization: [] as IOption[],
+};
+
+const optionSectionLabel = {
+	source: 'Source Platform',
+	organization: 'Attested By',
 };
 
 const limit = 10;
@@ -60,27 +65,24 @@ export const Projects = () => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
-	const filterParams = searchParams.getAll('source');
+	const sourceParams = searchParams.getAll('source');
 	const organisationParams = searchParams.getAll('organisation');
 	const sortParam = searchParams.get('sort') || defaultSort.key;
 	const termParam = searchParams.get('term') || '';
 
 	const fetchProjects = async ({ pageParam = 0 }) => {
-		const projectSource = filterValues['Source Platform'];
-		const organisationId = filterValues['Attested By'];
-
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
 			generateFetchProjectsQuery(
-				projectSource,
-				organisationId,
+				sourceParams,
+				organisationParams,
 				termParam,
 			),
 			{
 				orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
-				project_source: projectSource,
-				organisation_id: organisationId,
+				project_source: sourceParams,
+				organisation_id: organisationParams,
 				term: termParam,
 			},
 		);
@@ -100,7 +102,13 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sortParam, termParam],
+		queryKey: [
+			'projects',
+			sourceParams,
+			organisationParams,
+			sortParam,
+			termParam,
+		],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -112,7 +120,7 @@ export const Projects = () => {
 		staleTime: 3_600_000,
 	});
 
-	options['Attested By'] =
+	options.organization =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
 		[];
 
@@ -141,6 +149,10 @@ export const Projects = () => {
 		router.push(pathname + '?' + createQueryString('sort', sort.key));
 	};
 
+	const handleFilter = (filter: any) => {
+		console.log('filter', filter);
+	};
+
 	return (
 		<div className='container flex flex-col gap-10'>
 			<div className='flex flex-col md:flex-row gap-4'>
@@ -161,8 +173,9 @@ export const Projects = () => {
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
 						options={options}
+						optionSectionLabel={optionSectionLabel}
 						value={filterValues}
-						setValues={setFilterValues}
+						setValues={handleFilter}
 						label='Filter'
 						stickToRight={true}
 						className='w-full'
@@ -177,7 +190,8 @@ export const Projects = () => {
 						project={project}
 						queryKey={[
 							'projects',
-							filterValues,
+							sourceParams,
+							organisationParams,
 							sortParam,
 							termParam,
 						]}
