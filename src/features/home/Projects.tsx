@@ -42,7 +42,7 @@ const sortOptions: IOption[] = [
 	},
 ];
 
-enum FilterKey {
+export enum FilterKey {
 	SOURCE = 'source',
 	ORGANIZATION = 'organization',
 }
@@ -191,8 +191,8 @@ export const Projects = () => {
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
 						value={{
-							source: sourceParams,
-							organization: organisationParams,
+							[FilterKey.SOURCE]: sourceParams,
+							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
 						label='Filter'
 						stickToRight={true}
