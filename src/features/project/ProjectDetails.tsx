@@ -27,6 +27,8 @@ import { IOption } from '@/components/Select/Select';
 import { FilterKey } from '../home/Projects';
 import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
+import Tooltip from '@/components/Table/Tooltip';
+import config from '@/config/configuration';
 
 export enum Tab {
 	YourAttestations,
@@ -278,6 +280,10 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		router.push(pathname + '?' + params.toString());
 	};
 
+	const sourceName = config.SOURCE_PLATFORMS.find(
+		i => i.value.toLowerCase() === source.toLowerCase(),
+	)?.key;
+
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
 			<div className='bg-white p-6 '>
@@ -299,13 +305,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							target='_blank'
 							rel='noopener noreferrer'
 						>
-							<Image
-								src={'/images/icons/external.svg'}
-								style={{ cursor: 'pointer' }}
-								alt={'arrow'}
-								width={24}
-								height={24}
-							/>
+							<Tooltip
+								content={`Go to project page on ${sourceName} website`}
+								direction='bottom'
+							>
+								<Image
+									src={'/images/icons/external.svg'}
+									alt={'arrow'}
+									width={24}
+									height={24}
+								/>
+							</Tooltip>
 						</a>
 					</div>
 				</div>
