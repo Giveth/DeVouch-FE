@@ -48,10 +48,11 @@ const options = {
 };
 
 const limit = 10;
+const defaultSort = sortOptions[0];
 
 export const Projects = () => {
 	// const [term, setTerm] = useState<string>('');
-	const [sort, setSort] = useState(sortOptions[0]);
+
 	const [filterValues, setFilterValues] = useState<{
 		[key: string]: string[];
 	}>({});
@@ -61,7 +62,7 @@ export const Projects = () => {
 
 	const filterParams = searchParams.getAll('source');
 	const organisationParams = searchParams.getAll('organisation');
-	const sortParam = searchParams.get('sort');
+	const sortParam = searchParams.get('sort') || defaultSort.key;
 	const termParam = searchParams.get('term') || '';
 
 	const fetchProjects = async ({ pageParam = 0 }) => {
@@ -75,7 +76,7 @@ export const Projects = () => {
 				termParam,
 			),
 			{
-				orderBy: [sort.key, 'lastUpdatedTimestamp_DESC'],
+				orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
 				limit,
 				offset: pageParam,
 				project_source: projectSource,
@@ -99,7 +100,7 @@ export const Projects = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ['projects', filterValues, sort.key, termParam],
+		queryKey: ['projects', filterValues, sortParam, termParam],
 		initialPageParam: 0,
 		queryFn: fetchProjects,
 		getNextPageParam: lastPage => lastPage.nextPage,
@@ -136,6 +137,10 @@ export const Projects = () => {
 		router.push(pathname + '?' + createQueryString('term', term));
 	};
 
+	const HandleSort = (sort: IOption) => {
+		router.push(pathname + '?' + createQueryString('sort', sort.key));
+	};
+
 	return (
 		<div className='container flex flex-col gap-10'>
 			<div className='flex flex-col md:flex-row gap-4'>
@@ -143,8 +148,11 @@ export const Projects = () => {
 					<p className='text-gray-400'>Sort By</p>
 					<Select
 						options={sortOptions}
-						value={sort}
-						setValue={setSort}
+						value={
+							sortOptions.find(so => so.key === sortParam) ||
+							defaultSort
+						}
+						setValue={HandleSort}
 						className='w-60'
 					/>
 				</div>
@@ -170,7 +178,7 @@ export const Projects = () => {
 						queryKey={[
 							'projects',
 							filterValues,
-							sort.key,
+							sortParam,
 							termParam,
 						]}
 					/>
