@@ -1,8 +1,10 @@
+import config from '@/config/configuration';
+
 export const fetchGraphQL = async <T>(
 	query: string,
 	variables: Record<string, any> = {},
 ): Promise<T> => {
-	const response = await fetch('https://backend.devouch.xyz/graphql', {
+	const response = await fetch(config.GRAPHQL_ENDPOINT, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
