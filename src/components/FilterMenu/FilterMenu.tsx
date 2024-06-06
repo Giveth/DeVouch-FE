@@ -12,6 +12,7 @@ import TrashIcon from '../../../public/images/icons/trash.svg';
 
 interface FilterMenuProps {
 	options: IOptions;
+	optionSectionLabel?: { [key: string]: string };
 	value: { [key: string]: string[] };
 	setValues: Dispatch<SetStateAction<{ [key: string]: string[] }>>;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
@@ -25,6 +26,7 @@ interface IOptions {
 
 const FilterMenu: FC<FilterMenuProps> = ({
 	options,
+	optionSectionLabel,
 	value,
 	setValues,
 	className,
@@ -63,7 +65,8 @@ const FilterMenu: FC<FilterMenuProps> = ({
 				...Object.entries(options).map(([key, optionList]) => (
 					<div key={key}>
 						<div className='text-gray-400 font-bold py-3 px-3'>
-							{key}
+							{(optionSectionLabel && optionSectionLabel[key]) ||
+								key}
 						</div>
 						{optionList.map(option => (
 							<div
