@@ -1,5 +1,5 @@
 import { useState, type FC } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
@@ -46,6 +46,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 	const [step, setStep] = useState(AttestSteps.ATTEST);
 	const [selectedOrg, setSelectedOrg] = useState<IAttestorOrganisation>();
 	const [comment, setComment] = useState<string>('');
+	const { switchChainAsync } = useSwitchChain();
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
@@ -85,6 +86,12 @@ export const AttestModal: FC<AttestModalProps> = ({
 
 		try {
 			setStep(AttestSteps.ATTESTING);
+
+			// force user to switch to the chain
+			await switchChainAsync({
+				chainId: config.SUPPORTED_CHAINS[0].id,
+			});
+
 			const eas = new EAS(config.EAS_CONTRACT_ADDRESS);
 			eas.connect(signer);
 
