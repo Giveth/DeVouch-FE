@@ -223,7 +223,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 				<div className='relative h-48 overflow-hidden mb-4 bg-blue-100'>
 					<a
-						href={getSourceLink(project)}
+						href={`${getSourceLink(project)}${project?.url}`}
 						target='blank'
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
