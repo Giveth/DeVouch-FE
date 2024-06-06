@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Address } from 'viem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ import { ROUTES } from '@/config/routes';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
 import { FilterKey } from '../home/Projects';
+import { ITEMS_PER_PAGE } from './constants';
 
 const filterOptions = {
 	[FilterKey.ORGANIZATION]: [] as IOption[],
@@ -55,7 +56,11 @@ export const UserAttestations = ({
 	address?: Address;
 }) => {
 	const [currentPage, setCurrentPage] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
 	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
+	const [totalAttests, setTotalAttests] = useState(0);
+	const [totalVouches, setTotalVouches] = useState(0);
+	const [totalFlags, setTotalFlags] = useState(0);
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -72,7 +77,9 @@ export const UserAttestations = ({
 	const sortParam = searchParams.get('sort') || defaultSort;
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
-	console.log('organisationParams', organisationParams);
+	const onPageChange = (page: number) => {
+		setCurrentPage(page);
+	};
 
 	const { data, error, isLoading } = useQuery({
 		queryKey: [
@@ -101,15 +108,44 @@ export const UserAttestations = ({
 		{
 			key: VouchFilter.ALL_ATTESTATIONS,
 			label: 'All Attestations',
-			count: data?.totalAttests,
+			count: totalAttests,
 		},
 		{
 			key: VouchFilter.VOUCHED,
 			label: 'Vouched',
-			count: data?.totalVouches,
+			count: totalVouches,
 		},
-		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: data?.totalFlags },
+		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: totalFlags },
 	];
+
+	useEffect(() => {
+		if (!data) return;
+		let totalItems = 0;
+		const totalAttests = data?.totalAttests || 0;
+		const totalVouches = data?.totalVouches || 0;
+		const totalFlags = data?.totalFlags || 0;
+		switch (activeTab) {
+			case VouchFilter.ALL_ATTESTATIONS:
+				totalItems = totalAttests;
+				break;
+			case VouchFilter.VOUCHED:
+				totalItems = totalVouches;
+				break;
+			case VouchFilter.FLAGGED:
+				totalItems = totalFlags;
+				break;
+		}
+		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
+		setTotalAttests(totalAttests);
+		setTotalVouches(totalVouches);
+		setTotalFlags(totalFlags);
+	}, [data]);
+
+	useEffect(() => {
+		if (currentPage > 0 && currentPage >= totalPages) {
+			setCurrentPage(totalPages - 1);
+		}
+	}, [totalPages]);
 
 	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
 		const vouch = attestation.vouch;
@@ -414,6 +450,46 @@ export const UserAttestations = ({
 									)}
 								</React.Fragment>
 							))}
+						</div>
+
+						<div className='flex justify-center mt-4'>
+							<button
+								className={`px-3 py-1 border rounded ${
+									currentPage === 0
+										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+										: 'bg-white text-black'
+								}`}
+								onClick={() => onPageChange(currentPage - 1)}
+								disabled={currentPage === 0}
+							>
+								&lt;
+							</button>
+							{Array.from({ length: totalPages }).map(
+								(_, index) => (
+									<button
+										key={index}
+										className={`px-3 py-1 border rounded mx-1 ${
+											currentPage === index
+												? 'bg-gray-200 font-bold'
+												: 'bg-white'
+										}`}
+										onClick={() => onPageChange(index)}
+									>
+										{index + 1}
+									</button>
+								),
+							)}
+							<button
+								className={`px-3 py-1 border rounded ${
+									currentPage === totalPages - 1
+										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+										: 'bg-white text-black'
+								}`}
+								onClick={() => onPageChange(currentPage + 1)}
+								disabled={currentPage === totalPages - 1}
+							>
+								&gt;
+							</button>
 						</div>
 					</div>
 				)}
