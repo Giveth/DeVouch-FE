@@ -95,7 +95,7 @@ export const Projects = () => {
 	const { data: attestorGroups } = useQuery({
 		queryKey: ['fetchOrganisations'],
 		queryFn: fetchOrganization,
-		staleTime: 3000_000,
+		staleTime: 3_600_000,
 	});
 
 	options['Attested By'] =
