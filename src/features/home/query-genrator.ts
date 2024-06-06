@@ -27,9 +27,6 @@ export const generateFetchProjectsQuery = (
 
 	const addedProps = props.length > 0 ? `,${props.join(', ')}` : '';
 
-	console.log('whereClause', conditions);
-	console.log('addedProps', props);
-
 	return `
 	query fetchProjects(
 		$offset: Int!,
