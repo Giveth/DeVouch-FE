@@ -1,9 +1,4 @@
-import {
-	type Dispatch,
-	type SetStateAction,
-	type FC,
-	type HTMLAttributes,
-} from 'react';
+import { type FC, type HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Dropdown from '../Dropdown/Dropdown';
 
@@ -14,7 +9,7 @@ export interface IOption {
 
 interface SelectProps {
 	options: IOption[];
-	setValue: Dispatch<SetStateAction<IOption>>;
+	setValue: (sort: IOption) => void;
 	value: IOption;
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 }
@@ -46,7 +41,7 @@ export const Select: FC<SelectProps> = ({
 interface OptionProps {
 	option: IOption;
 	selected: boolean;
-	setValue: Dispatch<SetStateAction<IOption>>;
+	setValue: (sort: IOption) => void;
 }
 
 const Option: FC<OptionProps> = ({ option, setValue, selected }) => {

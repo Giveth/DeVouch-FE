@@ -18,6 +18,8 @@ export const fetchUserAttestations = async ({
 	queryKey: (string | number | object | string[] | undefined)[];
 }) => {
 	const [, address, page, orderBy, organisation, vouch] = queryKey;
+	const _organisation =
+		(organisation as string[]).length === 0 ? undefined : organisation;
 	const data = await fetchGraphQL<{
 		projectAttestations: ProjectAttestation[];
 		vouches: { totalCount: number };
@@ -28,10 +30,7 @@ export const fetchUserAttestations = async ({
 		limit: ITEMS_PER_PAGE,
 		offset: (page as number) * ITEMS_PER_PAGE,
 		orderBy: [orderBy],
-		organisation:
-			(organisation as string[])?.length > 0
-				? (organisation as string[])
-				: undefined,
+		organisation: _organisation as string[] | undefined,
 		vouch:
 			vouch === VouchFilter.VOUCHED
 				? true
