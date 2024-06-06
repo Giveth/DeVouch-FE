@@ -5,10 +5,10 @@ export const getSourceLink = (project?: IProject) => {
 	switch (project.source) {
 		case 'giveth':
 			return 'https://www.giveth.io';
-		case 'retro_funding':
-			return 'https://retrofunding.optimism.io/';
+		case 'rf4':
+			return 'https://retrolist.app';
 		case 'gitcoin':
-			return 'https://www.gitcoin.co/';
+			return 'https://explorer.gitcoin.co';
 		default:
 			return '/';
 	}
