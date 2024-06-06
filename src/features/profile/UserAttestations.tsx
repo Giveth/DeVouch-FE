@@ -22,6 +22,7 @@ import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
 import { FilterKey } from '../home/Projects';
 import { ITEMS_PER_PAGE } from './constants';
+import { IconSort } from '@/components/Icons/IconSort';
 
 const filterOptions = {
 	[FilterKey.ORGANIZATION]: [] as IOption[],
@@ -298,6 +299,17 @@ export const UserAttestations = ({
 		router.push(pathname + '?' + params.toString());
 	};
 
+	const handleSortClick = (header: any) => {
+		const params = new URLSearchParams(searchParams.toString());
+		if (!header?.order) return;
+		if (params.get('sort') === header.order[0]) {
+			params.set('sort', header.order[1]);
+		} else {
+			params.set('sort', header.order[0]);
+		}
+		router.push(pathname + '?' + params.toString());
+	};
+
 	return (
 		<div className='container'>
 			<div className='bg-white p-6 flex flex-col lg:flex-row justify-between items-center mb-6 gap-2'>
@@ -343,35 +355,27 @@ export const UserAttestations = ({
 							{headers.map((header, id) =>
 								header.type === ColumnType.PUBLIC || isOwner ? (
 									<div
-										className='px-4 py-2 font-semibold text-left text-gray-600'
+										className={`px-4 py-2 font-semibold text-left text-gray-600 flex items-center gap-1 ${header.order ? 'cursor-pointer' : ''}`}
 										key={id}
-										onClick={() => {
-											const params = new URLSearchParams(
-												searchParams.toString(),
-											);
-											if (!header?.order) return;
-											if (
-												params.get('sort') ===
-												header.order[0]
-											) {
-												params.set(
-													'sort',
-													header.order[1],
-												);
-											} else {
-												params.set(
-													'sort',
-													header.order[0],
-												);
-											}
-											router.push(
-												pathname +
-													'?' +
-													params.toString(),
-											);
-										}}
+										onClick={() => handleSortClick(header)}
 									>
-										{header.label}
+										{header.order && (
+											<IconSort
+												active={
+													sortParam.split('_')[0] ===
+													header.order[0].split(
+														'_',
+													)[0]
+												}
+												desc={
+													sortParam.split('_')[1] ===
+													header.order[0].split(
+														'_',
+													)[1]
+												}
+											/>
+										)}
+										<span>{header.label}</span>
 									</div>
 								) : null,
 							)}
