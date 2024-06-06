@@ -10,9 +10,9 @@ if (!projectId) throw new Error('Project ID is not defined');
 
 const metadata = {
 	name: 'DeVouch',
-	description: 'DeVouch Example',
-	url: 'https://DeVouch.com', // origin must match your domain & subdomain
-	icons: ['https://avatars.githubusercontent.com/u/37784886'],
+	description: 'On-Chain Vouching via Attestations',
+	url: 'https://devouch.xyz', // origin must match your domain & subdomain
+	icons: ['https://devouch.xyz/images/favicon.svg'],
 };
 
 // Create wagmiConfig
