@@ -173,7 +173,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 				};
 				_project.totalAttests++;
 				vouch ? _project.totalVouches++ : _project.totalFlags++;
-				_project.attests = [_attest];
+				_project.attests = [...(_project.attests || []), _attest];
 			}
 			onSuccess(_project);
 
