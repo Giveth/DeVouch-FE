@@ -26,19 +26,19 @@ enum EProjectSort {
 const sortOptions: IOption[] = [
 	{
 		key: EProjectSort.HIGHEST_VOUCH_COUNT,
-		value: 'Highest Vouch Count',
+		value: 'Most Vouches',
 	},
 	{
 		key: EProjectSort.LOWEST_VOUCH_COUNT,
-		value: 'Lowest Vouch Count',
+		value: 'Least Vouches',
 	},
 	{
 		key: EProjectSort.HIGHEST_FLAG,
-		value: 'Highest Flag',
+		value: 'Most Flags',
 	},
 	{
 		key: EProjectSort.LOWEST_FLAG,
-		value: 'Lowest Flag',
+		value: 'Least Flags',
 	},
 ];
 
