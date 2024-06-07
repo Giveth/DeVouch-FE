@@ -65,7 +65,7 @@ export const DeleteAttestModal: FC<DeleteAttestModalProps> = ({
 	return (
 		<Modal
 			{...props}
-			title='delete your Attestation'
+			title='Delete your Attestation'
 			showHeader={step !== DeleteSteps.SUCCESS}
 			className='w-full md:w-[500px] p-6'
 		>
@@ -82,7 +82,7 @@ export const DeleteAttestModal: FC<DeleteAttestModalProps> = ({
 					</div>
 					<div className='text-gray-400 text-center'>
 						You have successfully Deleted your Attestation to this
-						project. Check out more projects to Attest to.
+						project. 
 					</div>
 					<Button onClick={() => props.setShowModal(false)}>
 						Done

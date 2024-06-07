@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Projects } from '@/features/home/Projects';
+import { links } from '@/config/constants';
 
 export const metadata: Metadata = {
 	title: 'DeVouch',
@@ -44,12 +44,14 @@ export default function Home() {
 						using the power of Ethereum Attestations.
 					</p>
 					<div>
-						<Link
-							href={'/'}
+						<a
+							href={links.DOCUMENTATION_LINK}
+							target='_blank'
+							rel='noreferrer'
 							className='inline-block font-bold bg-gradient-to-t from-c-blue-200 to-c-blue-100 text-transparent bg-clip-text leading-tight'
 						>
 							Learn More
-						</Link>
+						</a>
 					</div>
 				</div>
 			</div>
