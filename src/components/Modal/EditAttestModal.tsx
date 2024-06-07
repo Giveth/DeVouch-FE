@@ -125,7 +125,6 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					</div>
 					<div className='text-gray-400 text-center'>
 						Your attestation to this project has been successful!
-						
 					</div>
 					<Button onClick={() => props.setShowModal(false)}>
 						Done
