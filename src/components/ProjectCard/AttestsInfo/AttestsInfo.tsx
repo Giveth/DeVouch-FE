@@ -14,10 +14,8 @@ export interface AttestsInfoProps {
 
 export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
 	const [showModal, setShowModal] = useState(false);
-	console.log('attests', attests);
 	const notEmpty = attests.length > 0;
 	const exceeded = attests.length - 4;
-	console.log('exceeded', exceeded);
 	return notEmpty ? (
 		<>
 			{attests.slice(0, 4).map((info, index) => (
