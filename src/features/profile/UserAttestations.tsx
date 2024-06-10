@@ -220,6 +220,9 @@ export const UserAttestations = ({
 	const onSuccessEdit = useCallback(
 		(attestation: ProjectAttestation, oldAttestId: Address) => {
 			const vouch = attestation.vouch;
+			let totalVouchDiff = 0;
+			let totalFlagDiff = 0;
+
 			queryClient.setQueryData(
 				[
 					'userAttestations',
@@ -232,12 +235,7 @@ export const UserAttestations = ({
 				(oldData: UserAttestationsInfo | undefined) => {
 					if (!oldData) return oldData; // In case oldData is undefined or null
 
-					let {
-						attestations,
-						totalVouches,
-						totalFlags,
-						totalAttests,
-					} = oldData;
+					let { attestations } = oldData;
 
 					// Find the existing attestation in the old data
 					const existingAttestationIndex = attestations.findIndex(
@@ -256,15 +254,13 @@ export const UserAttestations = ({
 					// Update counts based on the change in vouch status
 					if (existingAttestation.vouch !== vouch) {
 						if (vouch) {
-							totalVouches += 1;
-							totalFlags -= 1;
+							totalVouchDiff = 1;
+							totalFlagDiff = -1;
 						} else {
-							totalVouches -= 1;
-							totalFlags += 1;
+							totalVouchDiff = -1;
+							totalFlagDiff = 1;
 						}
 					}
-
-					totalAttests = totalVouches + totalFlags;
 
 					// Handle active tab filtering
 					const shouldRemoveAttestation =
@@ -290,10 +286,19 @@ export const UserAttestations = ({
 
 					return {
 						attestations: newAttestations,
-						totalVouches,
-						totalFlags,
-						totalAttests,
 					};
+				},
+			);
+			queryClient.setQueryData(
+				['userAttestationsCount', address, organisationParams],
+				(oldData: ITotalCountInfo) => {
+					if (!oldData) return oldData; // In case oldData is undefined or null
+					const newData = {
+						totalVouches: oldData.totalVouches + totalVouchDiff,
+						totalFlags: oldData.totalFlags + totalFlagDiff,
+						totalAttests: oldData.totalVouches,
+					};
+					return newData;
 				},
 			);
 		},
