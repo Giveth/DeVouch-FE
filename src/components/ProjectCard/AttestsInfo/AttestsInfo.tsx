@@ -1,17 +1,19 @@
-import { type FC } from 'react';
+import { useState, type FC } from 'react';
 import { AttestInfo } from './AttestInfo';
+import { AllAttestsModal } from './AllAttestsModal';
 
 interface AttestInfoWithKey {
 	id: string;
 	info: AttestInfo;
 }
 
-interface AttestsInfoProps {
+export interface AttestsInfoProps {
 	attests: AttestInfoWithKey[];
 	vouch?: boolean;
 }
 
 export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
+	const [showModal, setShowModal] = useState(false);
 	console.log('attests', attests);
 	const notEmpty = attests.length > 0;
 	const exceeded = attests.length - 4;
@@ -27,10 +29,19 @@ export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
 					onClick={e => {
 						e.preventDefault();
 						e.stopPropagation();
+						setShowModal(true);
 					}}
 				>
 					<span className='text-black font-bold'>+{exceeded}</span>
 				</div>
+			)}
+			{showModal && (
+				<AllAttestsModal
+					setShowModal={setShowModal}
+					showModal={showModal}
+					attests={attests}
+					vouch={vouch}
+				/>
 			)}
 		</>
 	) : (
