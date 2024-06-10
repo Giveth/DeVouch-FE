@@ -5,11 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import {
-	FETCH_PROJECT_ATTESTATIONS,
-	FETCH_PROJECT_BY_ID,
-} from '@/features/project/queries';
-import { fetchGraphQL } from '@/helpers/request';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -29,6 +24,7 @@ import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
 import config from '@/config/configuration';
+import { fetchProjectAttestationsData, fetchProjectData } from './services';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -51,45 +47,6 @@ const LoadingComponent = () => (
 		<Spinner size={32} color='blue' secondaryColor='lightgray' />
 	</div>
 );
-
-const fetchProjectData = async (source: string, projectId: string) => {
-	const id = `${source}-${projectId}`;
-	const data = await fetchGraphQL<{ projects: any[] }>(FETCH_PROJECT_BY_ID, {
-		id,
-	});
-	return data.projects[0] as IProject;
-};
-
-const fetchProjectAttestationsData = async (
-	source: string,
-	projectId: string,
-	limit: number,
-	page: number,
-	organisation?: string[],
-	address?: string,
-	attestorAddressFilter?: string,
-	vouch?: VouchFilter | undefined,
-) => {
-	const id = `${source}-${projectId}`;
-	const data = await fetchGraphQL<{ projects: any[] }>(
-		FETCH_PROJECT_ATTESTATIONS,
-		{
-			projectId: id,
-			limit,
-			offset: page * ITEMS_PER_PAGE,
-			organisation,
-			address: address?.toLowerCase(),
-			attestorAddressFilter: attestorAddressFilter?.toLowerCase(),
-			vouch:
-				vouch === VouchFilter.VOUCHED
-					? true
-					: vouch === VouchFilter.FLAGGED
-						? false
-						: undefined,
-		},
-	);
-	return data;
-};
 
 const defaultTab = Tab.AllAttestations;
 
