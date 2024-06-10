@@ -1,7 +1,10 @@
 import { Address } from 'viem';
 import { fetchGraphQL } from '@/helpers/request';
 import { ProjectAttestation } from '../home/types';
-import { FETCH_USER_ATTESTATIONS } from '../project/queries';
+import {
+	FETCH_USER_ATTESTATIONS,
+	FETCH_USER_ATTESTATIONS_TOTAL_COUNT,
+} from '../project/queries';
 import { ITEMS_PER_PAGE } from './constants';
 import { VouchFilter } from './types';
 
@@ -41,6 +44,27 @@ export const fetchUserAttestations = async ({
 
 	return {
 		attestations: data?.projectAttestations,
+	};
+};
+
+export const fetchUserAttestationsTotalCount = async ({
+	queryKey,
+}: {
+	queryKey: (string | number | object | string[] | undefined)[];
+}) => {
+	const [, address, organisation] = queryKey;
+	const _organisation =
+		(organisation as string[]).length === 0 ? undefined : organisation;
+	const data = await fetchGraphQL<{
+		vouches: { totalCount: number };
+		flags: { totalCount: number };
+		attests: { totalCount: number };
+	}>(FETCH_USER_ATTESTATIONS_TOTAL_COUNT, {
+		address: (address as Address).toLowerCase(),
+		organisation: _organisation as string[] | undefined,
+	});
+
+	return {
 		totalVouches: data?.vouches.totalCount,
 		totalFlags: data?.flags.totalCount,
 		totalAttests: data?.attests.totalCount,
