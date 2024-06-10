@@ -12,7 +12,11 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
-import { UserAttestationsInfo, fetchUserAttestations } from './service';
+import {
+	UserAttestationsInfo,
+	fetchUserAttestations,
+	fetchUserAttestationsTotalCount,
+} from './service';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
@@ -106,6 +110,16 @@ export const UserAttestations = ({
 		enabled: !!address,
 	});
 
+	const {
+		data: counts,
+		error: errorCount,
+		isLoading: loadingCount,
+	} = useQuery({
+		queryKey: ['userAttestationsCount', address, organisationParams],
+		queryFn: fetchUserAttestationsTotalCount,
+		enabled: !!address,
+	});
+
 	const { data: attestorGroups } = useQuery({
 		queryKey: ['fetchOrganisations'],
 		queryFn: fetchOrganization,
@@ -120,17 +134,17 @@ export const UserAttestations = ({
 		{
 			key: VouchFilter.ALL_ATTESTATIONS,
 			label: 'All Attestations',
-			count: data?.totalAttests || 0,
+			count: counts?.totalAttests || 0,
 		},
 		{
 			key: VouchFilter.VOUCHED,
 			label: 'Vouched',
-			count: data?.totalVouches || 0,
+			count: counts?.totalVouches || 0,
 		},
 		{
 			key: VouchFilter.FLAGGED,
 			label: 'Flagged',
-			count: data?.totalFlags || 0,
+			count: counts?.totalFlags || 0,
 		},
 	];
 
@@ -138,17 +152,22 @@ export const UserAttestations = ({
 		let totalItems = 0;
 		switch (tabParam) {
 			case VouchFilter.ALL_ATTESTATIONS:
-				totalItems = data?.totalAttests || 0;
+				totalItems = counts?.totalAttests || 0;
 				break;
 			case VouchFilter.VOUCHED:
-				totalItems = data?.totalVouches || 0;
+				totalItems = counts?.totalVouches || 0;
 				break;
 			case VouchFilter.FLAGGED:
-				totalItems = data?.totalFlags || 0;
+				totalItems = counts?.totalFlags || 0;
 				break;
 		}
 		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
-	}, [data?.totalAttests, data?.totalFlags, data?.totalVouches, tabParam]);
+	}, [
+		counts?.totalAttests,
+		counts?.totalFlags,
+		counts?.totalVouches,
+		tabParam,
+	]);
 
 	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
 		const vouch = attestation.vouch;
