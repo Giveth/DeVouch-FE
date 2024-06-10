@@ -60,12 +60,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 }) => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [showAttestModal, setShowAttestModal] = useState(false);
-	const [totalAttests, setTotalAttests] = useState(0);
-	const [totalVouches, setTotalVouches] = useState(0);
-	const [totalFlags, setTotalFlags] = useState(0);
-	const [userTotalAttests, setUserTotalAttests] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
-	const [filteredAttests, setFilteredAttests] = useState<any[]>([]);
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
@@ -93,7 +88,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		queryFn: () => fetchProjectData(source, projectId),
 	});
 
-	const attestations = useQuery({
+	const { data: attestations } = useQuery({
 		queryKey: [
 			'projectAttests',
 			source,
@@ -120,7 +115,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			),
 	});
 
-	const attestationsTotalCount = useQuery({
+	const { data: totalCount } = useQuery({
 		queryKey: [
 			'projectAttestsTotalCount',
 			source,
@@ -136,50 +131,29 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	});
 
 	useEffect(() => {
-		if (!attestations?.data) return;
-		const {
-			attests,
-			vouches,
-			flags,
-			userAttestations,
-			projectAttestations,
-		} = attestations.data as any;
-
-		const _totalAttests = attests.totalCount || 0;
-		const _totalVouches = vouches?.totalCount || 0;
-		const _totalFlags = flags?.totalCount || 0;
-		const _totalUserAttests = userAttestations?.totalCount || 0;
-
-		setTotalAttests(_totalAttests);
-		setTotalVouches(_totalVouches);
-		setTotalFlags(_totalFlags);
-		setUserTotalAttests(_totalUserAttests);
-		setFilteredAttests(projectAttestations || []);
-
 		let totalItems = 0;
-
 		switch (tabParam) {
 			case Tab.AllAttestations:
-				totalItems = _totalAttests;
+				totalItems = totalCount?.attests.totalCount || 0;
 				break;
 			case Tab.Vouched:
-				totalItems = _totalVouches;
+				totalItems = totalCount?.vouches.totalCount || 0;
 				break;
 			case Tab.Flagged:
-				totalItems = _totalFlags;
+				totalItems = totalCount?.flags.totalCount || 0;
 				break;
 			case Tab.YourAttestations:
-				totalItems = _totalUserAttests;
+				totalItems = totalCount?.userAttestations.totalCount || 0;
 				break;
 		}
 		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
-	}, [attestations]);
-
-	useEffect(() => {
-		if (currentPage > 0 && currentPage >= totalPages) {
-			setCurrentPage(totalPages - 1);
-		}
-	}, [totalPages]);
+	}, [
+		tabParam,
+		totalCount?.attests.totalCount,
+		totalCount?.flags.totalCount,
+		totalCount?.userAttestations.totalCount,
+		totalCount?.vouches.totalCount,
+	]);
 
 	const { data: attestorGroups } = useQuery({
 		queryKey: ['fetchOrganisations'],
@@ -229,15 +203,23 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		{
 			key: Tab.YourAttestations,
 			label: 'Your Attestations',
-			count: userTotalAttests,
+			count: totalCount?.userAttestations.totalCount || 0,
 		},
 		{
 			key: Tab.AllAttestations,
 			label: 'All Attestations',
-			count: totalAttests,
+			count: totalCount?.attests.totalCount || 0,
 		},
-		{ key: Tab.Vouched, label: 'Vouched', count: totalVouches },
-		{ key: Tab.Flagged, label: 'Flagged', count: totalFlags },
+		{
+			key: Tab.Vouched,
+			label: 'Vouched',
+			count: totalCount?.vouches.totalCount || 0,
+		},
+		{
+			key: Tab.Flagged,
+			label: 'Flagged',
+			count: totalCount?.flags.totalCount || 0,
+		},
 	];
 
 	const onSelectOption = (key: string, option: string) => {
@@ -357,7 +339,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						filteredAttests={filteredAttests}
+						filteredAttests={attestations || []}
 						totalPages={totalPages}
 						currentPage={currentPage}
 						onPageChange={handlePageChange}
