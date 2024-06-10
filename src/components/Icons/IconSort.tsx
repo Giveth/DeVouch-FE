@@ -19,11 +19,11 @@ export const IconSort: FC<IconSortProps> = ({ active, desc }) => {
 		>
 			<path
 				d='M14 6.99V14H16V6.99H19L15 3L11 6.99H14Z'
-				fill={desc && active ? blue : grey}
+				fill={active ? (desc ? blue : grey) : grey}
 			/>
 			<path
 				d='M13 17.01H10V10H8V17.01H5L9 21L13 17.01Z'
-				fill={active && !desc ? blue : grey}
+				fill={active ? (desc ? grey : blue) : grey}
 			/>
 		</svg>
 	);
