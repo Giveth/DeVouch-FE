@@ -5,14 +5,14 @@ import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { Address } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
-import { AttestInfo } from './AttestInfo';
+import { AttestInfo } from './AttestsInfo/AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 import { type IProject, type ProjectAttestation } from '@/features/home/types';
 import { SourceBadge } from '../SourceBadge';
 import { ROUTES } from '@/config/routes';
 import { PROJECT_DESC_LIMIT } from './constant';
-import { AttestsInfo } from './AttestsInfo';
+import { AttestsInfo } from './AttestsInfo/AttestsInfo';
 
 interface IProjectCardProps {
 	project: IProject;

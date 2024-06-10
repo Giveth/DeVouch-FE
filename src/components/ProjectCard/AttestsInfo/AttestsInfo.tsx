@@ -22,7 +22,13 @@ export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
 				<AttestInfo key={index} info={info.info} />
 			))}
 			{exceeded > 0 && (
-				<div className='bg-gray-100 flex items-center justify-center w-8 h-8'>
+				<div
+					className='bg-gray-100 flex items-center justify-center w-8 h-8'
+					onClick={e => {
+						e.preventDefault();
+						e.stopPropagation();
+					}}
+				>
 					<span className='text-black font-bold'>+{exceeded}</span>
 				</div>
 			)}
