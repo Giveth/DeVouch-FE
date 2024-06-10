@@ -4,7 +4,7 @@ import { FETCH_PROJECT_ATTESTATIONS, FETCH_PROJECT_BY_ID } from './queries';
 import { ITEMS_PER_PAGE } from './constants';
 import { IProject } from '../home/types';
 
-export const fetchProjectAttestationsData = async (
+export const fetchProjectAttestations = async (
 	source: string,
 	projectId: string,
 	limit: number,
@@ -30,6 +30,22 @@ export const fetchProjectAttestationsData = async (
 					: vouch === VouchFilter.FLAGGED
 						? false
 						: undefined,
+		},
+	);
+	return data;
+};
+
+export const fetchProjectAttestationsTotalCount = async (
+	source: string,
+	projectId: string,
+	organisation?: string[],
+) => {
+	const id = `${source}-${projectId}`;
+	const data = await fetchGraphQL<{ projects: any[] }>(
+		FETCH_PROJECT_ATTESTATIONS,
+		{
+			projectId: id,
+			organisation,
 		},
 	);
 	return data;
