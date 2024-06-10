@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
+import Link from 'next/link';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -30,6 +31,7 @@ import {
 	fetchProjectData,
 } from './services';
 import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
+import { ROUTES } from '@/config/routes';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -251,14 +253,15 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			<div className='bg-white p-6 '>
 				<div className='flex items-center gap-6 mb-6 border-b-2 py-2 justify-between'>
 					<div className='flex items-center gap-6'>
-						<Image
-							onClick={() => router.back()}
-							src={'/images/icons/left-arrow.svg'}
-							style={{ cursor: 'pointer' }}
-							alt={'arrow'}
-							width={24}
-							height={24}
-						/>
+						<Link href={ROUTES.HOME}>
+							<Image
+								src={'/images/icons/left-arrow.svg'}
+								style={{ cursor: 'pointer' }}
+								alt={'arrow'}
+								width={24}
+								height={24}
+							/>
+						</Link>
 						<h1 className='text-2xl font-bold'>{project?.title}</h1>
 					</div>
 					<div className='flex items-center gap-6'>
