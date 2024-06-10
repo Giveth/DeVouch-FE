@@ -42,7 +42,7 @@ export const generateFetchProjectsQuery = (
 		  id
 		  projectId
 		  title
-		  description
+		  descriptionSummary
 		  image
 		  source
 		  url
