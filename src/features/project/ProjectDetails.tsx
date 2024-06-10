@@ -24,7 +24,7 @@ import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
 import config from '@/config/configuration';
-import { fetchProjectAttestationsData, fetchProjectData } from './services';
+import { fetchProjectAttestations, fetchProjectData } from './services';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -89,7 +89,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		queryFn: () => fetchProjectData(source, projectId),
 	});
 
-	const attestation_data = useQuery({
+	const attestations = useQuery({
 		queryKey: [
 			'projectAttests',
 			source,
@@ -100,7 +100,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			tabParam,
 		],
 		queryFn: () =>
-			fetchProjectAttestationsData(
+			fetchProjectAttestations(
 				source,
 				projectId,
 				ITEMS_PER_PAGE,
@@ -117,14 +117,14 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	});
 
 	useEffect(() => {
-		if (!attestation_data?.data) return;
+		if (!attestations?.data) return;
 		const {
 			attests,
 			vouches,
 			flags,
 			userAttestations,
 			projectAttestations,
-		} = attestation_data.data as any;
+		} = attestations.data as any;
 
 		const _totalAttests = attests.totalCount || 0;
 		const _totalVouches = vouches?.totalCount || 0;
@@ -154,7 +154,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				break;
 		}
 		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
-	}, [attestation_data]);
+	}, [attestations]);
 
 	useEffect(() => {
 		if (currentPage > 0 && currentPage >= totalPages) {
