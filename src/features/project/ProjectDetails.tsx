@@ -31,10 +31,10 @@ import Tooltip from '@/components/Table/Tooltip';
 import config from '@/config/configuration';
 
 export enum Tab {
-	YourAttestations,
-	AllAttestations,
-	Vouched,
-	Flagged,
+	YourAttestations = 'your',
+	AllAttestations = 'all',
+	Vouched = 'vouched',
+	Flagged = 'flagged',
 }
 
 const filterOptions = {
@@ -91,14 +91,14 @@ const fetchProjectAttestationsData = async (
 	return data;
 };
 
+const defaultTab = Tab.AllAttestations;
+
 export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	source,
 	projectId,
 }) => {
 	const [currentPage, setCurrentPage] = useState(0);
-	const [activeTab, setActiveTab] = useState<Tab>(Tab.AllAttestations);
 	const [showAttestModal, setShowAttestModal] = useState(false);
-
 	const [totalAttests, setTotalAttests] = useState(0);
 	const [totalVouches, setTotalVouches] = useState(0);
 	const [totalFlags, setTotalFlags] = useState(0);
@@ -115,6 +115,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const router = useRouter();
 
 	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
+	const tabParam = searchParams.get('tab') || defaultTab;
 
 	const {
 		data: project,
@@ -139,7 +140,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			currentPage,
 			organisationParams,
 			address,
-			activeTab,
+			tabParam,
 		],
 		queryFn: () =>
 			fetchProjectAttestationsData(
@@ -149,10 +150,10 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				currentPage,
 				organisationParams?.length ? organisationParams : undefined,
 				address,
-				activeTab === Tab.YourAttestations ? address : undefined,
-				activeTab === Tab.Vouched
+				tabParam === Tab.YourAttestations ? address : undefined,
+				tabParam === Tab.Vouched
 					? VouchFilter.VOUCHED
-					: activeTab === Tab.Flagged
+					: tabParam === Tab.Flagged
 						? VouchFilter.FLAGGED
 						: undefined,
 			),
@@ -181,7 +182,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 		let totalItems = 0;
 
-		switch (activeTab) {
+		switch (tabParam) {
 			case Tab.AllAttestations:
 				totalItems = _totalAttests;
 				break;
@@ -363,11 +364,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 			<div className='relative bg-white shadow p-6'>
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
-					<Tabs
-						tabs={tabs}
-						activeTab={activeTab}
-						onTabChange={setActiveTab}
-					/>
+					<Tabs tabs={tabs} activeTab={tabParam} />
 					<FilterMenu
 						options={filterOptions}
 						value={{
