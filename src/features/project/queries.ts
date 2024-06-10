@@ -35,6 +35,11 @@ query fetchProjectAttestations($projectId: String, $address: String, $attestorAd
       }
     }
   }
+}
+`;
+
+export const FETCH_PROJECT_ATTESTATIONS_TOTAL_COUNT = `
+query fetchProjectAttestations($projectId: String, $organisation: [String!]) {
   userAttestations: projectAttestationsConnection(where: {project: {id_eq: $projectId}, attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}}, orderBy: $orderBy, first: 0) {
     totalCount
   }
