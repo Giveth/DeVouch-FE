@@ -24,7 +24,11 @@ import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
 import config from '@/config/configuration';
-import { fetchProjectAttestations, fetchProjectData } from './services';
+import {
+	fetchProjectAttestations,
+	fetchProjectAttestationsTotalCount,
+	fetchProjectData,
+} from './services';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -113,6 +117,21 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					: tabParam === Tab.Flagged
 						? VouchFilter.FLAGGED
 						: undefined,
+			),
+	});
+
+	const attestationsTotalCount = useQuery({
+		queryKey: [
+			'projectAttestsTotalCount',
+			source,
+			projectId,
+			organisationParams,
+		],
+		queryFn: () =>
+			fetchProjectAttestationsTotalCount(
+				source,
+				projectId,
+				organisationParams?.length ? organisationParams : undefined,
 			),
 	});
 
