@@ -63,6 +63,7 @@ const headers = [
 ];
 
 const defaultSort = OrderByOptions.NEWEST;
+const defaultTab = VouchFilter.ALL_ATTESTATIONS;
 
 export const UserAttestations = ({
 	address: externalAddress,
@@ -71,7 +72,6 @@ export const UserAttestations = ({
 }) => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
-	const [activeTab, setActiveTab] = useState(VouchFilter.ALL_ATTESTATIONS);
 	const [totalAttests, setTotalAttests] = useState(0);
 	const [totalVouches, setTotalVouches] = useState(0);
 	const [totalFlags, setTotalFlags] = useState(0);
@@ -89,6 +89,7 @@ export const UserAttestations = ({
 	const address = externalAddress || connectedAddress || '0x000';
 	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
 	const sortParam = searchParams.get('sort') || defaultSort;
+	const tabPatram = searchParams.get('tab') || defaultTab;
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
 	const onPageChange = (page: number) => {
@@ -102,7 +103,7 @@ export const UserAttestations = ({
 			currentPage,
 			sortParam,
 			organisationParams,
-			activeTab,
+			tabPatram,
 		],
 		queryFn: fetchUserAttestations,
 		enabled: !!address,
@@ -138,7 +139,7 @@ export const UserAttestations = ({
 		const totalAttests = data?.totalAttests || 0;
 		const totalVouches = data?.totalVouches || 0;
 		const totalFlags = data?.totalFlags || 0;
-		switch (activeTab) {
+		switch (tabPatram) {
 			case VouchFilter.ALL_ATTESTATIONS:
 				totalItems = totalAttests;
 				break;
@@ -170,7 +171,7 @@ export const UserAttestations = ({
 				currentPage,
 				sortParam,
 				organisationParams,
-				activeTab,
+				tabPatram,
 			],
 			(oldData: UserAttestationsInfo) => {
 				if (!oldData) return oldData; // In case oldData is undefined or null
@@ -199,7 +200,7 @@ export const UserAttestations = ({
 					currentPage,
 					sortParam,
 					organisationParams,
-					activeTab,
+					tabPatram,
 				],
 				(oldData: UserAttestationsInfo | undefined) => {
 					if (!oldData) return oldData; // In case oldData is undefined or null
@@ -240,8 +241,8 @@ export const UserAttestations = ({
 
 					// Handle active tab filtering
 					const shouldRemoveAttestation =
-						(activeTab === VouchFilter.VOUCHED && !vouch) ||
-						(activeTab === VouchFilter.FLAGGED && vouch);
+						(tabPatram === VouchFilter.VOUCHED && !vouch) ||
+						(tabPatram === VouchFilter.FLAGGED && vouch);
 
 					let newAttestations;
 
@@ -274,7 +275,7 @@ export const UserAttestations = ({
 			currentPage,
 			sortParam,
 			organisationParams,
-			activeTab,
+			tabPatram,
 			queryClient,
 		],
 	);
@@ -322,11 +323,7 @@ export const UserAttestations = ({
 			</div>
 			<div className='bg-white p-6 '>
 				<div className='flex flex-col w-full lg:flex-row justify-between items-center mb-4 gap-2'>
-					<Tabs
-						tabs={tabs}
-						activeTab={activeTab}
-						onTabChange={setActiveTab}
-					/>
+					<Tabs tabs={tabs} activeTab={tabPatram} />
 					<FilterMenu
 						options={filterOptions}
 						value={{
