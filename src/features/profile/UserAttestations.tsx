@@ -13,6 +13,7 @@ import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
 import {
+	ITotalCountInfo,
 	UserAttestationsInfo,
 	fetchUserAttestations,
 	fetchUserAttestationsTotalCount,
@@ -169,37 +170,59 @@ export const UserAttestations = ({
 		tabParam,
 	]);
 
-	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
-		const vouch = attestation.vouch;
-		queryClient.setQueryData(
-			[
-				'userAttestations',
-				address,
-				currentPage,
-				sortParam,
-				organisationParams,
-				tabParam,
-			],
-			(oldData: UserAttestationsInfo) => {
-				if (!oldData) return oldData; // In case oldData is undefined or null
-				const newData = {
-					attestations: oldData.attestations.filter(
-						attest =>
-							attest.id.toLowerCase() !==
-							attestation.id.toLowerCase(),
-					),
-					totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
-					totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
-					totalAttests: oldData.totalVouches - 1,
-				};
-				return newData;
-			},
-		);
-	}, []);
+	const onSuccessDelete = useCallback(
+		(attestation: ProjectAttestation) => {
+			const vouch = attestation.vouch;
+			queryClient.setQueryData(
+				[
+					'userAttestations',
+					address,
+					currentPage,
+					sortParam,
+					organisationParams,
+					tabParam,
+				],
+				(oldData: UserAttestationsInfo) => {
+					if (!oldData) return oldData; // In case oldData is undefined or null
+					const newData = {
+						attestations: oldData.attestations.filter(
+							attest =>
+								attest.id.toLowerCase() !==
+								attestation.id.toLowerCase(),
+						),
+					};
+					return newData;
+				},
+			);
+			queryClient.setQueryData(
+				['userAttestationsCount', address, organisationParams],
+				(oldData: ITotalCountInfo) => {
+					if (!oldData) return oldData; // In case oldData is undefined or null
+					const newData = {
+						totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
+						totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
+						totalAttests: oldData.totalVouches - 1,
+					};
+					return newData;
+				},
+			);
+		},
+		[
+			address,
+			currentPage,
+			organisationParams,
+			queryClient,
+			sortParam,
+			tabParam,
+		],
+	);
 
 	const onSuccessEdit = useCallback(
 		(attestation: ProjectAttestation, oldAttestId: Address) => {
 			const vouch = attestation.vouch;
+			let totalVouchDiff = 0;
+			let totalFlagDiff = 0;
+
 			queryClient.setQueryData(
 				[
 					'userAttestations',
@@ -212,12 +235,7 @@ export const UserAttestations = ({
 				(oldData: UserAttestationsInfo | undefined) => {
 					if (!oldData) return oldData; // In case oldData is undefined or null
 
-					let {
-						attestations,
-						totalVouches,
-						totalFlags,
-						totalAttests,
-					} = oldData;
+					let { attestations } = oldData;
 
 					// Find the existing attestation in the old data
 					const existingAttestationIndex = attestations.findIndex(
@@ -236,15 +254,13 @@ export const UserAttestations = ({
 					// Update counts based on the change in vouch status
 					if (existingAttestation.vouch !== vouch) {
 						if (vouch) {
-							totalVouches += 1;
-							totalFlags -= 1;
+							totalVouchDiff = 1;
+							totalFlagDiff = -1;
 						} else {
-							totalVouches -= 1;
-							totalFlags += 1;
+							totalVouchDiff = -1;
+							totalFlagDiff = 1;
 						}
 					}
-
-					totalAttests = totalVouches + totalFlags;
 
 					// Handle active tab filtering
 					const shouldRemoveAttestation =
@@ -270,10 +286,19 @@ export const UserAttestations = ({
 
 					return {
 						attestations: newAttestations,
-						totalVouches,
-						totalFlags,
-						totalAttests,
 					};
+				},
+			);
+			queryClient.setQueryData(
+				['userAttestationsCount', address, organisationParams],
+				(oldData: ITotalCountInfo) => {
+					if (!oldData) return oldData; // In case oldData is undefined or null
+					const newData = {
+						totalVouches: oldData.totalVouches + totalVouchDiff,
+						totalFlags: oldData.totalFlags + totalFlagDiff,
+						totalAttests: oldData.totalVouches,
+					};
+					return newData;
 				},
 			);
 		},
@@ -484,7 +509,7 @@ export const UserAttestations = ({
 													src={
 														'/images/icons/trash-black.svg'
 													}
-													alt={'edit'}
+													alt={'trash'}
 													width={18}
 													height={18}
 												/>

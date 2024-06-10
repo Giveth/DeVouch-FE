@@ -48,11 +48,17 @@ export const fetchUserAttestations = async ({
 	};
 };
 
+export interface ITotalCountInfo {
+	totalVouches: number;
+	totalFlags: number;
+	totalAttests: number;
+}
+
 export const fetchUserAttestationsTotalCount = async ({
 	queryKey,
 }: {
 	queryKey: (string | number | object | string[] | undefined)[];
-}) => {
+}): Promise<ITotalCountInfo> => {
 	const [, address, organisation] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
