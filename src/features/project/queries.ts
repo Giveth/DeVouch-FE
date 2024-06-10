@@ -37,6 +37,11 @@ query fetchUserAttestations($address: String, $vouch: Boolean, $organisation: [S
       source
     }
   }
+}
+`;
+
+export const FETCH_USER_ATTESTATIONS_TOTAL_COUNT = `
+query fetchUserAttestations($address: String, $organisation: [String!]) {
   vouches: projectAttestationsConnection(first: 0, orderBy: id_ASC, where: {attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}, AND: {vouch_eq: true}}) {
     totalCount
   }
