@@ -121,12 +121,14 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			source,
 			projectId,
 			organisationParams,
+			address,
 		],
 		queryFn: () =>
 			fetchProjectAttestationsTotalCount(
 				source,
 				projectId,
 				organisationParams?.length ? organisationParams : undefined,
+				address,
 			),
 	});
 
