@@ -7,6 +7,7 @@ query fetchProjectById($id: String!) {
     lastUpdatedTimestamp
     projectId
     description
+    descriptionHtml
     totalVouches
     totalFlags
     totalAttests

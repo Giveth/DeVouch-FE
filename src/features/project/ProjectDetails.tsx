@@ -29,6 +29,7 @@ import {
 	fetchProjectAttestationsTotalCount,
 	fetchProjectData,
 } from './services';
+import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -299,7 +300,19 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						/>
 					)}
 				</div>
-				<p className='text-black mb-4'>{project?.description}</p>
+				{project?.descriptionHtml ? (
+					<p
+						className='text-black mb-4'
+						dangerouslySetInnerHTML={{
+							__html: project.descriptionHtml,
+						}}
+					/>
+				) : project?.description ? (
+					<p className='text-black mb-4'>{project?.description}</p>
+				) : (
+					<p className='text-black mb-4'>{NO_DATA}</p>
+				)}
+
 				<div className='flex flex-col sm:flex-row gap-2 justify-between items-center border-t border-[rgba(219, 219, 219, 1)] pt-4'>
 					<span className='text-gray-500'>
 						Do You Trust This Project?
