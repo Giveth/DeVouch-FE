@@ -12,7 +12,11 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { AddressName } from '@/components/AddressName';
 import { Tabs } from '@/components/Tabs';
 import { VouchFilter } from './types';
-import { UserAttestationsInfo, fetchUserAttestations } from './service';
+import {
+	UserAttestationsInfo,
+	fetchUserAttestations,
+	fetchUserAttestationsTotalCount,
+} from './services';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
@@ -72,9 +76,6 @@ export const UserAttestations = ({
 }) => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
-	const [totalAttests, setTotalAttests] = useState(0);
-	const [totalVouches, setTotalVouches] = useState(0);
-	const [totalFlags, setTotalFlags] = useState(0);
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -89,7 +90,7 @@ export const UserAttestations = ({
 	const address = externalAddress || connectedAddress || '0x000';
 	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
 	const sortParam = searchParams.get('sort') || defaultSort;
-	const tabPatram = searchParams.get('tab') || defaultTab;
+	const tabParam = searchParams.get('tab') || defaultTab;
 	const isOwner = address?.toLowerCase() === connectedAddress?.toLowerCase();
 
 	const onPageChange = (page: number) => {
@@ -103,9 +104,19 @@ export const UserAttestations = ({
 			currentPage,
 			sortParam,
 			organisationParams,
-			tabPatram,
+			tabParam,
 		],
 		queryFn: fetchUserAttestations,
+		enabled: !!address,
+	});
+
+	const {
+		data: counts,
+		error: errorCount,
+		isLoading: loadingCount,
+	} = useQuery({
+		queryKey: ['userAttestationsCount', address, organisationParams],
+		queryFn: fetchUserAttestationsTotalCount,
 		enabled: !!address,
 	});
 
@@ -123,44 +134,40 @@ export const UserAttestations = ({
 		{
 			key: VouchFilter.ALL_ATTESTATIONS,
 			label: 'All Attestations',
-			count: totalAttests,
+			count: counts?.totalAttests || 0,
 		},
 		{
 			key: VouchFilter.VOUCHED,
 			label: 'Vouched',
-			count: totalVouches,
+			count: counts?.totalVouches || 0,
 		},
-		{ key: VouchFilter.FLAGGED, label: 'Flagged', count: totalFlags },
+		{
+			key: VouchFilter.FLAGGED,
+			label: 'Flagged',
+			count: counts?.totalFlags || 0,
+		},
 	];
 
 	useEffect(() => {
-		if (!data) return;
 		let totalItems = 0;
-		const totalAttests = data?.totalAttests || 0;
-		const totalVouches = data?.totalVouches || 0;
-		const totalFlags = data?.totalFlags || 0;
-		switch (tabPatram) {
+		switch (tabParam) {
 			case VouchFilter.ALL_ATTESTATIONS:
-				totalItems = totalAttests;
+				totalItems = counts?.totalAttests || 0;
 				break;
 			case VouchFilter.VOUCHED:
-				totalItems = totalVouches;
+				totalItems = counts?.totalVouches || 0;
 				break;
 			case VouchFilter.FLAGGED:
-				totalItems = totalFlags;
+				totalItems = counts?.totalFlags || 0;
 				break;
 		}
 		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
-		setTotalAttests(totalAttests);
-		setTotalVouches(totalVouches);
-		setTotalFlags(totalFlags);
-	}, [data]);
-
-	useEffect(() => {
-		if (currentPage > 0 && currentPage >= totalPages) {
-			setCurrentPage(totalPages - 1);
-		}
-	}, [totalPages]);
+	}, [
+		counts?.totalAttests,
+		counts?.totalFlags,
+		counts?.totalVouches,
+		tabParam,
+	]);
 
 	const onSuccessDelete = useCallback((attestation: ProjectAttestation) => {
 		const vouch = attestation.vouch;
@@ -171,7 +178,7 @@ export const UserAttestations = ({
 				currentPage,
 				sortParam,
 				organisationParams,
-				tabPatram,
+				tabParam,
 			],
 			(oldData: UserAttestationsInfo) => {
 				if (!oldData) return oldData; // In case oldData is undefined or null
@@ -200,7 +207,7 @@ export const UserAttestations = ({
 					currentPage,
 					sortParam,
 					organisationParams,
-					tabPatram,
+					tabParam,
 				],
 				(oldData: UserAttestationsInfo | undefined) => {
 					if (!oldData) return oldData; // In case oldData is undefined or null
@@ -241,8 +248,8 @@ export const UserAttestations = ({
 
 					// Handle active tab filtering
 					const shouldRemoveAttestation =
-						(tabPatram === VouchFilter.VOUCHED && !vouch) ||
-						(tabPatram === VouchFilter.FLAGGED && vouch);
+						(tabParam === VouchFilter.VOUCHED && !vouch) ||
+						(tabParam === VouchFilter.FLAGGED && vouch);
 
 					let newAttestations;
 
@@ -275,7 +282,7 @@ export const UserAttestations = ({
 			currentPage,
 			sortParam,
 			organisationParams,
-			tabPatram,
+			tabParam,
 			queryClient,
 		],
 	);
@@ -323,7 +330,7 @@ export const UserAttestations = ({
 			</div>
 			<div className='bg-white p-6 '>
 				<div className='flex flex-col w-full lg:flex-row justify-between items-center mb-4 gap-2'>
-					<Tabs tabs={tabs} activeTab={tabPatram} />
+					<Tabs tabs={tabs} activeTab={tabParam} />
 					<FilterMenu
 						options={filterOptions}
 						value={{
