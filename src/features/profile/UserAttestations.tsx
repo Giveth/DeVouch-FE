@@ -16,7 +16,7 @@ import {
 	UserAttestationsInfo,
 	fetchUserAttestations,
 	fetchUserAttestationsTotalCount,
-} from './service';
+} from './services';
 import Tooltip from '@/components/Table/Tooltip';
 import { DeleteAttestModal } from '@/components/Modal/DeleteAttestModal';
 import { type ProjectAttestation } from '../home/types';
