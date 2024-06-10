@@ -1,12 +1,15 @@
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { FC } from 'react';
 
 interface TabProps {
-	tabs: { key: number; label: string; count?: number }[];
-	activeTab: number;
-	onTabChange: (tab: number) => void;
+	tabs: { key: string; label: string; count?: number }[];
+	activeTab: string;
 }
 
-export const Tabs: FC<TabProps> = ({ tabs, activeTab, onTabChange }) => {
+export const Tabs: FC<TabProps> = ({ tabs, activeTab }) => {
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const router = useRouter();
 	return (
 		<div className='flex flex-col lg:flex-row gap-4 w-full'>
 			{tabs.map(tab => (
@@ -17,7 +20,13 @@ export const Tabs: FC<TabProps> = ({ tabs, activeTab, onTabChange }) => {
 							? 'bg-[#d7ddea] font-bold'
 							: 'bg-gray-100 hover:bg-gray-200'
 					}`}
-					onClick={() => onTabChange(tab.key)}
+					onClick={() => {
+						const params = new URLSearchParams(
+							searchParams.toString(),
+						);
+						params.set('tab', tab.key);
+						router.push(pathname + '?' + params.toString());
+					}}
 				>
 					{activeTab === tab.key && (
 						<span className='absolute left-[-10px] top-0 h-full w-1 bg-black'></span>

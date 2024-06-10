@@ -1,5 +1,5 @@
 export enum VouchFilter {
-	ALL_ATTESTATIONS,
-	VOUCHED,
-	FLAGGED,
+	ALL_ATTESTATIONS = 'all',
+	VOUCHED = 'vouched',
+	FLAGGED = 'flagged',
 }
