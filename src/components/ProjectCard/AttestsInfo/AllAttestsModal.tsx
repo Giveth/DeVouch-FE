@@ -1,9 +1,9 @@
 import { type FC } from 'react';
 import Modal, { IModal } from '../../Modal/Modal';
+import { AttestsInfoProps } from './AttestsInfo';
+import { AttestInfo } from './AttestInfo';
 
-interface AllAttestsModalProps extends IModal {
-	vouch?: boolean;
-}
+interface AllAttestsModalProps extends IModal, AttestsInfoProps {}
 
 export const AllAttestsModal: FC<AllAttestsModalProps> = ({
 	vouch,
@@ -15,7 +15,11 @@ export const AllAttestsModal: FC<AllAttestsModalProps> = ({
 			title={vouch ? 'Vouched By' : 'Flagged By'}
 			className='w-full md:w-[500px] p-6'
 		>
-			<div></div>
+			<div className='flex flex-col max-h-screen overflow-y-auto gap-2 lg:max-h-80'>
+				{props.attests.map((info, index) => (
+					<AttestInfo key={index} info={info.info} />
+				))}
+			</div>
 		</Modal>
 	);
 };
