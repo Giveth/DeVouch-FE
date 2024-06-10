@@ -81,17 +81,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		error,
 		isLoading,
 	} = useQuery({
-		queryKey: [
-			'project',
-			source,
-			projectId,
-			currentPage,
-			organisationParams,
-		],
+		queryKey: ['project', source, projectId],
 		queryFn: () => fetchProjectData(source, projectId),
 	});
 
-	const { data: attestations } = useQuery({
+	const { data: attestations, refetch: refetchAttestations } = useQuery({
 		queryKey: [
 			'projectAttests',
 			source,
@@ -118,7 +112,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			),
 	});
 
-	const { data: totalCount } = useQuery({
+	const { data: totalCount, refetch: refetchTotalCounts } = useQuery({
 		queryKey: [
 			'projectAttestsTotalCount',
 			source,
@@ -185,19 +179,12 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const onAttestSuccess = useCallback(
 		(updatedProject: IProject) => {
-			const queryKey = [
-				'attestations',
-				source,
-				projectId,
-				currentPage,
-				organisationParams,
-			];
-			queryClient.setQueryData(queryKey, (oldData: any) => {
-				if (!oldData) return oldData; // In case oldData is undefined or null
-				return updatedProject;
-			});
+			setTimeout(() => {
+				refetchAttestations();
+				refetchTotalCounts();
+			}, 5000);
 		},
-		[currentPage, projectId, queryClient, source, organisationParams],
+		[refetchAttestations, refetchTotalCounts],
 	);
 
 	if (error) return <p>Error: {error.message}</p>;
