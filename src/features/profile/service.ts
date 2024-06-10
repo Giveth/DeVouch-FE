@@ -1,12 +1,13 @@
 import { Address } from 'viem';
 import { fetchGraphQL } from '@/helpers/request';
 import { ProjectAttestation } from '../home/types';
+
+import { ITEMS_PER_PAGE } from './constants';
+import { VouchFilter } from './types';
 import {
 	FETCH_USER_ATTESTATIONS,
 	FETCH_USER_ATTESTATIONS_TOTAL_COUNT,
-} from '../project/queries';
-import { ITEMS_PER_PAGE } from './constants';
-import { VouchFilter } from './types';
+} from './queries';
 
 export interface UserAttestationsInfo {
 	attestations: ProjectAttestation[];
