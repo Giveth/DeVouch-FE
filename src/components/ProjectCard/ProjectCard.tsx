@@ -5,13 +5,14 @@ import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { Address } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
-import { AttestInfo } from './AttestInfo';
+import { AttestInfo } from './AttestsInfo/AttestInfo';
 import { OutlineButtonType, OutlineButton } from '../Button/OutlineButton';
 import { AttestModal } from '../Modal/AttestModal.tsx/AttestModal';
 import { type IProject, type ProjectAttestation } from '@/features/home/types';
 import { SourceBadge } from '../SourceBadge';
 import { ROUTES } from '@/config/routes';
 import { PROJECT_DESC_LIMIT } from './constant';
+import { AttestsInfo } from './AttestsInfo/AttestsInfo';
 
 interface IProjectCardProps {
 	project: IProject;
@@ -187,35 +188,13 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
 						<div className='flex gap-2 flex-wrap'>
-							{vouches.length > 0 ? (
-								vouches.map(vouch => (
-									<AttestInfo
-										key={vouch.id}
-										info={vouch.info}
-									/>
-								))
-							) : (
-								<div className='bg-gray-100 py-1 px-2 w-full text-center'>
-									No Vouches Received Yet
-								</div>
-							)}
+							<AttestsInfo attests={vouches} vouch />
 						</div>
 					</div>
 					<div>
 						<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
 						<div className='flex gap-2 flex-wrap'>
-							{flags?.length > 0 ? (
-								flags.map(flag => (
-									<AttestInfo
-										key={flag.id}
-										info={flag.info}
-									/>
-								))
-							) : (
-								<div className='bg-gray-100 py-1 px-2 w-full text-center'>
-									No Flags Received Yet
-								</div>
-							)}
+							<AttestsInfo attests={flags} />
 						</div>
 					</div>
 					<div className='flex flex-col md:flex-row gap-6'>

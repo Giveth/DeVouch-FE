@@ -1,5 +1,5 @@
 import { type FC } from 'react';
-import { IconRightArrow } from '../Icons/IconRightArrow';
+import { IconRightArrow } from '../../Icons/IconRightArrow';
 
 export interface AttestInfo {
 	name: string;
