@@ -91,7 +91,7 @@ const analyzeAttests = (
 	};
 };
 
-const NO_DATA = 'No data available to show here!';
+export const NO_DATA = 'No data available to show here!';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
@@ -174,14 +174,14 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 							{project.title || NO_DATA}
 						</h3>
 						<p className='text-gray-400 max-w-full break-all'>
-							{project.description
-								? project.description.length >
+							{project.descriptionSummary
+								? project.descriptionSummary.length >
 									PROJECT_DESC_LIMIT
-									? project.description.substring(
+									? project.descriptionSummary.substring(
 											0,
 											PROJECT_DESC_LIMIT,
 										) + '...'
-									: project.description
+									: project.descriptionSummary
 								: NO_DATA}
 						</p>
 					</div>

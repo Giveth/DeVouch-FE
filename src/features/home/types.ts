@@ -5,7 +5,9 @@ export interface IProject {
 	projectId: string;
 	title: string;
 	url: string;
-	description: string;
+	description?: string;
+	descriptionHtml?: string;
+	descriptionSummary?: string;
 	image: string;
 	source: string;
 	totalAttests: number;
