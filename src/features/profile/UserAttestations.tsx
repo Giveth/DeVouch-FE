@@ -198,7 +198,6 @@ export const UserAttestations = ({
 				['userAttestationsCount', address, organisationParams],
 				(oldData: ITotalCountInfo) => {
 					if (!oldData) return oldData; // In case oldData is undefined or null
-					console.log('oldData', oldData);
 					const newData = {
 						totalVouches: oldData.totalVouches - (vouch ? 1 : 0),
 						totalFlags: oldData.totalFlags - (!vouch ? 1 : 0),
@@ -498,8 +497,7 @@ export const UserAttestations = ({
 												onClick={() => {
 													attestOnAction.current =
 														attest;
-													// setShowDeleteModal(true);
-													onSuccessDelete(attest);
+													setShowDeleteModal(true);
 												}}
 											>
 												<Image
