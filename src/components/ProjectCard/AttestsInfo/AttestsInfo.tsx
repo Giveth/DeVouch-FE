@@ -26,11 +26,7 @@ export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
 			{exceeded > 0 && (
 				<div
 					className='bg-gray-100 flex items-center justify-center w-8 h-8'
-					onClick={e => {
-						e.preventDefault();
-						e.stopPropagation();
-						setShowModal(true);
-					}}
+					onClick={e => setShowModal(true)}
 				>
 					<span className='text-black font-bold'>+{exceeded}</span>
 				</div>

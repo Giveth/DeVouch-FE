@@ -39,13 +39,7 @@ const Modal: FC<ModalProps> = ({
 	if (!mounted || !showModal) return null;
 
 	return createPortal(
-		<div
-			className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'
-			onClick={e => {
-				e.preventDefault();
-				e.stopPropagation();
-			}}
-		>
+		<div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
 			<div
 				className={`relative bg-white w-full h-full md:h-auto mx-auto md:shadow-lg p-4 md:max-w-2xl lg:max-w-3xl ${className}`}
 			>

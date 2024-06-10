@@ -206,21 +206,13 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					<OutlineButton
 						buttonType={OutlineButtonType.BLUE}
 						className='flex-1'
-						onClick={e => {
-							e.stopPropagation();
-							e.preventDefault();
-							onAttestClick(true);
-						}}
+						onClick={e => onAttestClick(true)}
 					>
 						Vouch For Project
 					</OutlineButton>
 					<OutlineButton
 						buttonType={OutlineButtonType.RED}
-						onClick={e => {
-							e.stopPropagation();
-							e.preventDefault();
-							onAttestClick(false);
-						}}
+						onClick={e => onAttestClick(false)}
 					>
 						Flag Project
 					</OutlineButton>
