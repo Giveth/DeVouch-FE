@@ -248,6 +248,8 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		i => i.value.toLowerCase() === source.toLowerCase(),
 	)?.key;
 
+	const desc = project?.descriptionHtml || project?.description;
+
 	return (
 		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
 			<div className='bg-white p-6 '>
@@ -303,15 +305,13 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						/>
 					)}
 				</div>
-				{project?.descriptionHtml ? (
+				{desc ? (
 					<p
 						className='text-black mb-4'
 						dangerouslySetInnerHTML={{
-							__html: project.descriptionHtml,
+							__html: desc,
 						}}
 					/>
-				) : project?.description ? (
-					<p className='text-black mb-4'>{project?.description}</p>
 				) : (
 					<p className='text-black mb-4'>{NO_DATA}</p>
 				)}
