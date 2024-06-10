@@ -367,12 +367,9 @@ export const UserAttestations = ({
 														'_',
 													)[0]
 												}
-												desc={
-													sortParam.split('_')[1] ===
-													header.order[0].split(
-														'_',
-													)[1]
-												}
+												desc={sortParam.includes(
+													'_DESC',
+												)}
 											/>
 										)}
 										<span>{header.label}</span>
