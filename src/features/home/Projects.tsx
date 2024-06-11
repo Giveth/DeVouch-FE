@@ -162,8 +162,8 @@ export const Projects = () => {
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete('source');
-		params.delete('organisation');
+		params.delete(FilterKey.SOURCE);
+		params.delete(FilterKey.ORGANIZATION);
 		router.push(pathname + '?' + params.toString());
 	};
 
