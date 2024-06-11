@@ -52,7 +52,7 @@ const options = {
 	[FilterKey.ORGANIZATION]: [] as IOption[],
 };
 
-const optionSectionLabel = {
+export const optionSectionLabel = {
 	[FilterKey.SOURCE]: 'Source Platform',
 	[FilterKey.ORGANIZATION]: 'Attested By',
 };
