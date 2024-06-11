@@ -172,8 +172,9 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 				</Link>
 				<Link
 					href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
+					className='flex-1'
 				>
-					<div className='flex-1'>
+					<div>
 						<h3 className='text-2xl font-bold mb-2  max-w-full break-word'>
 							{project.title || NO_DATA}
 						</h3>
