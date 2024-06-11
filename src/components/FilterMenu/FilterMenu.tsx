@@ -30,6 +30,10 @@ const FilterMenu: FC<FilterMenuProps> = ({
 	label = 'Filter',
 	stickToRight = false,
 }) => {
+	const count = Object.values(value).reduce(
+		(acc, curr) => acc + curr.length,
+		0,
+	);
 	return (
 		<Dropdown
 			className={`relative ${className}`}
@@ -72,7 +76,19 @@ const FilterMenu: FC<FilterMenuProps> = ({
 			label={
 				<div className='flex flex-row items-center gap-6 justify-between'>
 					<div>{label}</div>
-					<Image src={OptionsIcon} alt='' width={24} height={24} />
+					<div className='flex gap-2 items-center'>
+						{count > 0 && (
+							<div className='bg-black block rounded-full text-white w-[20px] text-sm text-center'>
+								{count}
+							</div>
+						)}
+						<Image
+							src={OptionsIcon}
+							alt=''
+							width={24}
+							height={24}
+						/>
+					</div>
 				</div>
 			}
 			showChevron={false}
