@@ -140,13 +140,19 @@ export const Projects = () => {
 		if (term === '' && termParam) {
 			const params = new URLSearchParams(searchParams.toString());
 			params.delete(term);
-			router.push(pathname + '?' + params.toString());
+			router.push(pathname + '?' + params.toString(), {
+				scroll: false,
+			});
 		}
-		router.push(pathname + '?' + createQueryString('term', term));
+		router.push(pathname + '?' + createQueryString('term', term), {
+			scroll: false,
+		});
 	};
 
 	const HandleSort = (sort: IOption) => {
-		router.push(pathname + '?' + createQueryString('sort', sort.key));
+		router.push(pathname + '?' + createQueryString('sort', sort.key), {
+			scroll: false,
+		});
 	};
 
 	const onSelectOption = (key: string, option: string) => {
@@ -157,19 +163,23 @@ export const Projects = () => {
 		} else {
 			params.append(key, option);
 		}
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.delete(FilterKey.SOURCE);
 		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex flex-col md:flex-row gap-4'>
+			<div className='flex flex-col lg:flex-row gap-4'>
 				<div className='flex gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select

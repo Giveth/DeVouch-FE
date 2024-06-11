@@ -321,7 +321,9 @@ export const UserAttestations = ({
 			} else {
 				params.append(key, option);
 			}
-			router.push(pathname + '?' + params.toString());
+			router.push(pathname + '?' + params.toString(), {
+				scroll: false,
+			});
 		},
 		[searchParams, pathname, router],
 	);
@@ -329,7 +331,9 @@ export const UserAttestations = ({
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	const handleSortClick = (header: any) => {
@@ -340,7 +344,9 @@ export const UserAttestations = ({
 		} else {
 			params.set('sort', header.order[0]);
 		}
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	return (
