@@ -25,11 +25,13 @@ import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 import { ROUTES } from '@/config/routes';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey } from '../home/Projects';
+import { FilterKey, optionSectionLabel } from '../home/Projects';
 import { ITEMS_PER_PAGE } from './constants';
 import { IconSort } from '@/components/Icons/IconSort';
+import config from '@/config/configuration';
 
 const filterOptions = {
+	[FilterKey.SOURCE]: config.SOURCE_PLATFORMS,
 	[FilterKey.ORGANIZATION]: [] as IOption[],
 };
 
@@ -367,6 +369,7 @@ export const UserAttestations = ({
 						value={{
 							organization: organisationParams,
 						}}
+						optionSectionLabel={optionSectionLabel}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
 						className='w-full md:w-[150px]'
