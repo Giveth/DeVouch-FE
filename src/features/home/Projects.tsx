@@ -169,7 +169,7 @@ export const Projects = () => {
 
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex flex-col md:flex-row gap-4'>
+			<div className='flex flex-col lg:flex-row gap-4'>
 				<div className='flex gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
