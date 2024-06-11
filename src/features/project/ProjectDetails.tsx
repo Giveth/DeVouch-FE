@@ -227,7 +227,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete('organisation');
+		params.delete(FilterKey.ORGANIZATION);
 		router.push(pathname + '?' + params.toString());
 	};
 

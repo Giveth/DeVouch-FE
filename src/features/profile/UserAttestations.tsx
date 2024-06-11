@@ -328,7 +328,7 @@ export const UserAttestations = ({
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete('organisation');
+		params.delete(FilterKey.ORGANIZATION);
 		router.push(pathname + '?' + params.toString());
 	};
 
