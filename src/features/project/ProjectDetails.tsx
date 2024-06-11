@@ -222,13 +222,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		} else {
 			params.append(key, option);
 		}
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString());
+		router.push(pathname + '?' + params.toString(), {
+			scroll: false,
+		});
 	};
 
 	const sourceName = config.SOURCE_PLATFORMS.find(

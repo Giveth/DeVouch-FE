@@ -25,7 +25,9 @@ export const Tabs: FC<TabProps> = ({ tabs, activeTab }) => {
 							searchParams.toString(),
 						);
 						params.set('tab', tab.key);
-						router.push(pathname + '?' + params.toString());
+						router.push(pathname + '?' + params.toString(), {
+							scroll: false,
+						});
 					}}
 				>
 					{activeTab === tab.key && (
