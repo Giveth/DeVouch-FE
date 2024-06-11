@@ -23,7 +23,7 @@ export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
 			))}
 			{exceeded > 0 && (
 				<div
-					className='bg-gray-100 flex items-center justify-center w-8 h-8'
+					className='bg-gray-100 flex items-center justify-center w-8 h-8 cursor-pointer'
 					onClick={e => setShowModal(true)}
 				>
 					<span className='text-black font-bold'>+{exceeded}</span>
