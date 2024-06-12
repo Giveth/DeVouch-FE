@@ -155,18 +155,21 @@ export const Projects = () => {
 		});
 	};
 
-	const onSelectOption = (key: string, option: string) => {
-		const params = new URLSearchParams(searchParams.toString());
-		const value = params.getAll(key);
-		if (value.includes(option)) {
-			params.delete(key, option);
-		} else {
-			params.append(key, option);
-		}
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
-		});
-	};
+	const onSelectOption = useCallback(
+		(key: string, option: string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			const value = params.getAll(key);
+			if (value.includes(option)) {
+				params.delete(key, option);
+			} else {
+				params.append(key, option);
+			}
+			router.push(pathname + '?' + params.toString(), {
+				scroll: false,
+			});
+		},
+		[searchParams, pathname, router],
+	);
 
 	const onClearOptions = () => {
 		const params = new URLSearchParams(searchParams.toString());
