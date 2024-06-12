@@ -8,6 +8,7 @@ import {
 	FETCH_USER_ATTESTATIONS,
 	FETCH_USER_ATTESTATIONS_TOTAL_COUNT,
 } from './queries';
+import config from '@/config/configuration';
 
 export interface UserAttestationsInfo {
 	attestations: ProjectAttestation[];
@@ -21,9 +22,13 @@ export const fetchUserAttestations = async ({
 }: {
 	queryKey: (string | number | object | string[] | undefined)[];
 }) => {
-	const [, address, page, orderBy, organisation, vouch] = queryKey;
+	const [, address, page, orderBy, organisation, vouch, source] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
+	const _source =
+		(source as string[]).length === 0
+			? config.SOURCE_PLATFORMS.map(source => source.value)
+			: source;
 	const data = await fetchGraphQL<{
 		projectAttestations: ProjectAttestation[];
 		vouches: { totalCount: number };
@@ -41,6 +46,7 @@ export const fetchUserAttestations = async ({
 				: vouch === VouchFilter.FLAGGED
 					? false
 					: undefined,
+		source_in: _source as string[] | undefined,
 	});
 
 	return {
@@ -59,7 +65,7 @@ export const fetchUserAttestationsTotalCount = async ({
 }: {
 	queryKey: (string | number | object | string[] | undefined)[];
 }): Promise<ITotalCountInfo> => {
-	const [, address, organisation] = queryKey;
+	const [, address, organisation, source] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
 	const data = await fetchGraphQL<{
