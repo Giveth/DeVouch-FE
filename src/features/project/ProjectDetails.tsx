@@ -290,9 +290,8 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						<Image
 							src={project?.image}
 							alt={project?.title}
-							layout='fill'
-							objectFit='cover'
-							className='rounded-lg'
+							fill
+							className='object-cover'
 						/>
 					)}
 				</div>
