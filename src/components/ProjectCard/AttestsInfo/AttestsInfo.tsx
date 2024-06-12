@@ -9,17 +9,26 @@ interface AttestInfoWithKey {
 
 export interface AttestsInfoProps {
 	attests: AttestInfoWithKey[];
+	isHovered?: boolean;
 	vouch?: boolean;
 }
 
-export const AttestsInfo: FC<AttestsInfoProps> = ({ attests, vouch }) => {
+export const AttestsInfo: FC<AttestsInfoProps> = ({
+	attests,
+	vouch,
+	isHovered,
+}) => {
 	const [showModal, setShowModal] = useState(false);
 	const notEmpty = attests.length > 0;
 	const exceeded = attests.length - 4;
 	return notEmpty ? (
 		<>
 			{attests.slice(0, 4).map((info, index) => (
-				<AttestInfo key={index} info={info.info} />
+				<AttestInfo
+					key={index}
+					info={info.info}
+					isHovered={isHovered}
+				/>
 			))}
 			{exceeded > 0 && (
 				<div
