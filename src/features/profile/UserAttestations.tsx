@@ -380,7 +380,7 @@ export const UserAttestations = ({
 						optionSectionLabel={optionSectionLabel}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
-						className='w-full md:w-[150px]'
+						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}
 					/>

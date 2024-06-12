@@ -209,7 +209,6 @@ export const Projects = () => {
 						}}
 						label='Filter'
 						stickToRight={true}
-						className='w-full'
 					/>
 				</div>
 			</div>
