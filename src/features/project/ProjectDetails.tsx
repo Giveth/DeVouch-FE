@@ -297,7 +297,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				</div>
 				{desc ? (
 					<p
-						className='text-black mb-4'
+						className='text-black mb-4 whitespace-pre-line'
 						dangerouslySetInnerHTML={{
 							__html: desc,
 						}}
