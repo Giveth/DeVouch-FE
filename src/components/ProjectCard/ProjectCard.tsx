@@ -95,6 +95,7 @@ export const NO_DATA = 'No data available to show here!';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
+	const [isHovered, setIsHovered] = useState(false);
 	const { address } = useAccount();
 	const { open: openWeb3Modal } = useWeb3Modal();
 	const queryClient = useQueryClient();
@@ -128,8 +129,12 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 
 	return (
 		<div className='relative group/card max-w-full'>
-			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all '></div>
-			<div className='p-8 border h-full border-gray-100 bg-white hover:border-black flex flex-col gap-6 relative'>
+			<div className='absolute w-full h-full top-0 left-0 group-hover/card:top-2 group-hover/card:-left-2 bg-black transition-all duration-100'></div>
+			<div
+				className='p-8 border h-full border-gray-100 bg-white hover:border-black flex flex-col gap-6 relative'
+				onMouseEnter={() => setIsHovered(true)}
+				onMouseLeave={() => setIsHovered(false)}
+			>
 				<Link
 					href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
 				>
@@ -194,13 +199,17 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 				<div>
 					<h4 className='text-lg font-bold mb-4'>Vouched By</h4>
 					<div className='flex gap-2 flex-wrap'>
-						<AttestsInfo attests={vouches} vouch />
+						<AttestsInfo
+							attests={vouches}
+							vouch
+							isHovered={isHovered}
+						/>
 					</div>
 				</div>
 				<div>
 					<h4 className='text-lg font-bold mb-4'>Flagged By</h4>
 					<div className='flex gap-2 flex-wrap'>
-						<AttestsInfo attests={flags} />
+						<AttestsInfo attests={flags} isHovered={isHovered} />
 					</div>
 				</div>
 				<div className='flex flex-col md:flex-row gap-6'>
