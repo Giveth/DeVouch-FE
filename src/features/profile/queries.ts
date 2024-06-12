@@ -1,6 +1,6 @@
 export const FETCH_USER_ATTESTATIONS = `
-query fetchUserAttestations($address: String, $vouch: Boolean, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!] = null) {
-  projectAttestations(where: {attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch}, orderBy: $orderBy, limit: $limit, offset: $offset) {
+query fetchUserAttestations($address: String, $vouch: Boolean, $organisation: [String!], $limit: Int, $offset: Int, $orderBy: [ProjectAttestationOrderByInput!] = null, $source_in: [String!] = "") {
+  projectAttestations(where: {attestorOrganisation: {attestor: {id_eq: $address}, organisation: {id_in: $organisation}}, vouch_eq: $vouch, project: {source_in: $source_in}}, orderBy: $orderBy, limit: $limit, offset: $offset) {
     id
     vouch
     txHash
