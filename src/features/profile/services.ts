@@ -68,6 +68,10 @@ export const fetchUserAttestationsTotalCount = async ({
 	const [, address, organisation, source] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
+	const _source =
+		(source as string[]).length === 0
+			? config.SOURCE_PLATFORMS.map(source => source.value)
+			: source;
 	const data = await fetchGraphQL<{
 		vouches: { totalCount: number };
 		flags: { totalCount: number };
@@ -75,6 +79,7 @@ export const fetchUserAttestationsTotalCount = async ({
 	}>(FETCH_USER_ATTESTATIONS_TOTAL_COUNT, {
 		address: (address as Address).toLowerCase(),
 		organisation: _organisation as string[] | undefined,
+		source_in: _source as string[] | undefined,
 	});
 
 	return {
