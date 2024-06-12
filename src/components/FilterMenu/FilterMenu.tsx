@@ -34,9 +34,10 @@ const FilterMenu: FC<FilterMenuProps> = ({
 		(acc, curr) => acc + curr.length,
 		0,
 	);
+	const showCount = count > 0;
 	return (
 		<Dropdown
-			className={`relative ${className}`}
+			className={`relative w-full  ${showCount ? 'min-w-44' : 'min-w-40'} ${className || ''}`}
 			options={[
 				...Object.entries(options).map(([key, optionList]) => (
 					<div key={key}>
@@ -78,7 +79,7 @@ const FilterMenu: FC<FilterMenuProps> = ({
 					<div>{label}</div>
 					<div className='flex gap-2 items-center'>
 						{count > 0 && (
-							<div className='bg-black block rounded-full text-white w-[20px] text-sm text-center'>
+							<div className='bg-black block rounded-full text-white !min-w-[20px] text-sm text-center'>
 								{count}
 							</div>
 						)}

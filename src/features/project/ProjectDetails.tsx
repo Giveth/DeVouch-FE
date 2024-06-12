@@ -339,7 +339,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						}}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
-						className='custom-class'
+						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}
 					/>

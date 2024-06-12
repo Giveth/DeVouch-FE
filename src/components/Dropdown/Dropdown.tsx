@@ -59,6 +59,7 @@ const Dropdown: FC<DropdownProps> = ({
 					top:
 						containerRef.current.getBoundingClientRect().bottom +
 						window.scrollY +
+						4 +
 						'px',
 					right:
 						stickToRight || sameWidth
@@ -83,7 +84,7 @@ const Dropdown: FC<DropdownProps> = ({
 			onClick={toggleDropdown}
 		>
 			<div
-				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white mb-2 hover:border-black ${isOpen ? '!border-black' : ''} `}
+				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white hover:border-black ${isOpen ? '!border-black' : ''} `}
 			>
 				<div className='w-full'>{label}</div>
 				{showChevron && (

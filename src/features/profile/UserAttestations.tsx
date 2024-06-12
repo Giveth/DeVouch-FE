@@ -91,6 +91,7 @@ export const UserAttestations = ({
 
 	const isExternal = !!externalAddress;
 	const address = externalAddress || connectedAddress || '0x000';
+	const sourceParams = searchParams.getAll(FilterKey.SOURCE);
 	const organisationParams = searchParams.getAll(FilterKey.ORGANIZATION);
 	const sortParam = searchParams.get('sort') || defaultSort;
 	const tabParam = searchParams.get('tab') || defaultTab;
@@ -108,6 +109,7 @@ export const UserAttestations = ({
 			sortParam,
 			organisationParams,
 			tabParam,
+			sourceParams,
 		],
 		queryFn: fetchUserAttestations,
 		enabled: !!address,
@@ -118,7 +120,12 @@ export const UserAttestations = ({
 		error: errorCount,
 		isLoading: loadingCount,
 	} = useQuery({
-		queryKey: ['userAttestationsCount', address, organisationParams],
+		queryKey: [
+			'userAttestationsCount',
+			address,
+			organisationParams,
+			sourceParams,
+		],
 		queryFn: fetchUserAttestationsTotalCount,
 		enabled: !!address,
 	});
@@ -367,12 +374,13 @@ export const UserAttestations = ({
 					<FilterMenu
 						options={filterOptions}
 						value={{
-							organization: organisationParams,
+							[FilterKey.SOURCE]: sourceParams,
+							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
 						optionSectionLabel={optionSectionLabel}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
-						className='w-full md:w-[150px]'
+						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}
 					/>
