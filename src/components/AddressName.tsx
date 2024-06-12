@@ -1,15 +1,23 @@
 import { useEffect, useState, type FC } from 'react';
-import { Address, createPublicClient, http } from 'viem';
-import { mainnet } from 'viem/chains';
+import { Address, createClient, http } from 'viem';
+import { createConfig, cookieStorage, createStorage } from 'wagmi';
+import { mainnet } from 'wagmi/chains';
+import { getEnsName } from 'wagmi/actions';
 import { summarizeAddress } from '@/helpers/wallet';
-
-const publicClient = createPublicClient({
-	chain: mainnet,
-	transport: http(),
-});
 interface AddressNameProps {
 	address?: Address;
 }
+
+const wagmiConfig = createConfig({
+	chains: [mainnet],
+	ssr: true,
+	storage: createStorage({
+		storage: cookieStorage,
+	}),
+	client({ chain }) {
+		return createClient({ chain, transport: http() });
+	},
+});
 
 export const AddressName: FC<AddressNameProps> = ({ address }) => {
 	const [ensName, setEnsName] = useState('');
@@ -17,7 +25,7 @@ export const AddressName: FC<AddressNameProps> = ({ address }) => {
 		if (!address) return;
 		const _getEnsName = async (address: Address) => {
 			try {
-				const ensName = await publicClient.getEnsName({
+				const ensName = await getEnsName(wagmiConfig, {
 					address,
 				});
 				if (!ensName) return;
