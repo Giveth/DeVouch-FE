@@ -9,6 +9,7 @@ import { Button } from '../Button/Button';
 import Dropdown from '../Dropdown/Dropdown';
 import { ConnectedWalletInfo } from './ConnectedWalletInfo';
 import { ROUTES } from '@/config/routes';
+import { links } from '@/config/constants';
 
 const optionClasses: HTMLAttributes<HTMLDivElement>['className'] =
 	'text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100';
@@ -34,9 +35,9 @@ export const Header = () => {
 						<Link href={ROUTES.MY_ATTESTATIONS} key={1}>
 							<div className={optionClasses}>My Attestations</div>
 						</Link>,
-						<Link href={ROUTES.SUPPORT} key={2}>
+						<a href={links.DISCORD_LINK} key={2} target='_blank'>
 							<div className={optionClasses}>Support</div>
-						</Link>,
+						</a>,
 						<hr className='my-2' key={3} />,
 						<div
 							key={4}
