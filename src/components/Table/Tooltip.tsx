@@ -102,7 +102,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 				ReactDOM.createPortal(
 					<div
 						ref={tooltipRef}
-						className={`fixed z-50 py-2 px-3 text-xs text-white bg-black rounded shadow-lg transition-opacity duration-300 ${
+						className={`fixed z-50 py-2 px-3 text-xs text-black bg-white border border-black rounded transition-opacity duration-300 ${
 							initialRender ? 'opacity-0' : 'opacity-100'
 						}`}
 						style={{
@@ -116,6 +116,9 @@ const Tooltip: React.FC<TooltipProps> = ({
 						<div
 							className={`absolute w-0 h-0 border-solid border-transparent ${triangleClasses[adjustedDirection]}`}
 						/>
+						<div
+							className={`absolute w-0 h-0 border-solid border-transparent ${triangleClasses[adjustedDirection]} ${mask[adjustedDirection]}`}
+						/>
 					</div>,
 					document.body,
 				)}
@@ -128,6 +131,13 @@ const triangleClasses = {
 	bottom: 'border-b-black border-t-0 border-r-transparent border-l-transparent border-b-8 border-l-4 border-r-4 -top-2 left-1/2 transform -translate-x-1/2',
 	left: 'border-l-black border-r-0 border-t-transparent border-b-transparent border-l-8 border-t-4 border-b-4 -right-2 top-1/2 transform -translate-y-1/2',
 	right: 'border-r-black border-l-0 border-t-transparent border-b-transparent border-r-8 border-t-4 border-b-4 -left-2 top-1/2 transform -translate-y-1/2',
+};
+
+const mask = {
+	top: 'border-t-white -bottom-1.5 left-1/2 -translate-x-1',
+	bottom: 'border-b-white -top-1.5 left-1/2 -translate-x-1',
+	left: 'border-l-white -right-1.5 top-1/2 -translate-y-1',
+	right: 'border-r-white -left-1.5 top-1/2 -translate-y-1',
 };
 
 export default Tooltip;
