@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import Link from 'next/link';
 import { getSourceLink } from '@/helpers/source';
@@ -67,7 +67,6 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
-	const queryClient = useQueryClient();
 	const { open: openWeb3Modal } = useWeb3Modal();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
