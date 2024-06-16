@@ -142,7 +142,7 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 										{attestation.comment ? (
 											<Tooltip
 												content={attestation.comment}
-												direction='right'
+												direction='bottom'
 											>
 												<Image
 													src={
