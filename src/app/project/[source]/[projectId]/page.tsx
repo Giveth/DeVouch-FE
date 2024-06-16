@@ -21,6 +21,7 @@ export async function generateMetadata(
 
 	return {
 		title: `DeVouch | ${project.title} Details`,
+		description: project.descriptionSummary,
 		openGraph: {
 			images: [project.image, ...previousImages],
 		},
