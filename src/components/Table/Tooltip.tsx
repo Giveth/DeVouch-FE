@@ -102,7 +102,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 				ReactDOM.createPortal(
 					<div
 						ref={tooltipRef}
-						className={`fixed z-50 py-2 px-3 text-xs text-white bg-black rounded shadow-lg transition-opacity duration-300 ${
+						className={`fixed z-50 py-2 px-3 text-xs text-black bg-white rounded transition-opacity duration-300 ${
 							initialRender ? 'opacity-0' : 'opacity-100'
 						}`}
 						style={{
