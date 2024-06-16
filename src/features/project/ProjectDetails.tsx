@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import Link from 'next/link';
 import { getSourceLink } from '@/helpers/source';
@@ -20,7 +20,7 @@ import { IProject } from '../home/types';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey } from '../home/Projects';
+import { FilterKey, optionSectionLabel } from '../home/Projects';
 import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
@@ -67,7 +67,6 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
-	const queryClient = useQueryClient();
 	const { open: openWeb3Modal } = useWeb3Modal();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -328,7 +327,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				</div>
 			</div>
 
-			<div className='relative bg-white shadow p-6'>
+			<div className='relative bg-white p-6'>
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
 					<Tabs tabs={tabs} activeTab={tabParam} />
 					<FilterMenu
@@ -336,6 +335,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						value={{
 							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
+						optionSectionLabel={optionSectionLabel}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
 						className='lg:w-auto'

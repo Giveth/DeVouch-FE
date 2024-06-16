@@ -4,8 +4,23 @@ import { Projects } from '@/features/home/Projects';
 import { links } from '@/config/constants';
 
 export const metadata: Metadata = {
-	title: 'DeVouch',
-	description: 'On-Chain Vouching via Attestations',
+	title: 'DeVouch | Decentralized Vouching for the Projects you Trust',
+	description:
+		'DeVouch is a system for members of reputable organizations in the Ethereum ecosystem to vouch for projects that are looking to raise funding.',
+	openGraph: {
+		title: 'DeVouch | Decentralized Vouching for the Projects you Trust',
+		description:
+			'DeVouch is a system for members of reputable organizations in the Ethereum ecosystem to vouch for projects that are looking to raise funding.',
+		type: 'website',
+		images: [
+			{
+				url: 'https://devouch.app/images/banner.png',
+				width: 1024,
+				height: 512,
+				alt: 'DeVouch | Decentralized Vouching for the Projects you Trust',
+			},
+		],
+	},
 };
 
 export default function Home() {
