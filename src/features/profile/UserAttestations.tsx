@@ -497,7 +497,7 @@ export const UserAttestations = ({
 									{isOwner && (
 										<div className='flex flex-row px-4 py-6 align-top text-gray-800'>
 											<button
-												className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'
+												className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center min-w-fit'
 												onClick={() => {
 													attestOnAction.current =
 														attest;
@@ -515,7 +515,7 @@ export const UserAttestations = ({
 												/>
 											</button>
 											<button
-												className='mr-2 border border-gray text-black font-bold px-4 py-2'
+												className='mr-2 border border-gray text-black font-bold px-4 py-2 min-w-fit'
 												onClick={() => {
 													attestOnAction.current =
 														attest;
