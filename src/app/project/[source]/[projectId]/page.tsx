@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Metadata, ResolvingMetadata } from 'next';
+import { type Metadata, type ResolvingMetadata } from 'next';
 import {
 	ProjectDetails,
 	ProjectDetailsProps,
