@@ -141,11 +141,14 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				totalItems = totalCount?.flags.totalCount || 0;
 				break;
 			case Tab.YourAttestations:
-				totalItems = totalCount?.userAttestations.totalCount || 0;
+				totalItems = address
+					? totalCount?.userAttestations.totalCount || 0
+					: 0;
 				break;
 		}
 		setTotalPages(Math.ceil(totalItems / ITEMS_PER_PAGE));
 	}, [
+		address,
 		tabParam,
 		totalCount?.attests.totalCount,
 		totalCount?.flags.totalCount,
@@ -194,7 +197,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		{
 			key: Tab.YourAttestations,
 			label: 'Your Attestations',
-			count: totalCount?.userAttestations.totalCount || 0,
+			count: address ? totalCount?.userAttestations.totalCount || 0 : 0,
 		},
 		{
 			key: Tab.AllAttestations,
