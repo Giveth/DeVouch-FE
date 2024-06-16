@@ -328,7 +328,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				</div>
 			</div>
 
-			<div className='relative bg-white shadow p-6'>
+			<div className='relative bg-white p-6'>
 				<div className='flex flex-col lg:flex-row justify-between items-center mb-4 gap-2'>
 					<Tabs tabs={tabs} activeTab={tabParam} />
 					<FilterMenu
