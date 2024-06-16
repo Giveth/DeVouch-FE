@@ -20,7 +20,7 @@ import { IProject } from '../home/types';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey } from '../home/Projects';
+import { FilterKey, optionSectionLabel } from '../home/Projects';
 import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
@@ -336,6 +336,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						value={{
 							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
+						optionSectionLabel={optionSectionLabel}
 						onSelectOption={onSelectOption}
 						onClearOptions={onClearOptions}
 						className='lg:w-auto'
