@@ -350,7 +350,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					<LoadingComponent />
 				) : (
 					<AttestationsTable
-						filteredAttests={attestations || []}
+						attestations={attestations || []}
 						totalPages={totalPages}
 						currentPage={currentPage}
 						onPageChange={handlePageChange}

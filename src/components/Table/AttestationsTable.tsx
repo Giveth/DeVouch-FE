@@ -8,9 +8,10 @@ import { AddressName } from '../AddressName';
 import { type ProjectAttestation } from '@/features/home/types';
 import { ROUTES } from '@/config/routes';
 import { Pagination } from '../Pagination';
+import { NoAttestation } from '../NoAttestation';
 
 interface AttestationsTableProps {
-	filteredAttests: ProjectAttestation[];
+	attestations: ProjectAttestation[];
 	currentPage: number;
 	totalPages: number;
 	onPageChange: (page: number) => void;
@@ -20,7 +21,7 @@ interface AttestationsTableProps {
 }
 
 const AttestationsTable: FC<AttestationsTableProps> = ({
-	filteredAttests,
+	attestations,
 	currentPage,
 	totalPages,
 	onPageChange,
@@ -30,10 +31,8 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 }) => {
 	return (
 		<div className='overflow-x-auto relative'>
-			{filteredAttests.length === 0 ? (
-				<div className='text-center py-10 text-gray-500 font-bold my-12'>
-					No Attestations
-				</div>
+			{attestations.length === 0 ? (
+				<NoAttestation />
 			) : (
 				<table className='min-w-full table-auto text-left relative'>
 					<thead>
@@ -83,7 +82,7 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 						</tr>
 					</thead>
 					<tbody>
-						{filteredAttests.map(
+						{attestations.map(
 							(
 								attestation: ProjectAttestation,
 								index: number,
