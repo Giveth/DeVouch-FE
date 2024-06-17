@@ -30,6 +30,7 @@ import { ITEMS_PER_PAGE } from './constants';
 import { IconSort } from '@/components/Icons/IconSort';
 import config from '@/config/configuration';
 import { Pagination } from '@/components/Pagination';
+import { NoAttestation } from '@/components/NoAttestation';
 
 const filterOptions = {
 	[FilterKey.SOURCE]: config.SOURCE_PLATFORMS,
@@ -394,7 +395,8 @@ export const UserAttestations = ({
 							secondaryColor='lightgray'
 						/>
 					</div>
-				) : (
+				) : data?.attestations?.length &&
+				  data.attestations.length > 0 ? (
 					<div className='overflow-x-auto'>
 						<div
 							className={`grid ${isOwner ? 'grid-cols-6' : 'grid-cols-5'} items-center min-w-[900px] text-left relative`}
@@ -537,13 +539,14 @@ export const UserAttestations = ({
 								</React.Fragment>
 							))}
 						</div>
-
 						<Pagination
 							totalPages={totalPages}
 							currentPage={currentPage}
 							onPageChange={onPageChange}
 						/>
 					</div>
+				) : (
+					<NoAttestation />
 				)}
 			</div>
 			{showDeleteModal && attestOnAction.current && (
