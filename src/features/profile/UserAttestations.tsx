@@ -29,6 +29,7 @@ import { FilterKey, optionSectionLabel } from '../home/Projects';
 import { ITEMS_PER_PAGE } from './constants';
 import { IconSort } from '@/components/Icons/IconSort';
 import config from '@/config/configuration';
+import { Pagination } from '@/components/Pagination';
 
 const filterOptions = {
 	[FilterKey.SOURCE]: config.SOURCE_PLATFORMS,
@@ -537,45 +538,11 @@ export const UserAttestations = ({
 							))}
 						</div>
 
-						<div className='flex justify-center mt-4'>
-							<button
-								className={`px-3 py-1 border rounded ${
-									currentPage === 0
-										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-										: 'bg-white text-black'
-								}`}
-								onClick={() => onPageChange(currentPage - 1)}
-								disabled={currentPage === 0}
-							>
-								&lt;
-							</button>
-							{Array.from({ length: totalPages }).map(
-								(_, index) => (
-									<button
-										key={index}
-										className={`px-3 py-1 border rounded mx-1 ${
-											currentPage === index
-												? 'bg-gray-200 font-bold'
-												: 'bg-white'
-										}`}
-										onClick={() => onPageChange(index)}
-									>
-										{index + 1}
-									</button>
-								),
-							)}
-							<button
-								className={`px-3 py-1 border rounded ${
-									currentPage === totalPages - 1
-										? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-										: 'bg-white text-black'
-								}`}
-								onClick={() => onPageChange(currentPage + 1)}
-								disabled={currentPage === totalPages - 1}
-							>
-								&gt;
-							</button>
-						</div>
+						<Pagination
+							totalPages={totalPages}
+							currentPage={currentPage}
+							onPageChange={onPageChange}
+						/>
 					</div>
 				)}
 			</div>
