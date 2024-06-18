@@ -34,7 +34,13 @@ export default function Page({
 	params: ProjectDetailsProps;
 }) {
 	return (
-		<Suspense fallback={<Spinner size={16} />}>
+		<Suspense
+			fallback={
+				<div className='relative container flex flex-col gap-8 p-4'>
+					<Spinner size={16} />
+				</div>
+			}
+		>
 			<ProjectDetails source={source} projectId={projectId} />
 		</Suspense>
 	);

@@ -35,6 +35,10 @@ query fetchProjectAttestations($projectId: String, $attestorAddressFilter: Strin
         id
       }
     }
+    project {
+      source
+      projectId
+    }
   }
 }
 `;
