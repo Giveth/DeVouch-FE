@@ -16,7 +16,6 @@ import AttestationsTable from '@/components/Table/AttestationsTable';
 import { Spinner } from '@/components/Loading/Spinner';
 import { AttestModal } from '@/components/Modal/AttestModal.tsx/AttestModal';
 import { Tabs } from '@/components/Tabs';
-import { IProject } from '../home/types';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
@@ -179,15 +178,12 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		}
 	};
 
-	const onAttestSuccess = useCallback(
-		(updatedProject: IProject) => {
-			setTimeout(() => {
-				refetchAttestations();
-				refetchTotalCounts();
-			}, 5000);
-		},
-		[refetchAttestations, refetchTotalCounts],
-	);
+	const onAttestSuccess = useCallback(() => {
+		setTimeout(() => {
+			refetchAttestations();
+			refetchTotalCounts();
+		}, 5000);
+	}, [refetchAttestations, refetchTotalCounts]);
 
 	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
@@ -355,6 +351,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						currentPage={currentPage}
 						onPageChange={handlePageChange}
 						isOwner={tabParam === Tab.YourAttestations}
+						refetch={onAttestSuccess}
 					/>
 				)}
 			</div>
