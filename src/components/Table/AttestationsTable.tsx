@@ -37,20 +37,6 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 				<table className='min-w-full table-auto text-left relative'>
 					<thead>
 						<tr className='bg-transparent'>
-							{isOwner && (
-								<th
-									onClick={() => onOrderByProjectChange?.()}
-									className='flex flex-arrow gap-2 px-4 py-2 font-semibold text-left text-gray-600 cursor-pointer'
-								>
-									<Image
-										src={'/images/icons/two-arrows.svg'}
-										alt={'arrow'}
-										width={24}
-										height={24}
-									/>{' '}
-									Projects
-								</th>
-							)}
 							{!isOwner && (
 								<th className='px-4 py-2 font-semibold text-left text-gray-600'>
 									Attesters
@@ -88,11 +74,6 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 								index: number,
 							) => (
 								<tr key={index} className='border-t relative'>
-									{isOwner && (
-										<td className='max-w-[220px] px-4 py-6 align-top text-gray-800'>
-											{attestation.project.title}
-										</td>
-									)}
 									{!isOwner && (
 										<td className='px-4 py-6 align-top text-gray-800'>
 											<Link

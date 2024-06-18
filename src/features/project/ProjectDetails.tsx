@@ -354,6 +354,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						totalPages={totalPages}
 						currentPage={currentPage}
 						onPageChange={handlePageChange}
+						isOwner={tabParam === Tab.YourAttestations}
 					/>
 				)}
 			</div>
