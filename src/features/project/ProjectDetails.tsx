@@ -244,7 +244,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	const desc = project?.descriptionHtml || project?.description;
 
 	return (
-		<div className='relative container mx-auto flex flex-col gap-8 p-4'>
+		<div className='relative container flex flex-col gap-8 p-4'>
 			<div className='bg-white p-6 '>
 				<div className='flex items-center gap-6 mb-6 border-b-2 py-2 justify-between'>
 					<div className='flex items-center gap-6'>
