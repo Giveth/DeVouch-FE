@@ -1,6 +1,6 @@
 'use client';
 
-import { type FC } from 'react';
+import { useRef, useState, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Tooltip from './Tooltip';
@@ -9,6 +9,8 @@ import { type ProjectAttestation } from '@/features/home/types';
 import { ROUTES } from '@/config/routes';
 import { Pagination } from '../Pagination';
 import { NoAttestation } from '../NoAttestation';
+import { DeleteAttestModal } from '../Modal/DeleteAttestModal';
+import { EditAttestModal } from '../Modal/EditAttestModal';
 
 interface AttestationsTableProps {
 	attestations: ProjectAttestation[];
@@ -18,6 +20,7 @@ interface AttestationsTableProps {
 	onOrderByProjectChange?: () => void;
 	onOrderByDateChange?: () => void;
 	isOwner?: boolean;
+	refetch: () => void;
 }
 
 const AttestationsTable: FC<AttestationsTableProps> = ({
@@ -28,7 +31,12 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 	onOrderByProjectChange,
 	onOrderByDateChange,
 	isOwner,
+	refetch,
 }) => {
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
+	const attestOnAction = useRef<ProjectAttestation>();
+
 	return (
 		<div className='overflow-x-auto relative'>
 			{attestations.length === 0 ? (
@@ -168,7 +176,14 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 									</td>
 									{isOwner && (
 										<td className='flex flex-row px-4 py-6 align-top text-gray-800'>
-											<button className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'>
+											<button
+												className='flex flex-row mr-2 border border-gray text-black font-bold px-4 py-2 gap-2 items-center'
+												onClick={() => {
+													attestOnAction.current =
+														attestation;
+													setShowEditModal(true);
+												}}
+											>
 												Edit{' '}
 												<Image
 													src={
@@ -179,7 +194,14 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 													height={16}
 												/>
 											</button>
-											<button className='mr-2 border border-gray text-black font-bold px-4 py-2'>
+											<button
+												className='mr-2 border border-gray text-black font-bold px-4 py-2'
+												onClick={() => {
+													attestOnAction.current =
+														attestation;
+													setShowDeleteModal(true);
+												}}
+											>
 												<Image
 													src={
 														'/images/icons/trash-black.svg'
@@ -202,6 +224,22 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 				currentPage={currentPage}
 				onPageChange={onPageChange}
 			/>
+			{showDeleteModal && attestOnAction.current && (
+				<DeleteAttestModal
+					attestation={attestOnAction.current}
+					showModal={showDeleteModal}
+					setShowModal={setShowDeleteModal}
+					onSuccess={refetch}
+				/>
+			)}
+			{showEditModal && attestOnAction.current && (
+				<EditAttestModal
+					attestation={attestOnAction.current}
+					showModal={showEditModal}
+					setShowModal={setShowEditModal}
+					onSuccess={refetch}
+				/>
+			)}
 		</div>
 	);
 };
