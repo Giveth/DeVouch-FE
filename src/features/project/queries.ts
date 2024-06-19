@@ -1,3 +1,13 @@
+export const FETCH_PROJECT_METADATA_BY_ID = `
+query fetchProjectById($id: String!) {
+  projects(where: {id_eq: $id}) {
+    image
+    descriptionSummary
+    title
+  }
+}
+`;
+
 export const FETCH_PROJECT_BY_ID = `
 query fetchProjectById($id: String!) {
   projects(where: {id_eq: $id}) {
