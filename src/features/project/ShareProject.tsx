@@ -20,18 +20,30 @@ export const ShareProject = () => {
 			<div className='flex items-center'>
 				<button
 					onClick={copyToClipboard}
-					className='bg-white min-w-fit w-full min-h-11 md:w-auto border border-gray-300 text-black gap-2 px-4 py-2 transition-all duration-1000 ease-in-out'
+					className='bg-white min-w-fit w-full min-h-11 md:w-auto border border-gray-300 text-black gap-2 flex items-center px-6 py-2 transition-all duration-1000 ease-in-out'
 				>
 					{isCopied ? (
-						<span className='text-sm'>Copied!</span>
+						<>
+							<span className='text-sm'>Copied!</span>
+							<Image
+								src={'/images/icons/checkmark.svg'}
+								alt={'share'}
+								width={16}
+								height={16}
+								className='py-0'
+							/>
+						</>
 					) : (
-						<Image
-							src={'/images/icons/share.svg'}
-							alt={'share'}
-							width={16}
-							height={16}
-							className='py-0'
-						/>
+						<>
+							<span className='text-sm'>Share project</span>
+							<Image
+								src={'/images/icons/share.svg'}
+								alt={'share'}
+								width={16}
+								height={16}
+								className='py-0'
+							/>
+						</>
 					)}
 				</button>
 			</div>
