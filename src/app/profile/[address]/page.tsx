@@ -11,19 +11,15 @@ export async function generateMetadata(
 	parent: ResolvingMetadata,
 ): Promise<Metadata> {
 	const { address } = params;
+	const previousImages = (await parent).openGraph?.images || [];
 
 	return {
 		title: `DeVouch | ${address} Attestations`,
-		description:
-			'DeVouch is a system for members of reputable organizations in the Ethereum ecosystem to vouch for projects that are looking to raise funding.',
+		description: `View projects flagged or vouched by ${address} using DeVouch.`,
 		openGraph: {
 			images: [
-				{
-					url: 'https://devouch.app/images/banner.png',
-					width: 1024,
-					height: 512,
-					alt: 'DeVouch | Decentralized Vouching for the Projects you Trust',
-				},
+				'https://devouch.xyz/images/banner.png',
+				...previousImages,
 			],
 		},
 	};

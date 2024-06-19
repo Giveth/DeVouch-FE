@@ -5,7 +5,7 @@ import {
 	ProjectDetailsProps,
 } from '@/features/project/ProjectDetails';
 import { Spinner } from '@/components/Loading/Spinner';
-import { fetchProjectData } from '@/features/project/services';
+import { fetchProjectMetaData } from '@/features/project/services';
 
 type Props = {
 	params: { source: string; projectId: string };
@@ -16,7 +16,7 @@ export async function generateMetadata(
 	parent: ResolvingMetadata,
 ): Promise<Metadata> {
 	const { source, projectId } = params;
-	const project = await fetchProjectData(source, projectId);
+	const project = await fetchProjectMetaData(source, projectId);
 	const previousImages = (await parent).openGraph?.images || [];
 
 	return {
