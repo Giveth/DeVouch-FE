@@ -18,7 +18,7 @@ export async function generateMetadata(
 		description: `View projects flagged or vouched by ${address} using DeVouch.`,
 		openGraph: {
 			images: [
-				'https://devouch.app/images/banner.png',
+				'https://devouch.xyz/images/banner.png',
 				...previousImages,
 			],
 		},

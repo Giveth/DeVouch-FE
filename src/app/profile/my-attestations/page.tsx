@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 		title: 'DeVouch | My Attestations',
 		description: 'View your flagged or vouched projects using DeVouch.',
 		type: 'website',
-		images: ['https://devouch.app/images/banner.png'],
+		images: ['https://devouch.xyz/images/banner.png'],
 	},
 };
 
