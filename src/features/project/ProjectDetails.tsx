@@ -31,6 +31,7 @@ import {
 } from './services';
 import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
 import { ROUTES } from '@/config/routes';
+import { ShareProject } from './ShareProject';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -355,22 +356,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 					/>
 				)}
 			</div>
-
-			<div className='flex flex-col sm:flex-row bg-transparent rounded-lg p-6 justify-end items-center text-center gap-2 mt-[-20px]'>
-				<span className='block text-gray-500'>
-					Share this project with your community and invite them to
-					attest!
-				</span>
-				<button className='bg-white border border-gray-300 text-gray-500 gap-2 px-4 py-2 rounded flex items-center justify-center'>
-					<b> Share Project</b>
-					<Image
-						src={'/images/icons/share.svg'}
-						alt={'share'}
-						width={18}
-						height={18}
-					/>
-				</button>
-			</div>
+			<ShareProject />
 			{showAttestModal && project && (
 				<AttestModal
 					setShowModal={setShowAttestModal}
