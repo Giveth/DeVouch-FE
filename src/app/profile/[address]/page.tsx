@@ -14,8 +14,7 @@ export async function generateMetadata(
 
 	return {
 		title: `DeVouch | ${address} Attestations`,
-		description:
-			'DeVouch is a system for members of reputable organizations in the Ethereum ecosystem to vouch for projects that are looking to raise funding.',
+		description: `View projects flagged or vouched by ${address} using DeVouch.`,
 		openGraph: {
 			images: [
 				{
