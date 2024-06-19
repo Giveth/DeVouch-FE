@@ -101,7 +101,7 @@ const Dropdown: FC<DropdownProps> = ({
 					<div
 						style={dropdownStyle}
 						ref={dropdownRef}
-						className='absolute border py-2 px-2 border-black bg-white'
+						className='absolute border py-2 px-2 border-black bg-white z-50'
 					>
 						{options.map((option, idx) => (
 							<Fragment key={idx}>{option}</Fragment>

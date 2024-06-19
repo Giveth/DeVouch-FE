@@ -20,12 +20,19 @@ export const Header = () => {
 	const { address } = useAccount();
 	return (
 		<div className='container mx-auto py-10 flex justify-between items-center'>
-			<Link href={ROUTES.HOME}>
+			<Link href={ROUTES.HOME} className='flex gap-1'>
 				<Image
 					src='/images/logo.svg'
 					alt='logo'
-					width={165}
+					width={30}
 					height={30}
+				/>
+				<Image
+					src='/images/logotype.svg'
+					alt='logo'
+					width={129}
+					height={30}
+					className='hidden sm:block'
 				/>
 			</Link>
 			{address ? (
