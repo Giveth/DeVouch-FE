@@ -12,14 +12,7 @@ export const metadata: Metadata = {
 		description:
 			'DeVouch is a system for members of reputable organizations in the Ethereum ecosystem to vouch for projects that are looking to raise funding.',
 		type: 'website',
-		images: [
-			{
-				url: 'https://devouch.app/images/banner.png',
-				width: 1024,
-				height: 512,
-				alt: 'DeVouch | Decentralized Vouching for the Projects you Trust',
-			},
-		],
+		images: ['https://devouch.app/images/banner.png'],
 	},
 };
 
