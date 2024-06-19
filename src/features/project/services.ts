@@ -4,6 +4,7 @@ import {
 	FETCH_PROJECT_ATTESTATIONS,
 	FETCH_PROJECT_ATTESTATIONS_TOTAL_COUNT,
 	FETCH_PROJECT_BY_ID,
+	FETCH_PROJECT_METADATA_BY_ID,
 } from './queries';
 import { ITEMS_PER_PAGE } from './constants';
 import { IProject, ProjectAttestation } from '../home/types';
@@ -62,6 +63,20 @@ export const fetchProjectData = async (source: string, projectId: string) => {
 	const id = `${source}-${projectId}`;
 	const data = await fetchGraphQL<{ projects: IProject[] }>(
 		FETCH_PROJECT_BY_ID,
+		{
+			id,
+		},
+	);
+	return data.projects[0];
+};
+
+export const fetchProjectMetaData = async (
+	source: string,
+	projectId: string,
+) => {
+	const id = `${source}-${projectId}`;
+	const data = await fetchGraphQL<{ projects: IProject[] }>(
+		FETCH_PROJECT_METADATA_BY_ID,
 		{
 			id,
 		},
