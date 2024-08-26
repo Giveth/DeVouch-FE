@@ -45,6 +45,7 @@ export const generateFetchProjectsQuery = (
 		  descriptionSummary
 		  image
 		  source
+		  rfRounds
 		  url
 		  attests {
 			id
