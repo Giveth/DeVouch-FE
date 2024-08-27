@@ -97,8 +97,6 @@ export const Projects = () => {
 			term: termParam,
 		};
 
-		console.log('Query Variables:', queryVariables);
-
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
 			generateFetchProjectsQuery(
 				sourceParams,
@@ -108,8 +106,6 @@ export const Projects = () => {
 			),
 			queryVariables,
 		);
-
-		console.log('Fetched Data:', data);
 
 		return {
 			projects: data.projects,
