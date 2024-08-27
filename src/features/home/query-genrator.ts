@@ -4,7 +4,8 @@ export const generateFetchProjectsQuery = (
 	term?: string,
 	rfRounds?: number[],
 ) => {
-	const conditions: string[] = ['imported_eq: true'];
+	const baseConditions: string[] = ['imported_eq: true'];
+	const sourceConditions: string[] = [];
 
 	const props: string[] = [
 		'$offset: Int!',
@@ -21,29 +22,34 @@ export const generateFetchProjectsQuery = (
 		);
 
 		if (hasRfSource && rfRounds && rfRounds.length > 0) {
-			conditions.push('rfRounds_containsAny: $rf_rounds');
+			sourceConditions.push('rfRounds_containsAny: $rf_rounds');
 			props.push('$rf_rounds: [Int!]');
 		}
 
 		if (nonRfSources.length > 0) {
-			conditions.push('OR: { source_in: $non_rf_sources }');
+			sourceConditions.push('source_in: $non_rf_sources');
 			props.push('$non_rf_sources: [String!]');
 		}
 	}
 
 	if (organisationId && organisationId.length > 0) {
-		conditions.push(
+		baseConditions.push(
 			'attestedOrganisations_some: { organisation: { id_in: $organisation_id } }',
 		);
 		props.push('$organisation_id: [String!]');
 	}
 
 	if (term) {
-		conditions.push('title_containsInsensitive: $term');
+		baseConditions.push('title_containsInsensitive: $term');
 		props.push('$term: String');
 	}
 
-	const whereClause = `where: { ${conditions.join(', ')} }`;
+	let whereClause: string;
+	if (sourceConditions.length > 0) {
+		whereClause = `where: { AND: [{ ${baseConditions.join(', ')} }, { OR: [{ ${sourceConditions.join(' }, { ')} }] }] }`;
+	} else {
+		whereClause = `where: { ${baseConditions.join(', ')} }`;
+	}
 
 	const query = `
 	query fetchProjects(${props.join(', ')}) {
@@ -78,6 +84,6 @@ export const generateFetchProjectsQuery = (
 	  }
 	}
 	`;
-	console.log({ query });
+
 	return query;
 };
