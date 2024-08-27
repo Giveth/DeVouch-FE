@@ -4,8 +4,13 @@ export const generateFetchProjectsQuery = (
 	term?: string,
 	rfRounds?: number[],
 ) => {
-	const conditions = ['imported_eq: true'];
-	const props = [];
+	const conditions: string[] = ['imported_eq: true'];
+
+	const props: string[] = [
+		'$offset: Int!',
+		'$limit: Int',
+		'$orderBy: [ProjectOrderByInput!]',
+	];
 
 	if (projectSource && projectSource.length > 0) {
 		const nonRfSources = projectSource.filter(
@@ -15,15 +20,14 @@ export const generateFetchProjectsQuery = (
 			source.startsWith('rf'),
 		);
 
-		if (nonRfSources.length > 0) {
-			conditions.push('source_in: $non_rf_sources');
-			props.push('$non_rf_sources: [String!]');
-		}
-
 		if (hasRfSource && rfRounds && rfRounds.length > 0) {
-			conditions.push('source_eq: "rf"');
 			conditions.push('rfRounds_containsAny: $rf_rounds');
 			props.push('$rf_rounds: [Int!]');
+		}
+
+		if (nonRfSources.length > 0) {
+			conditions.push('OR: { source_in: $non_rf_sources }');
+			props.push('$non_rf_sources: [String!]');
 		}
 	}
 
@@ -41,15 +45,8 @@ export const generateFetchProjectsQuery = (
 
 	const whereClause = `where: { ${conditions.join(', ')} }`;
 
-	const addedProps = props.length > 0 ? `,${props.join(', ')}` : '';
-
 	const query = `
-	query fetchProjects(
-	  $offset: Int!,
-	  $limit: Int,
-	  $orderBy: [ProjectOrderByInput!] = lastUpdatedTimestamp_DESC
-	  ${addedProps}
-	) {
+	query fetchProjects(${props.join(', ')}) {
 	  projects(
 		offset: $offset,
 		limit: $limit,
@@ -80,6 +77,7 @@ export const generateFetchProjectsQuery = (
 		}
 	  }
 	}
-  `;
+	`;
+	console.log({ query });
 	return query;
 };
