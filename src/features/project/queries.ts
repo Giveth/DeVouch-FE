@@ -23,6 +23,7 @@ query fetchProjectById($id: String!) {
     totalAttests
     title
     source
+    rfRounds
   }
 }
 `;

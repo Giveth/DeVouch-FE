@@ -235,7 +235,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	};
 
 	const sourceName = config.SOURCE_PLATFORMS.find(
-		i => i.value.toLowerCase() === source.toLowerCase(),
+		i =>
+			i.value.toLowerCase() ===
+			(source.includes('rf')
+				? source + project?.rfRounds?.slice(-1)!
+				: source.toLowerCase()),
 	)?.key;
 
 	const desc = project?.descriptionHtml || project?.description;
@@ -283,7 +287,10 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						target='blank'
 						className='flex justify-end z-50 absolute right-[2%] top-4 cursor-pointer'
 					>
-						<SourceBadge source={project?.source} />
+						<SourceBadge
+							source={project?.source}
+							rfRound={project?.rfRounds}
+						/>
 					</a>
 					{project?.image && (
 						<Image
