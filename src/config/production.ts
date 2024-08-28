@@ -12,6 +12,7 @@ const config = {
 		{ key: 'Giveth', value: 'giveth' },
 		{ key: 'Gitcoin', value: 'gitcoin' },
 		{ key: 'Retro Funding 4', value: 'rf4' },
+		{ key: 'Retro Funding 5', value: 'rf5' },
 	],
 };
 
