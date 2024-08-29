@@ -149,6 +149,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 						)}
 						<SourceBadge
 							source={project.source}
+							rfRound={project.rfRounds}
 							className='absolute top-2 left-2'
 						/>
 						{attestedByMe && (

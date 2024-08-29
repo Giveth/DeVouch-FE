@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Select, type IOption } from '@/components/Select/Select';
@@ -70,21 +70,41 @@ export const Projects = () => {
 	const sortParam = searchParams.get('sort') || defaultSort.key;
 	const termParam = searchParams.get('term') || '';
 
+	const rfRounds = useMemo(() => {
+		return sourceParams
+			.filter(source => source.startsWith('rf'))
+			.map(source => parseInt(source.replace('rf', ''), 10));
+	}, [sourceParams]);
+
 	const fetchProjects = async ({ pageParam = 0 }) => {
+		const nonRfSources = sourceParams.filter(
+			source => !source.startsWith('rf'),
+		);
+		const rfSources = sourceParams.filter(source =>
+			source.startsWith('rf'),
+		);
+		const rfRounds = rfSources.map(source =>
+			parseInt(source.replace('rf', ''), 10),
+		);
+
+		const queryVariables = {
+			orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
+			limit,
+			offset: pageParam,
+			non_rf_sources: nonRfSources,
+			rf_rounds: rfRounds,
+			organisation_id: organisationParams,
+			term: termParam,
+		};
+
 		const data = await fetchGraphQL<{ projects: IProject[] }>(
 			generateFetchProjectsQuery(
 				sourceParams,
 				organisationParams,
 				termParam,
+				rfRounds,
 			),
-			{
-				orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
-				limit,
-				offset: pageParam,
-				project_source: sourceParams,
-				organisation_id: organisationParams,
-				term: termParam,
-			},
+			queryVariables,
 		);
 
 		return {
@@ -108,6 +128,7 @@ export const Projects = () => {
 			organisationParams,
 			sortParam,
 			termParam,
+			rfRounds,
 		],
 		initialPageParam: 0,
 		queryFn: fetchProjects,

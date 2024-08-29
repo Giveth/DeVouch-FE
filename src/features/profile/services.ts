@@ -17,6 +17,14 @@ export interface UserAttestationsInfo {
 	totalAttests: number;
 }
 
+const processSourcesAndRfRounds = (sources: string[]) => {
+	const nonRfSources = sources.filter(source => !source.startsWith('rf'));
+	const rfRounds = sources
+		.filter(source => source.startsWith('rf'))
+		.map(source => parseInt(source.replace('rf', ''), 10));
+	return { nonRfSources, rfRounds };
+};
+
 export const fetchUserAttestations = async ({
 	queryKey,
 }: {
@@ -25,10 +33,14 @@ export const fetchUserAttestations = async ({
 	const [, address, page, orderBy, organisation, vouch, source] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
-	const _source =
+
+	let _source =
 		(source as string[]).length === 0
 			? config.SOURCE_PLATFORMS.map(source => source.value)
-			: source;
+			: (source as string[]);
+
+	const { nonRfSources, rfRounds } = processSourcesAndRfRounds(_source);
+
 	const data = await fetchGraphQL<{
 		projectAttestations: ProjectAttestation[];
 		vouches: { totalCount: number };
@@ -46,7 +58,8 @@ export const fetchUserAttestations = async ({
 				: vouch === VouchFilter.FLAGGED
 					? false
 					: undefined,
-		source_in: _source as string[] | undefined,
+		source_in: nonRfSources.length > 0 ? nonRfSources : undefined,
+		rf_rounds: rfRounds.length > 0 ? rfRounds : undefined,
 	});
 
 	return {
@@ -68,10 +81,14 @@ export const fetchUserAttestationsTotalCount = async ({
 	const [, address, organisation, source] = queryKey;
 	const _organisation =
 		(organisation as string[]).length === 0 ? undefined : organisation;
-	const _source =
+
+	let _source =
 		(source as string[]).length === 0
 			? config.SOURCE_PLATFORMS.map(source => source.value)
-			: source;
+			: (source as string[]);
+
+	const { nonRfSources, rfRounds } = processSourcesAndRfRounds(_source);
+
 	const data = await fetchGraphQL<{
 		vouches: { totalCount: number };
 		flags: { totalCount: number };
@@ -79,7 +96,8 @@ export const fetchUserAttestationsTotalCount = async ({
 	}>(FETCH_USER_ATTESTATIONS_TOTAL_COUNT, {
 		address: (address as Address).toLowerCase(),
 		organisation: _organisation as string[] | undefined,
-		source_in: _source as string[] | undefined,
+		source_in: nonRfSources.length > 0 ? nonRfSources : undefined,
+		rf_rounds: rfRounds.length > 0 ? rfRounds : undefined,
 	});
 
 	return {
