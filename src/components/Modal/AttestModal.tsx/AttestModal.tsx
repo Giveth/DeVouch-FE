@@ -1,6 +1,10 @@
 import { useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
-import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
+import {
+	EAS,
+	SchemaEncoder,
+	ZERO_BYTES32,
+} from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { Address } from 'viem';
@@ -14,6 +18,7 @@ import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
 import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 import { IProject } from '@/features/home/types';
+import { NO_AFFILIATED_ORG } from '@/components/ProjectCard/constant';
 
 interface IOrganisation {
 	id: string;
@@ -75,15 +80,20 @@ export const AttestModal: FC<AttestModalProps> = ({
 		return result;
 	};
 
-	const { data, isLoading } = useQuery({
+	const { data: fetchedOrganisations, isLoading } = useQuery({
 		queryKey: ['fetchUserOrganisations', address],
 		queryFn: fetchOrganisations,
 		staleTime: 300_000,
 	});
+	const userNoAffiliated = fetchedOrganisations?.length === 0;
 
 	const handleConfirm = async () => {
-		if (!address || !signer || !selectedOrg) return;
-
+		let _selectedOrg = selectedOrg;
+		if (!address || !signer) return;
+		if (userNoAffiliated) {
+			_selectedOrg = NO_AFFILIATED_ORG;
+		}
+		if (!_selectedOrg) return;
 		try {
 			setStep(AttestSteps.ATTESTING);
 
@@ -119,7 +129,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					expirationTime: 0n,
 					revocable: true,
 					data: encodedData,
-					refUID: selectedOrg.id,
+					refUID: _selectedOrg.id,
 				},
 			});
 
@@ -133,7 +143,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 			let attest = _project.attests?.find(
 				_attest =>
 					_attest.attestorOrganisation.organisation.id.toLowerCase() ===
-						selectedOrg.organisation.id.toLowerCase() &&
+						_selectedOrg.organisation.id.toLowerCase() &&
 					_attest.attestorOrganisation.attestor.id.toLowerCase() ===
 						address?.toLowerCase(),
 			);
@@ -161,8 +171,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 							id: address,
 						},
 						organisation: {
-							id: selectedOrg.organisation.id,
-							name: selectedOrg.organisation.name,
+							id: _selectedOrg.organisation.id,
+							name: _selectedOrg.organisation.name,
 							color: DEFAULT_ORGANISATION_COLOR,
 						},
 						attestTimestamp: new Date(),
@@ -220,8 +230,9 @@ export const AttestModal: FC<AttestModalProps> = ({
 						<div className='border p-4'>
 							{isLoading ? (
 								<div>Loading user&apos;s organizations</div>
-							) : data && data?.length > 0 ? (
-								data?.map(ao => (
+							) : fetchedOrganisations &&
+							  fetchedOrganisations?.length > 0 ? (
+								fetchedOrganisations?.map(ao => (
 									<RadioButton
 										key={ao.id}
 										id={ao.id}
@@ -237,15 +248,11 @@ export const AttestModal: FC<AttestModalProps> = ({
 								))
 							) : (
 								<div className='p-4 bg-gray-100 flex gap-4 items-start'>
-									<Image
-										src='/images/icons/warning.svg'
-										width={24}
-										height={24}
-										alt='Empty'
-									/>
 									<div className='text-gray-500'>
 										You do not belong to any attester group
-										currently.
+										currently. Your attestation will be
+										grouped under "No Affiliation" on the
+										app.
 									</div>
 								</div>
 							)}
@@ -279,7 +286,10 @@ export const AttestModal: FC<AttestModalProps> = ({
 							className='flex-1'
 							onClick={handleConfirm}
 							loading={step === AttestSteps.ATTESTING}
-							disabled={!selectedOrg || isCommentExceed}
+							disabled={
+								!userNoAffiliated &&
+								(!selectedOrg || isCommentExceed)
+							}
 						>
 							Confirm
 						</Button>
