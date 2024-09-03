@@ -94,7 +94,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 	});
 	const userNoAffiliated =
 		fetchedOrganisations?.length === 0 ||
-		fetchedOrganisations?.[0]?.organisation?.id === ZERO_BYTES32;
+		(fetchedOrganisations?.length === 1 &&
+			fetchedOrganisations?.[0]?.organisation?.id === ZERO_BYTES32);
 
 	const handleConfirm = async () => {
 		if (!address || !signer) return;
