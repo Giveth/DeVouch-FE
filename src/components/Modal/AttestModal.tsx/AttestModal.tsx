@@ -242,20 +242,26 @@ export const AttestModal: FC<AttestModalProps> = ({
 							) : !userNoAffiliated &&
 							  fetchedOrganisations &&
 							  fetchedOrganisations?.length > 0 ? (
-								fetchedOrganisations?.map(ao => (
-									<RadioButton
-										key={ao.id}
-										id={ao.id}
-										name='organisation'
-										label={ao.organisation.name}
-										checked={
-											selectedOrg?.organisation.id ===
-											ao.organisation.id
-										}
-										onChange={() => handleRadioChange(ao)}
-										className='my-2'
-									/>
-								))
+								fetchedOrganisations?.map(ao => {
+									if (ao.organisation.id === ZERO_BYTES32)
+										return null; // skip no affiliation
+									return (
+										<RadioButton
+											key={ao.id}
+											id={ao.id}
+											name='organisation'
+											label={ao.organisation.name}
+											checked={
+												selectedOrg?.organisation.id ===
+												ao.organisation.id
+											}
+											onChange={() =>
+												handleRadioChange(ao)
+											}
+											className='my-2'
+										/>
+									);
+								})
 							) : (
 								<div className='p-4 bg-gray-100 flex gap-4 items-start'>
 									<div className='text-gray-500'>
