@@ -92,14 +92,14 @@ export const AttestModal: FC<AttestModalProps> = ({
 		queryFn: fetchOrganisations,
 		staleTime: 300_000,
 	});
-	const userNoAffiliated = fetchedOrganisations?.length === 0;
+	const userNoAffiliated =
+		fetchedOrganisations?.length === 0 ||
+		(fetchedOrganisations?.length === 1 &&
+			fetchedOrganisations?.[0]?.organisation?.id === ZERO_BYTES32);
 
 	const handleConfirm = async () => {
-		let _selectedOrg = selectedOrg;
 		if (!address || !signer) return;
-		if (userNoAffiliated) {
-			_selectedOrg = NO_AFFILIATED_ORG;
-		}
+		const _selectedOrg = userNoAffiliated ? NO_AFFILIATED_ORG : selectedOrg;
 		if (!_selectedOrg) return;
 		try {
 			setStep(AttestSteps.ATTESTING);
@@ -231,13 +231,16 @@ export const AttestModal: FC<AttestModalProps> = ({
 			) : (
 				<div className='flex flex-col gap-6'>
 					<div>
-						<div className='mb-2 text-gray-500'>
-							Select the Attester Group you wish to vouch as:
-						</div>
+						{!userNoAffiliated && (
+							<div className='mb-2 text-gray-500'>
+								Select the Attester Group you wish to vouch as:
+							</div>
+						)}
 						<div className='border p-4'>
 							{isLoading ? (
 								<div>Loading user&apos;s organizations</div>
-							) : fetchedOrganisations &&
+							) : !userNoAffiliated &&
+							  fetchedOrganisations &&
 							  fetchedOrganisations?.length > 0 ? (
 								fetchedOrganisations?.map(ao => (
 									<RadioButton
@@ -294,8 +297,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 							onClick={handleConfirm}
 							loading={step === AttestSteps.ATTESTING}
 							disabled={
-								!userNoAffiliated &&
-								(!selectedOrg || isCommentExceed)
+								isCommentExceed ||
+								(!userNoAffiliated && !selectedOrg)
 							}
 						>
 							Confirm
