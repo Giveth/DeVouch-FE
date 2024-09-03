@@ -18,7 +18,6 @@ import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
 import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 import { IProject } from '@/features/home/types';
-import { NO_AFFILIATED_ORG } from '@/components/ProjectCard/constant';
 
 interface IOrganisation {
 	id: string;
@@ -41,6 +40,14 @@ enum AttestSteps {
 	ATTESTING,
 	SUCCESS,
 }
+
+const NO_AFFILIATED_ORG = {
+	id: ZERO_BYTES32,
+	organisation: {
+		id: ZERO_BYTES32,
+		name: 'No Affiliation',
+	},
+};
 
 export const AttestModal: FC<AttestModalProps> = ({
 	project,
