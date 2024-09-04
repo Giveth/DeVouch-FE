@@ -2,7 +2,7 @@ import { useRef, useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
-import { Address } from 'viem';
+import { Address, isHex } from 'viem';
 import Modal, { IModal } from './Modal';
 import { Button } from '@/components/Button/Button';
 import {
@@ -72,6 +72,11 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 
 			const schemaUID = config.PROJECT_VERIFY_SCHEMA;
 
+			const attestorOrganisationId = attestation.attestorOrganisation.id;
+			const refUID = isHex(attestorOrganisationId) // No affiliation case doesn't have the format of hex
+				? attestorOrganisationId
+				: undefined;
+
 			const tx = await eas.attest({
 				schema: schemaUID,
 				data: {
@@ -79,7 +84,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					expirationTime: 0n,
 					revocable: true,
 					data: encodedData,
-					refUID: attestation.attestorOrganisation.id,
+					refUID,
 				},
 			});
 
