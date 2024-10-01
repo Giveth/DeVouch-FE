@@ -170,7 +170,7 @@ export const Projects = () => {
 		});
 	};
 
-	const HandleSort = (sort: IOption) => {
+	const handleSort = (sort: IOption) => {
 		router.push(pathname + '?' + createQueryString('sort', sort.key), {
 			scroll: false,
 		});
@@ -212,7 +212,7 @@ export const Projects = () => {
 							sortOptions.find(so => so.key === sortParam) ||
 							defaultSort
 						}
-						setValue={HandleSort}
+						setValue={handleSort}
 						className='w-60'
 					/>
 				</div>
