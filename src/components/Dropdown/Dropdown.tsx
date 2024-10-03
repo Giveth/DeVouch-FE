@@ -1,6 +1,4 @@
-'use client';
-import Image from 'next/image';
-import {
+import React, {
 	useState,
 	useRef,
 	useEffect,
@@ -9,8 +7,10 @@ import {
 	Fragment,
 	type HTMLAttributes,
 	type FC,
+	useCallback,
 } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 
 export interface DropdownProps {
 	label: ReactNode;
@@ -19,6 +19,7 @@ export interface DropdownProps {
 	options: ReactNode[];
 	className?: HTMLAttributes<HTMLDivElement>['className'];
 	showChevron?: boolean;
+	onClose?: () => void;
 }
 
 const Dropdown: FC<DropdownProps> = ({
@@ -27,31 +28,50 @@ const Dropdown: FC<DropdownProps> = ({
 	stickToRight,
 	sameWidth,
 	className = '',
-	showChevron,
+	showChevron = true,
+	onClose,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
-	const toggleDropdown = () => setIsOpen(!isOpen);
-
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			dropdownRef.current &&
-			!dropdownRef.current.contains(event.target as Node) &&
-			containerRef.current &&
-			!containerRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
-	};
+	const handleClickOutside = useCallback(
+		(event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node) &&
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+				if (onClose) {
+					onClose();
+				}
+			}
+		},
+		[onClose],
+	);
 
 	useEffect(() => {
-		document.addEventListener('mousedown', handleClickOutside);
+		if (isOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		} else {
+			document.removeEventListener('mousedown', handleClickOutside);
+		}
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, []);
+	}, [isOpen, handleClickOutside]);
+
+	const toggleDropdown = () => {
+		setIsOpen(prevOpen => {
+			const newOpen = !prevOpen;
+			if (!newOpen && onClose) {
+				onClose();
+			}
+			return newOpen;
+		});
+	};
 
 	const dropdownStyle: CSSProperties =
 		isOpen && containerRef.current
@@ -78,13 +98,12 @@ const Dropdown: FC<DropdownProps> = ({
 			: {};
 
 	return (
-		<div
-			className={`relative select-none cursor-pointer ${className}`}
-			ref={containerRef}
-			onClick={toggleDropdown}
-		>
+		<div className={`relative select-none ${className}`} ref={containerRef}>
 			<div
-				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white hover:border-black ${isOpen ? '!border-black' : ''} `}
+				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white hover:border-black ${
+					isOpen ? '!border-black' : ''
+				} cursor-pointer`}
+				onClick={toggleDropdown}
 			>
 				<div className='w-full'>{label}</div>
 				{showChevron && (
