@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { type FC, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { type FC, useEffect, useState } from 'react';
 
 interface SearchInputProps {
 	setTerm: (term: string) => void;
@@ -7,6 +8,13 @@ interface SearchInputProps {
 
 export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 	const [value, setValue] = useState<string>();
+	const searchParams = useSearchParams();
+
+	useEffect(() => {
+		const term = searchParams.get('term');
+		setValue(term || '');
+	}, [searchParams]);
+
 	return (
 		<>
 			<input
