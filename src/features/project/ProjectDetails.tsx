@@ -19,7 +19,7 @@ import { Tabs } from '@/components/Tabs';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey, optionSectionLabel } from '../home/Projects';
+import { FilterKey } from '../home/Projects';
 import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
@@ -213,25 +213,13 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		},
 	];
 
-	const onSelectOption = (key: string, option: string) => {
+	const handleApplyFilters = (filters: { [key: string]: string[] }) => {
 		const params = new URLSearchParams(searchParams.toString());
-		const value = params.getAll(key);
-		if (value.includes(option)) {
-			params.delete(key, option);
-		} else {
-			params.append(key, option);
-		}
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
+		Object.entries(filters).forEach(([key, value]) => {
+			params.delete(key);
+			value.forEach(v => params.append(key, v));
 		});
-	};
-
-	const onClearOptions = () => {
-		const params = new URLSearchParams(searchParams.toString());
-		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
-		});
+		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
 	const sourceName = config.SOURCE_PLATFORMS.find(
@@ -342,9 +330,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						value={{
 							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
-						optionSectionLabel={optionSectionLabel}
-						onSelectOption={onSelectOption}
-						onClearOptions={onClearOptions}
+						onApplyFilters={handleApplyFilters}
 						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}
