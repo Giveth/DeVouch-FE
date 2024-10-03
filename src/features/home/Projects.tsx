@@ -177,7 +177,6 @@ export const Projects = () => {
 	};
 
 	const handleApplyFilters = (filters: { [key: string]: string[] }) => {
-		console.log('filters', filters);
 		const params = new URLSearchParams(searchParams.toString());
 		Object.entries(filters).forEach(([key, value]) => {
 			params.delete(key);
