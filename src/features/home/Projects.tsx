@@ -176,29 +176,14 @@ export const Projects = () => {
 		});
 	};
 
-	const onSelectOption = useCallback(
-		(key: string, option: string) => {
-			const params = new URLSearchParams(searchParams.toString());
-			const value = params.getAll(key);
-			if (value.includes(option)) {
-				params.delete(key, option);
-			} else {
-				params.append(key, option);
-			}
-			router.push(pathname + '?' + params.toString(), {
-				scroll: false,
-			});
-		},
-		[searchParams, pathname, router],
-	);
-
-	const onClearOptions = () => {
+	const handleApplyFilters = (filters: { [key: string]: string[] }) => {
+		console.log('filters', filters);
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete(FilterKey.SOURCE);
-		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
+		Object.entries(filters).forEach(([key, value]) => {
+			params.delete(key);
+			value.forEach(v => params.append(key, v));
 		});
+		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
 	return (
@@ -221,9 +206,7 @@ export const Projects = () => {
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
 						options={options}
-						optionSectionLabel={optionSectionLabel}
-						onSelectOption={onSelectOption}
-						onClearOptions={onClearOptions}
+						onApplyFilters={handleApplyFilters}
 						value={{
 							[FilterKey.SOURCE]: sourceParams,
 							[FilterKey.ORGANIZATION]: organisationParams,
