@@ -83,6 +83,10 @@ export const AttestModal: FC<AttestModalProps> = ({
 				result.push(ao);
 			}
 		}
+		// preselect if only one org
+		if (result.length === 1) {
+			setSelectedOrg(result[0]);
+		}
 
 		return result;
 	};
