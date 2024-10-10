@@ -29,7 +29,6 @@ import {
 	fetchProjectData,
 } from './services';
 import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
-import { ROUTES } from '@/config/routes';
 import { ShareProject } from './ShareProject';
 
 export enum Tab {
