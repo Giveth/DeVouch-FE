@@ -229,6 +229,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	)?.key;
 
 	const desc = project?.descriptionHtml || project?.description;
+	const createdAt = project?.sourceCreatedAt;
 
 	return (
 		<div className='relative container flex flex-col gap-8 p-4'>
@@ -244,7 +245,27 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 								height={24}
 							/>
 						</span>
-						<h1 className='text-2xl font-bold'>{project?.title}</h1>
+						<div className='flex flex-col'>
+							<h1 className='text-2xl font-bold'>
+								{project?.title}
+							</h1>
+
+							{createdAt && (
+								<p className='mt-1'>
+									<span className='text-neutral-400'>
+										Created
+									</span>{' '}
+									{new Date(createdAt).toLocaleDateString(
+										'en-US',
+										{
+											year: 'numeric',
+											month: 'long',
+											day: '2-digit',
+										},
+									)}
+								</p>
+							)}
+						</div>
 					</div>
 					<div className='flex items-center gap-6'>
 						<a
