@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react';
 import Image from 'next/image';
-import { Button, ButtonType } from '@/components/Button/Button';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Button, ButtonType } from '@/components/Button/Button';
 import Modal, { IModal } from './Modal';
 
 interface ShareModalProps extends IModal {

@@ -6,6 +6,7 @@ import {
 	ZERO_BYTES32,
 } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Address } from 'viem';
 import Modal, { IModal } from '../Modal';
@@ -18,7 +19,6 @@ import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
 import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 import { IProject } from '@/features/home/types';
-import { usePathname, useRouter } from 'next/navigation';
 import { ROUTES } from '@/config/routes';
 import { ShareModal } from '../ShareModal';
 
