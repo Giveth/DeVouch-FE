@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import Link from 'next/link';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -237,7 +236,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			<div className='bg-white p-6 '>
 				<div className='flex items-center gap-6 mb-6 border-b-2 py-2 justify-between'>
 					<div className='flex items-center gap-6'>
-						<Link href={ROUTES.HOME}>
+						<span className='cursor-pointer' onClick={router.back}>
 							<Image
 								src={'/images/icons/left-arrow.svg'}
 								style={{ cursor: 'pointer' }}
@@ -245,7 +244,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 								width={24}
 								height={24}
 							/>
-						</Link>
+						</span>
 						<h1 className='text-2xl font-bold'>{project?.title}</h1>
 					</div>
 					<div className='flex items-center gap-6'>
@@ -260,7 +259,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							>
 								<Image
 									src={'/images/icons/external.svg'}
-									alt={'arrow'}
+									alt={'external'}
 									width={24}
 									height={24}
 								/>
