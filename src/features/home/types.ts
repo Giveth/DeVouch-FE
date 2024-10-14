@@ -10,6 +10,7 @@ export interface IProject {
 	descriptionSummary?: string;
 	image: string;
 	source: string;
+	sourceCreatedAt?: Date;
 	rfRounds?: number[] | null;
 	totalAttests: number;
 	totalVouches: number;

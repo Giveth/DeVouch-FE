@@ -181,10 +181,24 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					className='flex-1'
 				>
 					<div>
-						<h3 className='text-2xl font-bold mb-2  max-w-full break-word'>
+						<h3 className='text-2xl font-bold mb-1  max-w-full break-word'>
 							{project.title || NO_DATA}
 						</h3>
-						<p className='text-gray-400 max-w-full break-all'>
+						{project?.sourceCreatedAt && (
+							<p className='mb-1'>
+								<span className='text-neutral-400'>
+									Created
+								</span>{' '}
+								{new Date(
+									project.sourceCreatedAt,
+								).toLocaleDateString('en-US', {
+									year: 'numeric',
+									month: 'long',
+									day: '2-digit',
+								})}
+							</p>
+						)}
+						<p className='text-gray-400 max-w-full break-all mt-1'>
 							{project.descriptionSummary
 								? project.descriptionSummary.length >
 									PROJECT_DESC_LIMIT

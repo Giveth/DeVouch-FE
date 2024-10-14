@@ -57,7 +57,7 @@ export const optionSectionLabel = {
 	[FilterKey.ORGANIZATION]: 'Attested By',
 };
 
-const limit = 10;
+const limit = 20;
 const defaultSort = sortOptions[0];
 
 export const Projects = () => {

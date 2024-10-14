@@ -6,10 +6,11 @@ import {
 	ZERO_BYTES32,
 } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Address } from 'viem';
 import Modal, { IModal } from '../Modal';
-import { Button } from '@/components/Button/Button';
+import { Button, ButtonType } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
 import { FETCH_USER_ORGANISATIONS } from '@/queries/user';
 import { fetchGraphQL } from '@/helpers/request';
@@ -18,6 +19,8 @@ import { useEthersSigner } from '@/helpers/wallet';
 import config from '@/config/configuration';
 import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 import { IProject } from '@/features/home/types';
+import { ROUTES } from '@/config/routes';
+import { ShareModal } from '../ShareModal';
 
 interface IOrganisation {
 	id: string;
@@ -58,7 +61,12 @@ export const AttestModal: FC<AttestModalProps> = ({
 	const [step, setStep] = useState(AttestSteps.ATTEST);
 	const [selectedOrg, setSelectedOrg] = useState<IAttestorOrganisation>();
 	const [comment, setComment] = useState<string>('');
+	const [showShareModal, setShowShareModal] = useState<boolean>(false); // State for ShareModal
 	const { switchChainAsync } = useSwitchChain();
+
+	const router = useRouter();
+	const pathname = usePathname();
+	const isHome = pathname === ROUTES.HOME;
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
@@ -82,6 +90,10 @@ export const AttestModal: FC<AttestModalProps> = ({
 				organisations.add(ao.organisation.id);
 				result.push(ao);
 			}
+		}
+		// preselect if only one org
+		if (result.length === 1) {
+			setSelectedOrg(result[0]);
 		}
 
 		return result;
@@ -204,114 +216,149 @@ export const AttestModal: FC<AttestModalProps> = ({
 	const isCommentExceed = comment.length > 256;
 
 	return (
-		<Modal
-			{...props}
-			title={`${vouch ? 'Vouch for' : 'Flag'} Project`}
-			showHeader={step !== AttestSteps.SUCCESS}
-			className='w-full md:w-[500px] p-6'
-		>
-			{step === AttestSteps.SUCCESS ? (
-				<div className='flex flex-col gap-6 items-center'>
-					<Image
-						src='/images/devouch-green.svg'
-						width={100}
-						height={100}
-						alt='Success'
-					/>
-					<div className='text-2xl font-black'>
-						Attestation Successful
+		<>
+			<Modal
+				{...props}
+				title={`${vouch ? 'Vouch for' : 'Flag'} Project`}
+				showHeader={step !== AttestSteps.SUCCESS}
+				className='w-full md:w-[500px] p-6'
+				showModal={step !== AttestSteps.SUCCESS || !showShareModal}
+			>
+				{step === AttestSteps.SUCCESS ? (
+					<div className='flex flex-col gap-6 items-center'>
+						<Image
+							src='/images/devouch-green.svg'
+							width={100}
+							height={100}
+							alt='Success'
+						/>
+						<div className='text-2xl font-black'>
+							Attestation Successful
+						</div>
+						<div className='text-gray-400 text-center'>
+							Your attestation to this project has been
+							successful! <br />
+							Share your attestation or check out more projects to
+							Attest to.
+						</div>
+						<div className='flex flex-row w-full justify-between gap-10 '>
+							<Button
+								className='w-full'
+								onClick={() => {
+									if (isHome)
+										return props.setShowModal(false);
+									router.push(ROUTES.HOME);
+								}}
+							>
+								View Projects
+							</Button>
+							<Button
+								className='w-full'
+								buttonType={ButtonType.OUTLINE}
+								onClick={() => {
+									setShowShareModal(true); // Open ShareModal
+								}}
+							>
+								Share
+							</Button>
+						</div>
 					</div>
-					<div className='text-gray-400 text-center'>
-						Your attestation to this project has been successful!
-					</div>
-					<Button onClick={() => props.setShowModal(false)}>
-						Done
-					</Button>
-				</div>
-			) : (
-				<div className='flex flex-col gap-6'>
-					<div>
-						{!userNoAffiliated && (
-							<div className='mb-2 text-gray-500'>
-								Select the Attester Group you wish to vouch as:
-							</div>
-						)}
-						<div className='border p-4'>
-							{isLoading ? (
-								<div>Loading user&apos;s organizations</div>
-							) : !userNoAffiliated &&
-							  fetchedOrganisations &&
-							  fetchedOrganisations?.length > 0 ? (
-								fetchedOrganisations?.map(ao => {
-									if (ao.organisation.id === ZERO_BYTES32)
-										return null; // skip no affiliation
-									return (
-										<RadioButton
-											key={ao.id}
-											id={ao.id}
-											name='organisation'
-											label={ao.organisation.name}
-											checked={
-												selectedOrg?.organisation.id ===
-												ao.organisation.id
-											}
-											onChange={() =>
-												handleRadioChange(ao)
-											}
-											className='my-2'
-										/>
-									);
-								})
-							) : (
-								<div className='p-4 bg-gray-100 flex gap-4 items-start'>
-									<div className='text-gray-500'>
-										You do not belong to any attester group
-										currently. Your attestation will be
-										grouped under "No Affiliation" on the
-										app.
+				) : (
+					<div className='flex flex-col gap-6'>
+						<div>
+							{!userNoAffiliated && (
+								<div className='mb-2 text-gray-500'>
+									Select the Attester Group you wish to vouch
+									as:
+								</div>
+							)}
+							<div className='border p-4'>
+								{isLoading ? (
+									<div>Loading user&apos;s organizations</div>
+								) : !userNoAffiliated &&
+								  fetchedOrganisations &&
+								  fetchedOrganisations?.length > 0 ? (
+									fetchedOrganisations?.map(ao => {
+										if (ao.organisation.id === ZERO_BYTES32)
+											return null; // skip no affiliation
+										return (
+											<RadioButton
+												key={ao.id}
+												id={ao.id}
+												name='organisation'
+												label={ao.organisation.name}
+												checked={
+													selectedOrg?.organisation
+														.id ===
+													ao.organisation.id
+												}
+												onChange={() =>
+													handleRadioChange(ao)
+												}
+												className='my-2'
+											/>
+										);
+									})
+								) : (
+									<div className='p-4 bg-gray-100 flex gap-4 items-start'>
+										<div className='text-gray-500'>
+											You do not belong to any attester
+											group currently. Your attestation
+											will be grouped under "No
+											Affiliation" on the app.
+										</div>
 									</div>
+								)}
+							</div>
+						</div>
+						<div>
+							<div className='mb-2 text-gray-500'>
+								Any comments you want to add with your
+								Attestation?
+							</div>
+							<textarea
+								rows={3}
+								placeholder='Write here'
+								className='border w-full resize-none p-4'
+								value={comment}
+								onChange={e => setComment(e.target.value)}
+							></textarea>
+							{isCommentExceed && (
+								<div className='text-red-600 text-sm'>
+									Comment must be less than 256 characters.
 								</div>
 							)}
 						</div>
-					</div>
-					<div>
-						<div className='mb-2 text-gray-500'>
-							Any comments you want to add with your Attestation?
+						<div className='flex gap-8'>
+							<OutlineButton
+								className='flex-1'
+								onClick={() => props.setShowModal(false)}
+							>
+								Cancel
+							</OutlineButton>
+							<Button
+								className='flex-1'
+								onClick={handleConfirm}
+								loading={step === AttestSteps.ATTESTING}
+								disabled={
+									isCommentExceed ||
+									(!userNoAffiliated && !selectedOrg)
+								}
+							>
+								Confirm
+							</Button>
 						</div>
-						<textarea
-							rows={3}
-							placeholder='Write here'
-							className='border w-full resize-none p-4'
-							value={comment}
-							onChange={e => setComment(e.target.value)}
-						></textarea>
-						{isCommentExceed && (
-							<div className='text-red-600 text-sm'>
-								Comment must be less than 256 characters.
-							</div>
-						)}
 					</div>
-					<div className='flex gap-8'>
-						<OutlineButton
-							className='flex-1'
-							onClick={() => props.setShowModal(false)}
-						>
-							Cancel
-						</OutlineButton>
-						<Button
-							className='flex-1'
-							onClick={handleConfirm}
-							loading={step === AttestSteps.ATTESTING}
-							disabled={
-								isCommentExceed ||
-								(!userNoAffiliated && !selectedOrg)
-							}
-						>
-							Confirm
-						</Button>
-					</div>
-				</div>
-			)}
-		</Modal>
+				)}
+			</Modal>
+			<ShareModal
+				showModal={showShareModal}
+				setShowModal={(value: any) => {
+					setShowShareModal(value);
+					if (!value) props.setShowModal(false); // Close AttestModal only when ShareModal is closed
+				}}
+				shareLink={`https://devouch.xyz${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
+			/>
+		</>
 	);
 };

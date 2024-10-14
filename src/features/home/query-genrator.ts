@@ -67,6 +67,7 @@ export const generateFetchProjectsQuery = (
 		source
 		rfRounds
 		url
+		sourceCreatedAt
 		attests {
 		  id
 		  vouch
