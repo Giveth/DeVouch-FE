@@ -49,7 +49,10 @@ const FilterMenu: FC<FilterMenuProps> = ({
 	};
 
 	const handleClearOptions = () => {
-		setLocalValue({});
+		setLocalValue({
+			source: [],
+			organization: [],
+		});
 	};
 
 	const handleApplyFilters = () => {
