@@ -220,7 +220,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 			<Modal
 				{...props}
 				title={`${vouch ? 'Vouch for' : 'Flag'} Project`}
-				showHeader={step !== AttestSteps.SUCCESS}
+				showHeader
 				className='w-full md:w-[500px] p-6'
 				showModal={step !== AttestSteps.SUCCESS || !showShareModal}
 			>
