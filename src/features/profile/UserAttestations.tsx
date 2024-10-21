@@ -25,7 +25,7 @@ import { EditAttestModal } from '@/components/Modal/EditAttestModal';
 import { ROUTES } from '@/config/routes';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey, optionSectionLabel } from '../home/Projects';
+import { FilterKey } from '../home/Projects';
 import { ITEMS_PER_PAGE } from './constants';
 import { IconSort } from '@/components/Icons/IconSort';
 import config from '@/config/configuration';
@@ -323,28 +323,13 @@ export const UserAttestations = ({
 		],
 	);
 
-	const onSelectOption = useCallback(
-		(key: string, option: string) => {
-			const params = new URLSearchParams(searchParams.toString());
-			const value = params.getAll(key);
-			if (value.includes(option)) {
-				params.delete(key, option);
-			} else {
-				params.append(key, option);
-			}
-			router.push(pathname + '?' + params.toString(), {
-				scroll: false,
-			});
-		},
-		[searchParams, pathname, router],
-	);
-
-	const onClearOptions = () => {
+	const handleApplyFilters = (filters: { [key: string]: string[] }) => {
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
+		Object.entries(filters).forEach(([key, value]) => {
+			params.delete(key);
+			value.forEach(v => params.append(key, v));
 		});
+		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
 	const handleSortClick = (header: any) => {
@@ -375,13 +360,11 @@ export const UserAttestations = ({
 					<Tabs tabs={tabs} activeTab={tabParam} />
 					<FilterMenu
 						options={filterOptions}
+						onApplyFilters={handleApplyFilters}
 						value={{
 							[FilterKey.SOURCE]: sourceParams,
 							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
-						optionSectionLabel={optionSectionLabel}
-						onSelectOption={onSelectOption}
-						onClearOptions={onClearOptions}
 						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}

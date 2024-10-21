@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import Link from 'next/link';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -19,7 +18,7 @@ import { Tabs } from '@/components/Tabs';
 import { SourceBadge } from '@/components/SourceBadge';
 import { fetchOrganization } from '@/services/organization';
 import { IOption } from '@/components/Select/Select';
-import { FilterKey, optionSectionLabel } from '../home/Projects';
+import { FilterKey } from '../home/Projects';
 import { VouchFilter } from '../profile/types';
 import { ITEMS_PER_PAGE } from '../profile/constants';
 import Tooltip from '@/components/Table/Tooltip';
@@ -30,7 +29,6 @@ import {
 	fetchProjectData,
 } from './services';
 import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
-import { ROUTES } from '@/config/routes';
 import { ShareProject } from './ShareProject';
 
 export enum Tab {
@@ -213,25 +211,13 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		},
 	];
 
-	const onSelectOption = (key: string, option: string) => {
+	const handleApplyFilters = (filters: { [key: string]: string[] }) => {
 		const params = new URLSearchParams(searchParams.toString());
-		const value = params.getAll(key);
-		if (value.includes(option)) {
-			params.delete(key, option);
-		} else {
-			params.append(key, option);
-		}
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
+		Object.entries(filters).forEach(([key, value]) => {
+			params.delete(key);
+			value.forEach(v => params.append(key, v));
 		});
-	};
-
-	const onClearOptions = () => {
-		const params = new URLSearchParams(searchParams.toString());
-		params.delete(FilterKey.ORGANIZATION);
-		router.push(pathname + '?' + params.toString(), {
-			scroll: false,
-		});
+		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
 	const sourceName = config.SOURCE_PLATFORMS.find(
@@ -243,13 +229,14 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 	)?.key;
 
 	const desc = project?.descriptionHtml || project?.description;
+	const createdAt = project?.sourceCreatedAt;
 
 	return (
 		<div className='relative container flex flex-col gap-8 p-4'>
 			<div className='bg-white p-6 '>
 				<div className='flex items-center gap-6 mb-6 border-b-2 py-2 justify-between'>
 					<div className='flex items-center gap-6'>
-						<Link href={ROUTES.HOME}>
+						<span className='cursor-pointer' onClick={router.back}>
 							<Image
 								src={'/images/icons/left-arrow.svg'}
 								style={{ cursor: 'pointer' }}
@@ -257,8 +244,28 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 								width={24}
 								height={24}
 							/>
-						</Link>
-						<h1 className='text-2xl font-bold'>{project?.title}</h1>
+						</span>
+						<div className='flex flex-col'>
+							<h1 className='text-2xl font-bold'>
+								{project?.title}
+							</h1>
+
+							{createdAt && (
+								<p className='mt-1'>
+									<span className='text-neutral-400'>
+										Created
+									</span>{' '}
+									{new Date(createdAt).toLocaleDateString(
+										'en-US',
+										{
+											year: 'numeric',
+											month: 'long',
+											day: '2-digit',
+										},
+									)}
+								</p>
+							)}
+						</div>
 					</div>
 					<div className='flex items-center gap-6'>
 						<a
@@ -272,7 +279,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							>
 								<Image
 									src={'/images/icons/external.svg'}
-									alt={'arrow'}
+									alt={'external'}
 									width={24}
 									height={24}
 								/>
@@ -342,9 +349,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 						value={{
 							[FilterKey.ORGANIZATION]: organisationParams,
 						}}
-						optionSectionLabel={optionSectionLabel}
-						onSelectOption={onSelectOption}
-						onClearOptions={onClearOptions}
+						onApplyFilters={handleApplyFilters}
 						className='lg:w-auto'
 						label='Filters'
 						stickToRight={true}

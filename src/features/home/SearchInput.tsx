@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { type FC, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { type FC, useEffect, useState } from 'react';
 
 interface SearchInputProps {
 	setTerm: (term: string) => void;
@@ -7,6 +8,13 @@ interface SearchInputProps {
 
 export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 	const [value, setValue] = useState<string>();
+	const searchParams = useSearchParams();
+
+	useEffect(() => {
+		const term = searchParams.get('term');
+		setValue(term || '');
+	}, [searchParams]);
+
 	return (
 		<>
 			<input
@@ -22,7 +30,7 @@ export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 			/>
 			<div className='relative'>
 				{value ? (
-					<div className='absolute -top-14 right-4 lg:top-3 lg:-left-20 cursor-pointer flex z-auto gap-3'>
+					<div className='absolute -top-12 right-4 lg:top-3 lg:-left-20 cursor-pointer flex z-auto gap-3'>
 						<Image
 							src='/images/icons/right-arrow.svg'
 							width={20}
@@ -46,7 +54,7 @@ export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 						/>
 					</div>
 				) : (
-					<div className='absolute -top-14 right-4  lg:top-3 lg:-left-12 cursor-pointer flex z-auto'>
+					<div className='absolute -top-12 right-4  lg:top-3 lg:-left-12 cursor-pointer flex z-auto'>
 						<Image
 							src='/images/icons/search.svg'
 							width={20}

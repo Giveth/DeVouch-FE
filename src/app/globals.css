@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
 }
 
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 /* Remove supporting dark mode */
@@ -22,17 +22,54 @@ html {
 } */
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background-image: 
-  radial-gradient(circle at 10% 10%, rgba(55, 66, 250, 0.25), transparent 30%),
-  radial-gradient(circle at 100% 0%, rgba(30,144, 255, 0.25), transparent 15%),
-  radial-gradient(circle at 120% 80%, rgba(43, 203, 186, 0.35), transparent 50%),
-  radial-gradient(circle at 10% 120%, rgba(29, 209, 161, 0.25), transparent 30%);
-  background-color: #ffffff; /* Background color */
+	color: rgb(var(--foreground-rgb));
+	background-image: radial-gradient(
+			circle at 10% 10%,
+			rgba(55, 66, 250, 0.25),
+			transparent 30%
+		),
+		radial-gradient(
+			circle at 100% 0%,
+			rgba(30, 144, 255, 0.25),
+			transparent 15%
+		),
+		radial-gradient(
+			circle at 120% 80%,
+			rgba(43, 203, 186, 0.35),
+			transparent 50%
+		),
+		radial-gradient(
+			circle at 10% 120%,
+			rgba(29, 209, 161, 0.25),
+			transparent 30%
+		);
+	background-color: #ffffff; /* Background color */
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+	.text-balance {
+		text-wrap: balance;
+	}
+}
+
+.hover-gradient-text {
+	color: rgba(0, 0, 0, 1); /* Default black color */
+	background-image: linear-gradient(
+		to bottom,
+		rgba(27, 156, 252, 1),
+		rgba(55, 66, 250, 1)
+	);
+	background-size: 100% 0%; /* Initially, gradient covers none of the text */
+	background-repeat: no-repeat;
+	-webkit-background-clip: text;
+	background-clip: text;
+	transition:
+		background-size 0.1s ease,
+		color 0.1s ease; /* Smooth transition */
+	cursor: pointer;
+}
+
+.hover-gradient-text:hover {
+	color: transparent;
+	background-size: 100% 100%; /* Expand gradient to full size on hover, from top to bottom */
 }
