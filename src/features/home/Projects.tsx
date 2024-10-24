@@ -7,7 +7,11 @@ import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
 import { Button, ButtonType } from '@/components/Button/Button';
-import { generateFetchProjectsQuery } from './query-genrator';
+import {
+	generateFetchProjectsByIdsQuery,
+	generateFetchProjectsQuery,
+	generateGetProjectsSortedByVouchOrFlagQuery,
+} from './query-genrator';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
@@ -89,29 +93,87 @@ export const Projects = () => {
 
 		const queryVariables = {
 			orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
-			limit,
-			offset: pageParam,
+			limit: limit as number,
+			offset: pageParam as number,
 			non_rf_sources: nonRfSources,
 			rf_rounds: rfRounds,
 			organisation_id: organisationParams,
 			term: termParam,
 		};
 
-		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(
-				sourceParams,
-				organisationParams,
-				termParam,
-				rfRounds,
-			),
-			queryVariables,
-		);
+		const sortByValue =
+			sortParam === EProjectSort.HIGHEST_VOUCH_COUNT
+				? 'totalVouches_DESC'
+				: sortParam === EProjectSort.LOWEST_VOUCH_COUNT
+					? 'totalVouches_ASC'
+					: sortParam === EProjectSort.HIGHEST_FLAG
+						? 'totalFlags_DESC'
+						: sortParam === EProjectSort.LOWEST_FLAG
+							? 'totalFlags_ASC'
+							: sortParam;
 
-		return {
-			projects: data.projects,
-			nextPage:
-				data.projects.length === limit ? pageParam + limit : undefined,
-		};
+		if (organisationParams.length > 0) {
+			// Fetch sorted project IDs
+			const idsData = await fetchGraphQL<{
+				getProjectsSortedByVouchOrFlag: { id: string }[];
+			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
+				orgIds: organisationParams,
+				sortBy: sortByValue,
+				limit: limit as number,
+				offset: pageParam as number,
+			});
+
+			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
+				item => item.id,
+			);
+
+			if (projectIds.length === 0) {
+				return {
+					projects: [],
+					nextPage: undefined,
+				};
+			}
+
+			// Fetch full project data
+			const data = await fetchGraphQL<{ projects: IProject[] }>(
+				generateFetchProjectsByIdsQuery(),
+				{
+					ids: projectIds,
+				},
+			);
+
+			const projectsMap = new Map(
+				data.projects.map(project => [project.id, project]),
+			);
+			const sortedProjects = projectIds
+				.map(id => projectsMap.get(id))
+				.filter((project): project is IProject => Boolean(project));
+
+			return {
+				projects: sortedProjects,
+				nextPage:
+					projectIds.length === limit ? pageParam + limit : undefined,
+			};
+		} else {
+			// Existing logic
+			const data = await fetchGraphQL<{ projects: IProject[] }>(
+				generateFetchProjectsQuery(
+					sourceParams,
+					organisationParams,
+					termParam,
+					rfRounds,
+				),
+				queryVariables,
+			);
+
+			return {
+				projects: data.projects,
+				nextPage:
+					data.projects.length === limit
+						? pageParam + limit
+						: undefined,
+			};
+		}
 	};
 
 	const {
