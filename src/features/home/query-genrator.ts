@@ -88,3 +88,45 @@ export const generateFetchProjectsQuery = (
 
 	return query;
 };
+
+export const generateGetProjectsSortedByVouchOrFlagQuery = () => {
+	return `
+	  query getProjectsSortedByVouchOrFlag($orgIds: [String!]!, $sortBy: String!, $limit: Float!, $offset: Float!) {
+		getProjectsSortedByVouchOrFlag(orgIds: $orgIds, sortBy: $sortBy, limit: $limit, offset: $offset) {
+		  id
+		}
+	  }
+	`;
+};
+
+export const generateFetchProjectsByIdsQuery = () => {
+	return `
+	  query fetchProjectsByIds($ids: [String!]!) {
+		projects(where: { id_in: $ids }) {
+		  id
+		  projectId
+		  title
+		  descriptionSummary
+		  image
+		  source
+		  rfRounds
+		  url
+		  sourceCreatedAt
+		  attests {
+			id
+			vouch
+			attestorOrganisation {
+			  attestor {
+				id
+			  }
+			  organisation {
+				id
+				name
+				color
+			  }
+			}
+		  }
+		}
+	  }
+	`;
+};
