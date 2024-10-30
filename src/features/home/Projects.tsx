@@ -102,24 +102,13 @@ export const Projects = () => {
 			term: termParam,
 		};
 
-		const sortByValue =
-			sortParam === EProjectSort.HIGHEST_VOUCH_COUNT
-				? 'totalVouches_DESC'
-				: sortParam === EProjectSort.LOWEST_VOUCH_COUNT
-					? 'totalVouches_ASC'
-					: sortParam === EProjectSort.HIGHEST_FLAG
-						? 'totalFlags_DESC'
-						: sortParam === EProjectSort.LOWEST_FLAG
-							? 'totalFlags_ASC'
-							: sortParam;
-
 		if (organisationParams.length > 0) {
 			// Fetch sorted project IDs
 			const idsData = await fetchGraphQL<{
 				getProjectsSortedByVouchOrFlag: { id: string }[];
 			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
 				organizations: organisationParams,
-				sortBy: sortByValue,
+				sortBy: sortParam,
 				limit: limit as number,
 				offset: pageParam as number,
 				sources: nonRfSources.length > 0 ? nonRfSources : undefined,
