@@ -17,6 +17,7 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
 import { IProject } from './types';
 import { fetchOrganization } from '@/services/organization';
+import SelectedFilters from './SelectedFilters';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -117,12 +118,12 @@ export const Projects = () => {
 			const idsData = await fetchGraphQL<{
 				getProjectsSortedByVouchOrFlag: { id: string }[];
 			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
-				orgIds: organisationParams,
+				organizations: organisationParams,
 				sortBy: sortByValue,
 				limit: limit as number,
 				offset: pageParam as number,
+				sources: nonRfSources.length > 0 ? nonRfSources : undefined,
 			});
-
 			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
 				item => item.id,
 			);
@@ -247,9 +248,42 @@ export const Projects = () => {
 		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
+	const handleRemoveFilter = (
+		type: 'source' | 'organization',
+		value: string,
+	) => {
+		const params = new URLSearchParams(searchParams.toString());
+		const currentValues = params.getAll(
+			type === 'source' ? FilterKey.SOURCE : FilterKey.ORGANIZATION,
+		);
+		params.delete(
+			type === 'source' ? FilterKey.SOURCE : FilterKey.ORGANIZATION,
+		);
+
+		currentValues
+			.filter(v => v !== value)
+			.forEach(v =>
+				params.append(
+					type === 'source'
+						? FilterKey.SOURCE
+						: FilterKey.ORGANIZATION,
+					v,
+				),
+			);
+
+		router.push(pathname + '?' + params.toString(), { scroll: false });
+	};
+
+	const handleClearAllFilters = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete(FilterKey.SOURCE);
+		params.delete(FilterKey.ORGANIZATION);
+		router.push(pathname + '?' + params.toString(), { scroll: false });
+	};
+
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex flex-col lg:flex-row gap-4'>
+			<div className='flex flex-col items-center lg:flex-row gap-4'>
 				<div className='flex gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
@@ -263,6 +297,13 @@ export const Projects = () => {
 					/>
 				</div>
 				<div className='flex-1' />
+				<SelectedFilters
+					sources={sourceParams}
+					organizations={organisationParams}
+					attestorGroups={attestorGroups}
+					onRemoveFilter={handleRemoveFilter}
+					onClearAll={handleClearAllFilters}
+				/>
 				<SearchInput setTerm={handleSearchTerm} />
 				<div className='flex gap-4 items-center'>
 					<FilterMenu
