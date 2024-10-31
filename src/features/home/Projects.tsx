@@ -273,7 +273,7 @@ export const Projects = () => {
 	return (
 		<div className='container flex flex-col gap-10'>
 			<div className='flex flex-col items-center lg:flex-row gap-4'>
-				<div className='flex gap-4 items-center justify-between'>
+				<div className='flex w-full lg:w-fit gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
 						options={sortOptions}
@@ -286,15 +286,17 @@ export const Projects = () => {
 					/>
 				</div>
 				<div className='flex-1' />
-				<SelectedFilters
-					sources={sourceParams}
-					organizations={organisationParams}
-					attestorGroups={attestorGroups}
-					onRemoveFilter={handleRemoveFilter}
-					onClearAll={handleClearAllFilters}
-				/>
+				<div className='hidden 2xl:block'>
+					<SelectedFilters
+						sources={sourceParams}
+						organizations={organisationParams}
+						attestorGroups={attestorGroups}
+						onRemoveFilter={handleRemoveFilter}
+						onClearAll={handleClearAllFilters}
+					/>
+				</div>
 				<SearchInput setTerm={handleSearchTerm} />
-				<div className='flex gap-4 items-center'>
+				<div className='flex w-full lg:w-fit gap-4 items-center'>
 					<FilterMenu
 						options={options}
 						onApplyFilters={handleApplyFilters}
@@ -306,6 +308,15 @@ export const Projects = () => {
 						stickToRight={true}
 					/>
 				</div>
+			</div>
+			<div className='block 2xl:hidden'>
+				<SelectedFilters
+					sources={sourceParams}
+					organizations={organisationParams}
+					attestorGroups={attestorGroups}
+					onRemoveFilter={handleRemoveFilter}
+					onClearAll={handleClearAllFilters}
+				/>
 			</div>
 			<h2 className='text-2xl font-bold'>Explore Projects </h2>
 			{projects && projects.length > 0 ? (

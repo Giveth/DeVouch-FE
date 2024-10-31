@@ -20,11 +20,11 @@ const SelectedFilters: React.FC<SelectedFiltersProps> = ({
 	const totalFilters = sources.length + organizations.length;
 
 	return (
-		<div className='flex flex-wrap max-w-[500px] items-end justify-end gap-2'>
+		<div className='flex flex-wrap 2xl:max-w-[500px] items-end justify-end gap-2'>
 			{totalFilters > 1 && (
 				<button
 					onClick={onClearAll}
-					className='inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors whitespace-nowrap'
+					className='inline-flex items-center gap-1.5 px-3 py-1 text-sm hover:font-semibold transition-colors whitespace-nowrap'
 				>
 					Clear All Filters
 				</button>
