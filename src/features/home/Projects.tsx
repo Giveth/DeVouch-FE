@@ -7,12 +7,17 @@ import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
 import { Button, ButtonType } from '@/components/Button/Button';
-import { generateFetchProjectsQuery } from './query-genrator';
+import {
+	generateFetchProjectsByIdsQuery,
+	generateFetchProjectsQuery,
+	generateGetProjectsSortedByVouchOrFlagQuery,
+} from './query-genrator';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
 import { IProject } from './types';
 import { fetchOrganization } from '@/services/organization';
+import SelectedFilters from './SelectedFilters';
 
 enum EProjectSort {
 	NEWEST = 'lastUpdatedTimestamp_DESC',
@@ -89,29 +94,76 @@ export const Projects = () => {
 
 		const queryVariables = {
 			orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
-			limit,
-			offset: pageParam,
+			limit: limit as number,
+			offset: pageParam as number,
 			non_rf_sources: nonRfSources,
 			rf_rounds: rfRounds,
 			organisation_id: organisationParams,
 			term: termParam,
 		};
 
-		const data = await fetchGraphQL<{ projects: IProject[] }>(
-			generateFetchProjectsQuery(
-				sourceParams,
-				organisationParams,
-				termParam,
-				rfRounds,
-			),
-			queryVariables,
-		);
+		if (organisationParams.length > 0) {
+			// Fetch sorted project IDs
+			const idsData = await fetchGraphQL<{
+				getProjectsSortedByVouchOrFlag: { id: string }[];
+			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
+				organizations: organisationParams,
+				sortBy: sortParam,
+				limit: limit as number,
+				offset: pageParam as number,
+				sources: nonRfSources.length > 0 ? nonRfSources : undefined,
+			});
+			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
+				item => item.id,
+			);
 
-		return {
-			projects: data.projects,
-			nextPage:
-				data.projects.length === limit ? pageParam + limit : undefined,
-		};
+			if (projectIds.length === 0) {
+				return {
+					projects: [],
+					nextPage: undefined,
+				};
+			}
+
+			// Fetch full project data
+			const data = await fetchGraphQL<{ projects: IProject[] }>(
+				generateFetchProjectsByIdsQuery(),
+				{
+					ids: projectIds,
+				},
+			);
+
+			const projectsMap = new Map(
+				data.projects.map(project => [project.id, project]),
+			);
+			const sortedProjects = projectIds
+				.map(id => projectsMap.get(id))
+				.filter((project): project is IProject => Boolean(project));
+
+			return {
+				projects: sortedProjects,
+				nextPage:
+					projectIds.length === limit ? pageParam + limit : undefined,
+			};
+		} else {
+			// Existing logic
+			const data = await fetchGraphQL<{ projects: IProject[] }>(
+				generateFetchProjectsQuery(
+					sourceParams,
+					organisationParams,
+					termParam,
+					rfRounds,
+				),
+				queryVariables,
+			);
+
+			return {
+				projects: data.projects,
+				nextPage:
+					data.projects.length === limit
+						? pageParam + limit
+						: undefined,
+			};
+		}
 	};
 
 	const {
@@ -185,10 +237,43 @@ export const Projects = () => {
 		router.push(pathname + '?' + params.toString(), { scroll: false });
 	};
 
+	const handleRemoveFilter = (
+		type: 'source' | 'organization',
+		value: string,
+	) => {
+		const params = new URLSearchParams(searchParams.toString());
+		const currentValues = params.getAll(
+			type === 'source' ? FilterKey.SOURCE : FilterKey.ORGANIZATION,
+		);
+		params.delete(
+			type === 'source' ? FilterKey.SOURCE : FilterKey.ORGANIZATION,
+		);
+
+		currentValues
+			.filter(v => v !== value)
+			.forEach(v =>
+				params.append(
+					type === 'source'
+						? FilterKey.SOURCE
+						: FilterKey.ORGANIZATION,
+					v,
+				),
+			);
+
+		router.push(pathname + '?' + params.toString(), { scroll: false });
+	};
+
+	const handleClearAllFilters = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete(FilterKey.SOURCE);
+		params.delete(FilterKey.ORGANIZATION);
+		router.push(pathname + '?' + params.toString(), { scroll: false });
+	};
+
 	return (
 		<div className='container flex flex-col gap-10'>
-			<div className='flex flex-col lg:flex-row gap-4'>
-				<div className='flex gap-4 items-center justify-between'>
+			<div className='flex flex-col items-center lg:flex-row gap-4'>
+				<div className='flex w-full lg:w-fit gap-4 items-center justify-between'>
 					<p className='text-gray-400'>Sort By</p>
 					<Select
 						options={sortOptions}
@@ -201,8 +286,17 @@ export const Projects = () => {
 					/>
 				</div>
 				<div className='flex-1' />
+				<div className='hidden 2xl:block'>
+					<SelectedFilters
+						sources={sourceParams}
+						organizations={organisationParams}
+						attestorGroups={attestorGroups}
+						onRemoveFilter={handleRemoveFilter}
+						onClearAll={handleClearAllFilters}
+					/>
+				</div>
 				<SearchInput setTerm={handleSearchTerm} />
-				<div className='flex gap-4 items-center'>
+				<div className='flex w-full lg:w-fit gap-4 items-center'>
 					<FilterMenu
 						options={options}
 						onApplyFilters={handleApplyFilters}
@@ -214,6 +308,15 @@ export const Projects = () => {
 						stickToRight={true}
 					/>
 				</div>
+			</div>
+			<div className='block 2xl:hidden'>
+				<SelectedFilters
+					sources={sourceParams}
+					organizations={organisationParams}
+					attestorGroups={attestorGroups}
+					onRemoveFilter={handleRemoveFilter}
+					onClearAll={handleClearAllFilters}
+				/>
 			</div>
 			<h2 className='text-2xl font-bold'>Explore Projects </h2>
 			{projects && projects.length > 0 ? (
