@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import {
 	EAS,
@@ -63,7 +63,6 @@ export const AttestModal: FC<AttestModalProps> = ({
 	const [comment, setComment] = useState<string>('');
 	const [showShareModal, setShowShareModal] = useState<boolean>(false); // State for ShareModal
 	const { switchChainAsync } = useSwitchChain();
-
 	const router = useRouter();
 	const pathname = usePathname();
 	const isHome = pathname === ROUTES.HOME;
@@ -90,10 +89,6 @@ export const AttestModal: FC<AttestModalProps> = ({
 				organisations.add(ao.organisation.id);
 				result.push(ao);
 			}
-		}
-		// preselect if only one org
-		if (result.length === 1) {
-			setSelectedOrg(result[0]);
 		}
 
 		return result;
@@ -214,6 +209,17 @@ export const AttestModal: FC<AttestModalProps> = ({
 	};
 
 	const isCommentExceed = comment.length > 256;
+
+	useEffect(() => {
+		// preselect if only one org and not selected
+		if (
+			!selectedOrg &&
+			fetchedOrganisations &&
+			fetchedOrganisations.length === 2 // because of NO_AFFILIATED_ORG
+		) {
+			setSelectedOrg(fetchedOrganisations[1]);
+		}
+	}, [fetchedOrganisations]);
 
 	return (
 		<>
