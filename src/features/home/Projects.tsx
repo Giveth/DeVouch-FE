@@ -112,6 +112,7 @@ export const Projects = () => {
 				limit: limit as number,
 				offset: pageParam as number,
 				sources: nonRfSources.length > 0 ? nonRfSources : undefined,
+				rfRounds: rfRounds.length > 0 ? rfRounds : [],
 			});
 			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
 				item => item.id,
