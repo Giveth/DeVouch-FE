@@ -14,17 +14,27 @@ export const SourceBadge: FC<SourceBadgeProps> = ({
 	rfRound,
 	className = '',
 }) => {
-	const roundSuffix = rfRound?.length ? `${rfRound.slice(-1)}` : '';
+	const lastRoundSuffix = rfRound?.length ? `${rfRound.slice(-1)}` : '';
+	const roundSuffix =
+		Array.isArray(rfRound) && rfRound.length > 0
+			? rfRound.length > 1
+				? rfRound.join(',')
+				: rfRound[0]
+			: '';
+
 	const formattedSource =
-		source === 'rf' ? `${source}${roundSuffix}` : source;
+		source === 'rf' ? `${source}${lastRoundSuffix}` : source;
+
 	const platform = config.SOURCE_PLATFORMS.find(
 		i => i.value.toLowerCase() === formattedSource?.toLowerCase(),
 	);
+	const formattedSourceLabel =
+		source === 'rf' ? `Retro Funding ${roundSuffix}` : platform?.key;
 
 	return source ? (
 		<div className={`flex gap-1 bg-white py-1 px-2 z-auto ${className}`}>
 			<span className='text-gray-300 font-light'>From </span>
-			<span className='text-black'>{platform?.key}</span>
+			<span className='text-black'>{formattedSourceLabel}</span>
 			{platform && (
 				<Image
 					src={`/images/sources/${formattedSource}.svg`}
