@@ -18,7 +18,7 @@ export const SourceBadge: FC<SourceBadgeProps> = ({
 	const roundSuffix =
 		Array.isArray(rfRound) && rfRound.length > 0
 			? rfRound.length > 1
-				? rfRound.join(',')
+				? rfRound.join(', ')
 				: rfRound[0]
 			: '';
 

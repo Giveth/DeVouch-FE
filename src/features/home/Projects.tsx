@@ -106,7 +106,7 @@ export const Projects = () => {
 			// Fetch sorted project IDs
 			const allSources = sourceParams.some(s => s.startsWith('rf'))
 				? ['rf', ...sourceParams.filter(s => !s.startsWith('rf'))]
-				: sourceParams;
+				: nonRfSources;
 			const idsData = await fetchGraphQL<{
 				getProjectsSortedByVouchOrFlag: { id: string }[];
 			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
@@ -115,6 +115,7 @@ export const Projects = () => {
 				limit: limit as number,
 				offset: pageParam as number,
 				sources: allSources,
+				rfRounds: rfRounds.length > 0 ? rfRounds : [],
 			});
 			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
 				item => item.id,

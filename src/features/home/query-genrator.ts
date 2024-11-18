@@ -96,7 +96,8 @@ export const generateGetProjectsSortedByVouchOrFlagQuery = () => {
         $sortBy: String!,
         $limit: Int!,
         $offset: Int!,
-        $sources: [String!]
+        $sources: [String!],
+		$rfRounds: [Int!]
     ) {
         getProjectsSortedByVouchOrFlag(
             organizations: $organizations,
@@ -104,6 +105,7 @@ export const generateGetProjectsSortedByVouchOrFlagQuery = () => {
             limit: $limit,
             offset: $offset,
             sources: $sources
+			rfRounds: $rfRounds
         ) {
             id
         }
