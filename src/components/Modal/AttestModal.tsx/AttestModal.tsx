@@ -8,7 +8,7 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Address } from 'viem';
+import { Address, parseEther } from 'viem';
 import Modal, { IModal } from '../Modal';
 import { Button, ButtonType } from '@/components/Button/Button';
 import RadioButton from '@/components/RadioButton/RadioButton';
@@ -144,6 +144,7 @@ export const AttestModal: FC<AttestModalProps> = ({
 					revocable: true,
 					data: encodedData,
 					refUID: _selectedOrg.id,
+					value: parseEther(config.ATTESTATION_FEE),
 				},
 			});
 
