@@ -2,7 +2,7 @@ import { useRef, useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
-import { Address, isHex } from 'viem';
+import { Address, isHex, parseEther } from 'viem';
 import Modal, { IModal } from './Modal';
 import { Button } from '@/components/Button/Button';
 import {
@@ -85,6 +85,7 @@ export const EditAttestModal: FC<AttestModalProps> = ({
 					revocable: true,
 					data: encodedData,
 					refUID,
+					value: parseEther(config.ATTESTATION_FEE),
 				},
 			});
 

@@ -8,8 +8,11 @@
 		"start": "next start",
 		"lint": "next lint"
 	},
+	"resolutions": {
+		"base-x": "^5.0.0"
+	},
 	"dependencies": {
-		"@ethereum-attestation-service/eas-sdk": "^2.1.4",
+		"@ethereum-attestation-service/eas-sdk": "^2.7.0",
 		"@tanstack/react-query": "^5.34.2",
 		"@web3modal/wagmi": "^4.2.3",
 		"next": "14.2.3",

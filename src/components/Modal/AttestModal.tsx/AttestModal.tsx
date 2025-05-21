@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import {
 	EAS,
@@ -8,10 +8,9 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Address } from 'viem';
+import { Address, parseEther } from 'viem';
 import Modal, { IModal } from '../Modal';
 import { Button, ButtonType } from '@/components/Button/Button';
-import RadioButton from '@/components/RadioButton/RadioButton';
 import { FETCH_USER_ORGANISATIONS } from '@/queries/user';
 import { fetchGraphQL } from '@/helpers/request';
 import { OutlineButton } from '@/components/Button/OutlineButton';
@@ -21,6 +20,7 @@ import { DEFAULT_ORGANISATION_COLOR } from '@/config/constants';
 import { IProject } from '@/features/home/types';
 import { ROUTES } from '@/config/routes';
 import { ShareModal } from '../ShareModal';
+import Checkbox from '@/components/CheckBox/CheckBox';
 
 interface IOrganisation {
 	id: string;
@@ -59,21 +59,18 @@ export const AttestModal: FC<AttestModalProps> = ({
 	...props
 }) => {
 	const [step, setStep] = useState(AttestSteps.ATTEST);
-	const [selectedOrg, setSelectedOrg] = useState<IAttestorOrganisation>();
+	const [selectedOrgs, setSelectedOrgs] = useState<IAttestorOrganisation[]>(
+		[],
+	);
 	const [comment, setComment] = useState<string>('');
 	const [showShareModal, setShowShareModal] = useState<boolean>(false); // State for ShareModal
 	const { switchChainAsync } = useSwitchChain();
-
 	const router = useRouter();
 	const pathname = usePathname();
 	const isHome = pathname === ROUTES.HOME;
 
 	const { address } = useAccount();
 	const signer = useEthersSigner();
-
-	const handleRadioChange = (value: IAttestorOrganisation) => {
-		setSelectedOrg(value);
-	};
 
 	const fetchOrganisations = async () => {
 		if (!address) return [];
@@ -91,10 +88,6 @@ export const AttestModal: FC<AttestModalProps> = ({
 				result.push(ao);
 			}
 		}
-		// preselect if only one org
-		if (result.length === 1) {
-			setSelectedOrg(result[0]);
-		}
 
 		return result;
 	};
@@ -105,14 +98,18 @@ export const AttestModal: FC<AttestModalProps> = ({
 		staleTime: 300_000,
 	});
 	const userNoAffiliated =
-		fetchedOrganisations?.length === 0 ||
-		(fetchedOrganisations?.length === 1 &&
-			fetchedOrganisations?.[0]?.organisation?.id === ZERO_BYTES32);
+		!fetchedOrganisations ||
+		fetchedOrganisations.every(org => org.organisation.id === ZERO_BYTES32);
 
 	const handleConfirm = async () => {
 		if (!address || !signer) return;
-		const _selectedOrg = userNoAffiliated ? NO_AFFILIATED_ORG : selectedOrg;
+
+		const _selectedOrg = userNoAffiliated
+			? NO_AFFILIATED_ORG
+			: selectedOrgs;
+
 		if (!_selectedOrg) return;
+
 		try {
 			setStep(AttestSteps.ATTESTING);
 
@@ -141,16 +138,51 @@ export const AttestModal: FC<AttestModalProps> = ({
 
 			const schemaUID = config.PROJECT_VERIFY_SCHEMA;
 
-			const tx = await eas.attest({
-				schema: schemaUID,
-				data: {
-					recipient: '0x0000000000000000000000000000000000000000',
-					expirationTime: 0n,
-					revocable: true,
-					data: encodedData,
-					refUID: _selectedOrg.id,
-				},
-			});
+			const targets = userNoAffiliated
+				? [
+						{
+							schema: schemaUID,
+							data: [
+								{
+									recipient:
+										'0x0000000000000000000000000000000000000000',
+									expirationTime: 0n,
+									revocable: true,
+									data: encodedData,
+									refUID: ZERO_BYTES32,
+									value: parseEther(config.ATTESTATION_FEE),
+								},
+							],
+						},
+					]
+				: [
+						{
+							schema: schemaUID,
+							data: selectedOrgs.map(org => ({
+								recipient:
+									'0x0000000000000000000000000000000000000000',
+								expirationTime: 0n,
+								revocable: true,
+								data: encodedData,
+								refUID: org.id,
+								value: parseEther(config.ATTESTATION_FEE),
+							})),
+						},
+					];
+
+			const tx = await eas.multiAttest(targets);
+
+			// const tx = await eas.attest({
+			// 	schema: schemaUID,
+			// 	data: {
+			// 		recipient: '0x0000000000000000000000000000000000000000',
+			// 		expirationTime: 0n,
+			// 		revocable: true,
+			// 		data: encodedData,
+			// 		refUID: _selectedOrg.id,
+			// 		value: parseEther(config.ATTESTATION_FEE),
+			// 	},
+			// });
 
 			console.log('tx', tx);
 
@@ -159,51 +191,58 @@ export const AttestModal: FC<AttestModalProps> = ({
 
 			// Update Project Data
 			const _project = structuredClone(project);
-			let attest = _project.attests?.find(
-				_attest =>
-					_attest.attestorOrganisation.organisation.id.toLowerCase() ===
-						_selectedOrg.organisation.id.toLowerCase() &&
-					_attest.attestorOrganisation.attestor.id.toLowerCase() ===
-						address?.toLowerCase(),
-			);
-			if (attest) {
-				const oldVouch = attest.vouch;
-				attest.vouch = vouch;
-				attest.comment = comment;
-				attest.id = newAttestationUID as Address;
-				//old attest was attest and now user flagged
-				if (oldVouch && !vouch) {
-					_project.totalVouches--;
-					_project.totalFlags++;
-				}
-				//old attest was flag and now user vouched
-				if (!oldVouch && vouch) {
-					_project.totalVouches++;
-					_project.totalFlags--;
-				}
-			} else {
-				const _attest = {
-					id: newAttestationUID as Address,
-					vouch,
-					attestorOrganisation: {
-						attestor: {
-							id: address,
-						},
-						organisation: {
-							id: _selectedOrg.organisation.id,
-							name: _selectedOrg.organisation.name,
-							color: DEFAULT_ORGANISATION_COLOR,
+			const newDate = new Date();
+
+			selectedOrgs.forEach((organisation, index) => {
+				console.log({ organisation });
+				const UID = newAttestationUID[index] as Address;
+
+				let attest = _project.attests?.find(
+					_attest =>
+						_attest.attestorOrganisation.organisation.id.toLowerCase() ===
+							organisation.id.toLowerCase() &&
+						_attest.attestorOrganisation.attestor.id.toLowerCase() ===
+							address?.toLowerCase(),
+				);
+				if (attest) {
+					const oldVouch = attest.vouch;
+					attest.vouch = vouch;
+					attest.comment = comment;
+					attest.id = UID as Address;
+					//old attest was attest and now user flagged
+					if (oldVouch && !vouch) {
+						_project.totalVouches--;
+						_project.totalFlags++;
+					}
+					//old attest was flag and now user vouched
+					if (!oldVouch && vouch) {
+						_project.totalVouches++;
+						_project.totalFlags--;
+					}
+				} else {
+					const _attest = {
+						id: UID as Address,
+						vouch,
+						attestorOrganisation: {
+							attestor: {
+								id: address,
+							},
+							organisation: {
+								id: organisation.id,
+								name: organisation.organisation.name,
+								color: DEFAULT_ORGANISATION_COLOR,
+							},
+							attestTimestamp: new Date(),
 						},
 						attestTimestamp: new Date(),
-					},
-					attestTimestamp: new Date(),
-					comment: comment,
-					project: _project,
-				};
-				_project.totalAttests++;
-				vouch ? _project.totalVouches++ : _project.totalFlags++;
-				_project.attests = [...(_project.attests || []), _attest];
-			}
+						comment: comment,
+						project: _project,
+					};
+					_project.totalAttests++;
+					vouch ? _project.totalVouches++ : _project.totalFlags++;
+					_project.attests = [...(_project.attests || []), _attest];
+				}
+			});
 			onSuccess(_project);
 
 			setStep(AttestSteps.SUCCESS);
@@ -214,6 +253,19 @@ export const AttestModal: FC<AttestModalProps> = ({
 	};
 
 	const isCommentExceed = comment.length > 256;
+
+	useEffect(() => {
+		// preselect if only one org and not selected
+		if (
+			!selectedOrgs.length &&
+			fetchedOrganisations?.length === 2 // because of NO_AFFILIATED_ORG
+		) {
+			const affiliated = fetchedOrganisations.filter(
+				org => org.organisation.id !== ZERO_BYTES32,
+			);
+			setSelectedOrgs(affiliated);
+		}
+	}, [fetchedOrganisations]);
 
 	return (
 		<>
@@ -268,8 +320,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 						<div>
 							{!userNoAffiliated && (
 								<div className='mb-2 text-gray-500'>
-									Select the Attester Group you wish to vouch
-									as:
+									Select the Attester Group(s) you wish to
+									vouch as:
 								</div>
 							)}
 							<div className='border p-4'>
@@ -282,19 +334,28 @@ export const AttestModal: FC<AttestModalProps> = ({
 										if (ao.organisation.id === ZERO_BYTES32)
 											return null; // skip no affiliation
 										return (
-											<RadioButton
+											<Checkbox
 												key={ao.id}
 												id={ao.id}
-												name='organisation'
 												label={ao.organisation.name}
-												checked={
-													selectedOrg?.organisation
-														.id ===
-													ao.organisation.id
-												}
-												onChange={() =>
-													handleRadioChange(ao)
-												}
+												checked={selectedOrgs.some(
+													org =>
+														org.organisation.id ===
+														ao.organisation.id,
+												)}
+												onChange={() => {
+													setSelectedOrgs(prev =>
+														prev.some(
+															o => o.id === ao.id,
+														)
+															? prev.filter(
+																	o =>
+																		o.id !==
+																		ao.id,
+																)
+															: [...prev, ao],
+													);
+												}}
 												className='my-2'
 											/>
 										);
@@ -342,7 +403,8 @@ export const AttestModal: FC<AttestModalProps> = ({
 								loading={step === AttestSteps.ATTESTING}
 								disabled={
 									isCommentExceed ||
-									(!userNoAffiliated && !selectedOrg)
+									(!userNoAffiliated &&
+										selectedOrgs.length === 0)
 								}
 							>
 								Confirm
