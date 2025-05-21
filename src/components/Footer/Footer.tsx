@@ -22,6 +22,14 @@ export const Footer = () => {
 				>
 					Contact Us
 				</a>
+				<a
+					href={links.INTEGRATE_LINK}
+					target='_blank'
+					rel='noreferrer'
+					className='px-4 py-2 text-center sm:text-left'
+				>
+					Integrate DeVouch
+				</a>
 			</div>
 			<div className='flex gap-3 items-center text-lg text-center sm:text-left'>
 				<span className='text-gray-400 font-semibold'>Built by</span>
