@@ -16,10 +16,10 @@ export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 	}, [searchParams]);
 
 	return (
-		<>
+		<div className='relative w-full lg:w-fit'>
 			<input
 				placeholder='Search for projects'
-				className={`w-full lg:w-fit max-h-fit relative inline-block py-2 px-2 border border-gray-300 hover:border-black ${value ? 'flex-1 !border-black pr-16' : ''} outline-none focus:border-black focus:flex-1 focus:pr-16 transition-all`}
+				className={`w-full max-h-fit py-2 px-2 pr-16 border border-gray-300 hover:border-black outline-none focus:border-black transition-all`}
 				value={value}
 				onChange={e => setValue(e.target.value)}
 				onKeyDown={e => {
@@ -28,42 +28,38 @@ export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 					}
 				}}
 			/>
-			<div className='relative'>
+			<div className='absolute inset-y-0 right-3 flex items-center gap-2'>
 				{value ? (
-					<div className='absolute -top-12 right-4 lg:top-3 lg:-left-20 cursor-pointer flex z-auto gap-3'>
+					<>
 						<Image
 							src='/images/icons/right-arrow.svg'
 							width={20}
 							height={20}
 							alt='search'
-							className=''
-							onClick={() => {
-								value && setTerm(value);
-							}}
+							className='cursor-pointer'
+							onClick={() => value && setTerm(value)}
 						/>
 						<Image
 							src='/images/icons/x.svg'
 							width={20}
 							height={20}
 							alt='clear'
-							className=''
+							className='cursor-pointer'
 							onClick={() => {
 								setValue('');
-								setTerm(''); // Clear the term as well
+								setTerm('');
 							}}
 						/>
-					</div>
+					</>
 				) : (
-					<div className='absolute -top-12 right-4  lg:-top-2 lg:-left-12 cursor-pointer flex z-auto'>
-						<Image
-							src='/images/icons/search.svg'
-							width={20}
-							height={20}
-							alt='search'
-						/>
-					</div>
+					<Image
+						src='/images/icons/search.svg'
+						width={20}
+						height={20}
+						alt='search'
+					/>
 				)}
 			</div>
-		</>
+		</div>
 	);
 };
