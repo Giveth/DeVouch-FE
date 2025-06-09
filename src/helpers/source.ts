@@ -15,6 +15,8 @@ export const getSourceLink = (project?: IProject) => {
 			return 'https://retrolist.app';
 		case 'gitcoin':
 			return 'https://explorer.gitcoin.co';
+		case 'gardens':
+			return 'https://app.gardens.fund/gardens';
 		default:
 			return '/';
 	}
