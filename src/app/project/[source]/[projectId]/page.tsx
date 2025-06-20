@@ -19,6 +19,13 @@ export async function generateMetadata(
 	const project = await fetchProjectMetaData(source, projectId);
 	const previousImages = (await parent).openGraph?.images || [];
 
+	if (!project) {
+		return {
+			title: `DeVouch | Project Not Found`,
+			description: 'Project not found',
+		};
+	}
+
 	return {
 		title: `DeVouch | ${project.title} Details`,
 		description: project.descriptionSummary,

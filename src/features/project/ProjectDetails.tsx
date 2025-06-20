@@ -30,6 +30,7 @@ import {
 } from './services';
 import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
 import { ShareProject } from './ShareProject';
+import { ProjectNotFound } from '@/features/project/projectNotFound';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -126,6 +127,12 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			),
 	});
 
+	const { data: attestorGroups } = useQuery({
+		queryKey: ['fetchOrganisations'],
+		queryFn: fetchOrganization,
+		staleTime: 3000_000,
+	});
+
 	useEffect(() => {
 		let totalItems = 0;
 		switch (tabParam) {
@@ -154,11 +161,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		totalCount?.vouches.totalCount,
 	]);
 
-	const { data: attestorGroups } = useQuery({
-		queryKey: ['fetchOrganisations'],
-		queryFn: fetchOrganization,
-		staleTime: 3000_000,
-	});
+	const onAttestSuccess = useCallback(() => {
+		setTimeout(() => {
+			refetchAttestations();
+			refetchTotalCounts();
+		}, 5000);
+	}, [refetchAttestations, refetchTotalCounts]);
+
+	// If project not found, redirect to 404 page
+	if (error) {
+		return <ProjectNotFound />;
+	}
 
 	filterOptions[FilterKey.ORGANIZATION] =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
@@ -177,14 +190,6 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		}
 	};
 
-	const onAttestSuccess = useCallback(() => {
-		setTimeout(() => {
-			refetchAttestations();
-			refetchTotalCounts();
-		}, 5000);
-	}, [refetchAttestations, refetchTotalCounts]);
-
-	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
 	if (!isLoading && !project) return <p>Project not found.</p>;
 
