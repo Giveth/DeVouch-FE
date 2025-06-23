@@ -7,7 +7,6 @@ import { AddressName } from '../AddressName';
 
 export const ConnectedWalletInfo = () => {
 	const { walletInfo } = useWalletInfo();
-	console.log(walletInfo?.name, walletInfo?.icon);
 	const { address, chainId } = useAccount();
 
 	return address ? (

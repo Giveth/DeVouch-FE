@@ -15,7 +15,10 @@ const wagmiConfig = createConfig({
 		storage: cookieStorage,
 	}),
 	client({ chain }) {
-		return createClient({ chain, transport: http() });
+		return createClient({
+			chain,
+			transport: http(process.env.NEXT_PUBLIC_DRPC_ENDPOINT),
+		});
 	},
 });
 
