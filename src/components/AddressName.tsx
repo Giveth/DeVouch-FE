@@ -13,12 +13,9 @@ interface AddressNameProps {
 const getRpcEndpoint = () => {
 	const drpcEndpoint = process.env.NEXT_PUBLIC_DRPC_ENDPOINT;
 	if (drpcEndpoint) {
-		console.log('ENS: Using DRPC endpoint:', drpcEndpoint);
 		return drpcEndpoint;
 	}
-	console.log(
-		'ENS: DRPC endpoint not found, using fallback: https://eth.llamarpc.com',
-	);
+
 	// Fallback to public RPC endpoints
 	return 'https://eth.llamarpc.com';
 };
@@ -45,7 +42,6 @@ export const AddressName: FC<AddressNameProps> = ({ address }) => {
 	const resolveEnsName = useCallback(async (walletAddress: Address) => {
 		if (!walletAddress) return;
 
-		console.log('ENS: Starting resolution for address:', walletAddress);
 		setIsLoading(true);
 		setEnsName(''); // Reset previous name
 
@@ -54,13 +50,9 @@ export const AddressName: FC<AddressNameProps> = ({ address }) => {
 				address: walletAddress,
 			});
 
-			console.log('ENS: Resolved name:', resolvedName);
-
 			if (resolvedName) {
 				setEnsName(resolvedName);
-				console.log('ENS: State updated with name:', resolvedName);
 			} else {
-				console.log('ENS: No name found for address:', walletAddress);
 			}
 		} catch (error) {
 			console.error('ENS: Resolution failed:', error);
@@ -77,16 +69,6 @@ export const AddressName: FC<AddressNameProps> = ({ address }) => {
 			setIsLoading(false);
 		}
 	}, [address, resolveEnsName]);
-
-	// Debug current state
-	console.log(
-		'ENS: Current state - address:',
-		address,
-		'ensName:',
-		ensName,
-		'isLoading:',
-		isLoading,
-	);
 
 	if (isLoading) {
 		return <span>{summarizeAddress(address)}</span>; // Show address while loading
