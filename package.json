@@ -12,7 +12,7 @@
 		"start": "next start",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "next typegen && tsc --noEmit"
 	},
 	"resolutions": {
 		"@wagmi/connectors": "6.2.0",
