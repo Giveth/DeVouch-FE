@@ -1,4 +1,4 @@
-import { useWalletInfo } from '@web3modal/wagmi/react';
+import { useWalletInfo } from '@reown/appkit/react';
 import Image from 'next/image';
 import React from 'react';
 import { useAccount } from 'wagmi';

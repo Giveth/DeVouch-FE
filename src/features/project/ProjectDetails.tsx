@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAppKit } from '@reown/appkit/react';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -66,7 +66,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
-	const { open: openWeb3Modal } = useWeb3Modal();
+	const { open: openAppKit } = useAppKit();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -186,7 +186,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			openWeb3Modal();
+			openAppKit();
 		}
 	};
 
@@ -309,6 +309,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							src={project?.image}
 							alt={project?.title}
 							fill
+							sizes='100vw'
 							className='object-cover'
 						/>
 					)}

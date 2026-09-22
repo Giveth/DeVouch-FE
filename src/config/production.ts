@@ -1,4 +1,4 @@
-import { optimism } from 'wagmi/chains';
+import { optimism } from '@reown/appkit/networks';
 
 const config = {
 	SUPPORTED_CHAINS: [optimism] as const,

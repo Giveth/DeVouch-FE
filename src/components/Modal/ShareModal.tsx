@@ -95,7 +95,7 @@ export const ShareModal: FC<ShareModalProps> = ({ shareLink, ...props }) => {
 						type='text'
 						value={shareLink}
 						readOnly
-						className='w-full border p-4 pr-20 rounded'
+						className='w-full border p-4 pr-20 rounded-sm'
 					/>
 					<CopyToClipboard text={shareLink} onCopy={handleCopy}>
 						<button className='absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-600'>

@@ -101,7 +101,7 @@ const Dropdown: FC<DropdownProps> = ({
 		<div className={`relative select-none ${className}`} ref={containerRef}>
 			<div
 				className={`flex justify-between w-full border py-2 px-6 border-gray-300 bg-white hover:border-black ${
-					isOpen ? '!border-black' : ''
+					isOpen ? 'border-black!' : ''
 				} cursor-pointer`}
 				onClick={toggleDropdown}
 			>

@@ -33,7 +33,7 @@ const SelectedFilters: React.FC<SelectedFiltersProps> = ({
 				<button
 					key={source}
 					onClick={() => onRemoveFilter('source', source)}
-					className='inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors whitespace-nowrap'
+					className='inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-white border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors whitespace-nowrap'
 				>
 					<span>
 						From:{' '}
