@@ -1,8 +1,8 @@
 import { useRef, useState, useMemo, useCallback, type FC } from 'react';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { Address } from 'viem';
+import { useAppKit } from '@reown/appkit/react';
+import { type Address } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { AttestInfo } from './AttestsInfo/AttestInfo';
@@ -97,7 +97,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 	const { address } = useAccount();
-	const { open: openWeb3Modal } = useWeb3Modal();
+	const { open: openAppKit } = useAppKit();
 	const queryClient = useQueryClient();
 
 	const { vouches, flags, attestedByMe } = useMemo(
@@ -111,7 +111,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			openWeb3Modal();
+			openAppKit();
 		}
 	};
 
@@ -143,6 +143,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 							<Image
 								src={project.image}
 								fill
+								sizes='(max-width: 1024px) 100vw, 50vw'
 								alt='Project Image'
 								className='object-cover'
 							/>

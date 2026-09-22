@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, type FC } from 'react';
-import { Address, createClient, http } from 'viem';
+import { type Address, createClient, fallback, http } from 'viem';
 import { createConfig, cookieStorage, createStorage } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
 import { getEnsName } from 'wagmi/actions';
@@ -9,15 +9,16 @@ interface AddressNameProps {
 	address?: Address;
 }
 
-// Get RPC endpoint with fallbacks
-const getRpcEndpoint = () => {
+const PUBLIC_RPC_ENDPOINT = 'https://eth.llamarpc.com';
+
+// Prefer the configured RPC, but fall back to a public one if it is missing
+// or rejects requests, so ENS lookups degrade to showing the plain address.
+const getTransport = () => {
 	const drpcEndpoint = process.env.NEXT_PUBLIC_DRPC_ENDPOINT;
 	if (drpcEndpoint) {
-		return drpcEndpoint;
+		return fallback([http(drpcEndpoint), http(PUBLIC_RPC_ENDPOINT)]);
 	}
-
-	// Fallback to public RPC endpoints
-	return 'https://eth.llamarpc.com';
+	return http(PUBLIC_RPC_ENDPOINT);
 };
 
 // Create wagmi config outside component to prevent recreation
@@ -30,7 +31,7 @@ const wagmiConfig = createConfig({
 	client({ chain }) {
 		return createClient({
 			chain,
-			transport: http(getRpcEndpoint()),
+			transport: getTransport(),
 		});
 	},
 });

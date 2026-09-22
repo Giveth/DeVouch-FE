@@ -2,7 +2,7 @@ import { useRef, useState, type FC } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import Image from 'next/image';
-import { Address, isHex, parseEther } from 'viem';
+import { type Address, isHex, parseEther } from 'viem';
 import Modal, { IModal } from './Modal';
 import { Button } from '@/components/Button/Button';
 import {

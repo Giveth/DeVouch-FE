@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { Address } from 'viem';
+import { type Address } from 'viem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -85,7 +85,7 @@ export const UserAttestations = ({
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const queryClient = useQueryClient();
-	const attestOnAction = useRef<ProjectAttestation>();
+	const attestOnAction = useRef<ProjectAttestation | undefined>(undefined);
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const router = useRouter();
