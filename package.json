@@ -12,7 +12,8 @@
 		"start": "next start",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"typecheck": "next typegen && tsc --noEmit"
+		"typecheck": "next typegen && tsc --noEmit",
+		"test": "node --experimental-strip-types --no-warnings --import ./test/register.mjs --test \"src/**/*.test.ts\""
 	},
 	"resolutions": {
 		"@wagmi/connectors": "6.2.0",
