@@ -28,7 +28,10 @@ import {
 	fetchProjectAttestationsTotalCount,
 	fetchProjectData,
 } from './services';
-import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
+import {
+	NO_DATA,
+	PROJECT_FALLBACK_IMAGE,
+} from '@/components/ProjectCard/ProjectCard';
 import { ShareProject } from './ShareProject';
 import { ProjectNotFound } from '@/features/project/projectNotFound';
 
@@ -233,7 +236,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				: source.toLowerCase()),
 	)?.key;
 
-	const desc = project?.descriptionHtml || project?.description;
+	// Source HTML uses &nbsp; between words, which prevents line wrapping
+	const desc = (project?.descriptionHtml || project?.description)?.replace(
+		/&nbsp;|\u00a0/g,
+		' ',
+	);
 	const createdAt = project?.sourceCreatedAt;
 
 	return (
@@ -304,19 +311,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							rfRound={project?.rfRounds}
 						/>
 					</a>
-					{project?.image && (
-						<Image
-							src={project?.image}
-							alt={project?.title}
-							fill
-							sizes='100vw'
-							className='object-cover'
-						/>
-					)}
+					<Image
+						src={project?.image || PROJECT_FALLBACK_IMAGE}
+						alt={project?.title || 'Project Image'}
+						fill
+						sizes='100vw'
+						className='object-cover'
+					/>
 				</div>
 				{desc ? (
-					<p
-						className='text-black mb-4 whitespace-pre-line'
+					<div
+						className='text-black mb-4 whitespace-pre-line break-words'
 						dangerouslySetInnerHTML={{
 							__html: desc,
 						}}

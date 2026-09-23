@@ -92,6 +92,7 @@ const analyzeAttests = (
 };
 
 export const NO_DATA = 'No data available to show here!';
+export const PROJECT_FALLBACK_IMAGE = '/images/project-fallback.png';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
@@ -139,15 +140,13 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
 				>
 					<div className='h-56 bg-blue-100 relative'>
-						{project.image && (
-							<Image
-								src={project.image}
-								fill
-								sizes='(max-width: 1024px) 100vw, 50vw'
-								alt='Project Image'
-								className='object-cover'
-							/>
-						)}
+						<Image
+							src={project.image || PROJECT_FALLBACK_IMAGE}
+							fill
+							sizes='(max-width: 1024px) 100vw, 50vw'
+							alt='Project Image'
+							className='object-cover'
+						/>
 						<SourceBadge
 							source={project.source}
 							rfRound={project.rfRounds}
