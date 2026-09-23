@@ -12,7 +12,8 @@
 		"start": "next start",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"typecheck": "next typegen && tsc --noEmit"
+		"typecheck": "next typegen && tsc --noEmit",
+		"test": "node test/run.mjs"
 	},
 	"resolutions": {
 		"@wagmi/connectors": "6.2.0",
@@ -49,6 +50,7 @@
 		"postcss": "^8.5.28",
 		"prettier": "^3.9.8",
 		"tailwindcss": "^4.3.3",
+		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.70.1"
 	}
