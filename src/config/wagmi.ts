@@ -1,34 +1,27 @@
-import { cookieStorage, createConfig, createStorage } from 'wagmi';
-import { walletConnect } from 'wagmi/connectors';
-import { createClient, http } from 'viem';
+import { cookieStorage, createStorage } from 'wagmi';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import config from './configuration';
 
-// Get projectId at https://cloud.walletconnect.com
+// Get projectId at https://dashboard.reown.com
 export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_ID;
 
 if (!projectId) throw new Error('Project ID is not defined');
 
-const metadata = {
+export const metadata = {
 	name: 'DeVouch',
 	description: 'On-Chain Vouching via Attestations',
 	url: 'https://devouch.xyz', // origin must match your domain & subdomain
 	icons: ['https://devouch.xyz/images/favicon.svg'],
 };
 
-// Create wagmiConfig
-export const wagmiConfig = createConfig({
-	chains: config.SUPPORTED_CHAINS,
-	connectors: [
-		walletConnect({
-			projectId,
-			metadata,
-		}),
-	],
+// Create the wagmi adapter (owns the wagmi config used by WagmiProvider)
+export const wagmiAdapter = new WagmiAdapter({
+	networks: [...config.SUPPORTED_CHAINS],
+	projectId,
 	ssr: true,
 	storage: createStorage({
 		storage: cookieStorage,
 	}),
-	client({ chain }) {
-		return createClient({ chain, transport: http() });
-	},
 });
+
+export const wagmiConfig = wagmiAdapter.wagmiConfig;

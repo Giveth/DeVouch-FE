@@ -42,7 +42,7 @@ export default function Home() {
 			/>
 			<div className='container'>
 				<div className='md:px-20 py-10 flex flex-col gap-6'>
-					<h1 className='text-4xl md:text-6xl lg:text-8xl	font-bold leading-normal'>
+					<h1 className='text-4xl md:text-6xl lg:text-8xl font-bold leading-normal md:leading-none'>
 						On-Chain Vouching via Attestations
 					</h1>
 					<p className='text-xl leading-relaxed'>
@@ -56,7 +56,7 @@ export default function Home() {
 							href={links.DOCUMENTATION_LINK}
 							target='_blank'
 							rel='noreferrer'
-							className='inline-block font-bold bg-gradient-to-t from-c-blue-200 to-c-blue-100 text-transparent bg-clip-text leading-tight'
+							className='inline-block font-bold bg-linear-to-t from-c-blue-200 to-c-blue-100 text-transparent bg-clip-text leading-tight'
 						>
 							Learn More
 						</a>

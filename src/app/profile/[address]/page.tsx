@@ -1,16 +1,16 @@
-import { Address } from 'viem';
+import { type Address } from 'viem';
 import { type Metadata, type ResolvingMetadata } from 'next';
 import { UserAttestations } from '@/features/profile/UserAttestations';
 
 type Props = {
-	params: { address: string };
+	params: Promise<{ address: string }>;
 };
 
 export async function generateMetadata(
 	{ params }: Props,
 	parent: ResolvingMetadata,
 ): Promise<Metadata> {
-	const { address } = params;
+	const { address } = await params;
 	const previousImages = (await parent).openGraph?.images || [];
 
 	return {
@@ -25,10 +25,7 @@ export async function generateMetadata(
 	};
 }
 
-export default function Page({
-	params: { address },
-}: {
-	params: { address: string };
-}) {
+export default async function Page({ params }: Props) {
+	const { address } = await params;
 	return <UserAttestations address={address as Address} />;
 }

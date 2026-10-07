@@ -8,7 +8,7 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Address, parseEther } from 'viem';
+import { type Address, parseEther } from 'viem';
 import Modal, { IModal } from '../Modal';
 import { Button, ButtonType } from '@/components/Button/Button';
 import { FETCH_USER_ORGANISATIONS } from '@/queries/user';

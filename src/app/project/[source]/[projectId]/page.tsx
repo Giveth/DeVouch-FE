@@ -8,16 +8,23 @@ import { Spinner } from '@/components/Loading/Spinner';
 import { fetchProjectMetaData } from '@/features/project/services';
 
 type Props = {
-	params: { source: string; projectId: string };
+	params: Promise<ProjectDetailsProps>;
 };
 
 export async function generateMetadata(
 	{ params }: Props,
 	parent: ResolvingMetadata,
 ): Promise<Metadata> {
-	const { source, projectId } = params;
+	const { source, projectId } = await params;
 	const project = await fetchProjectMetaData(source, projectId);
 	const previousImages = (await parent).openGraph?.images || [];
+
+	if (!project) {
+		return {
+			title: `DeVouch | Project Not Found`,
+			description: 'Project not found',
+		};
+	}
 
 	return {
 		title: `DeVouch | ${project.title} Details`,
@@ -28,11 +35,8 @@ export async function generateMetadata(
 	};
 }
 
-export default function Page({
-	params: { source, projectId },
-}: {
-	params: ProjectDetailsProps;
-}) {
+export default async function Page({ params }: Props) {
+	const { source, projectId } = await params;
 	return (
 		<Suspense
 			fallback={

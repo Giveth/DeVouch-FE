@@ -1,13 +1,11 @@
 'use client';
 
-import React, { ReactNode } from 'react';
-
-import { createWeb3Modal } from '@web3modal/wagmi/react';
-
+import { type ReactNode } from 'react';
+import { createAppKit } from '@reown/appkit/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-import { State, WagmiProvider } from 'wagmi';
-import { projectId, wagmiConfig } from '@/config/wagmi';
+import { type State, WagmiProvider } from 'wagmi';
+import { metadata, projectId, wagmiAdapter, wagmiConfig } from '@/config/wagmi';
+import config from '@/config/configuration';
 
 // Setup queryClient
 const queryClient = new QueryClient();
@@ -15,14 +13,22 @@ const queryClient = new QueryClient();
 if (!projectId) throw new Error('Project ID is not defined');
 
 // Create modal
-createWeb3Modal({
-	wagmiConfig: wagmiConfig,
+createAppKit({
+	adapters: [wagmiAdapter],
 	projectId,
-	enableAnalytics: true, // Optional - defaults to your Cloud configuration
-	enableOnramp: true, // Optional - false as default
+	networks: [...config.SUPPORTED_CHAINS],
+	defaultNetwork: config.SUPPORTED_CHAINS[0],
+	metadata,
+	features: {
+		analytics: true, // Optional - defaults to your Cloud configuration
+		onramp: true, // Optional - false as default
+		// Keep the wallet-only connect flow the app had with Web3Modal v4
+		email: false,
+		socials: false,
+	},
 });
 
-export default function Web3ModalProvider({
+export default function AppKitProvider({
 	children,
 	initialState,
 }: {

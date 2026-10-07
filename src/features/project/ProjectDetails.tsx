@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAppKit } from '@reown/appkit/react';
 import { getSourceLink } from '@/helpers/source';
 import {
 	OutlineButton,
@@ -28,8 +28,12 @@ import {
 	fetchProjectAttestationsTotalCount,
 	fetchProjectData,
 } from './services';
-import { NO_DATA } from '@/components/ProjectCard/ProjectCard';
+import {
+	NO_DATA,
+	PROJECT_FALLBACK_IMAGE,
+} from '@/components/ProjectCard/ProjectCard';
 import { ShareProject } from './ShareProject';
+import { ProjectNotFound } from '@/features/project/projectNotFound';
 
 export enum Tab {
 	YourAttestations = 'your',
@@ -65,7 +69,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 
 	const { address } = useAccount();
 	const isVouching = useRef(true);
-	const { open: openWeb3Modal } = useWeb3Modal();
+	const { open: openAppKit } = useAppKit();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -126,6 +130,12 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			),
 	});
 
+	const { data: attestorGroups } = useQuery({
+		queryKey: ['fetchOrganisations'],
+		queryFn: fetchOrganization,
+		staleTime: 3000_000,
+	});
+
 	useEffect(() => {
 		let totalItems = 0;
 		switch (tabParam) {
@@ -154,11 +164,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		totalCount?.vouches.totalCount,
 	]);
 
-	const { data: attestorGroups } = useQuery({
-		queryKey: ['fetchOrganisations'],
-		queryFn: fetchOrganization,
-		staleTime: 3000_000,
-	});
+	const onAttestSuccess = useCallback(() => {
+		setTimeout(() => {
+			refetchAttestations();
+			refetchTotalCounts();
+		}, 5000);
+	}, [refetchAttestations, refetchTotalCounts]);
+
+	// If project not found, redirect to 404 page
+	if (error) {
+		return <ProjectNotFound />;
+	}
 
 	filterOptions[FilterKey.ORGANIZATION] =
 		attestorGroups?.map(group => ({ key: group.name, value: group.id })) ||
@@ -173,18 +189,10 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			openWeb3Modal();
+			openAppKit();
 		}
 	};
 
-	const onAttestSuccess = useCallback(() => {
-		setTimeout(() => {
-			refetchAttestations();
-			refetchTotalCounts();
-		}, 5000);
-	}, [refetchAttestations, refetchTotalCounts]);
-
-	if (error) return <p>Error: {error.message}</p>;
 	if (isLoading && !project) return <LoadingComponent />;
 	if (!isLoading && !project) return <p>Project not found.</p>;
 
@@ -228,7 +236,11 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				: source.toLowerCase()),
 	)?.key;
 
-	const desc = project?.descriptionHtml || project?.description;
+	// Source HTML uses &nbsp; between words, which prevents line wrapping
+	const desc = (project?.descriptionHtml || project?.description)?.replace(
+		/&nbsp;|\u00a0/g,
+		' ',
+	);
 	const createdAt = project?.sourceCreatedAt;
 
 	return (
@@ -299,18 +311,17 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 							rfRound={project?.rfRounds}
 						/>
 					</a>
-					{project?.image && (
-						<Image
-							src={project?.image}
-							alt={project?.title}
-							fill
-							className='object-cover'
-						/>
-					)}
+					<Image
+						src={project?.image || PROJECT_FALLBACK_IMAGE}
+						alt={project?.title || 'Project Image'}
+						fill
+						sizes='100vw'
+						className='object-cover'
+					/>
 				</div>
 				{desc ? (
-					<p
-						className='text-black mb-4 whitespace-pre-line'
+					<div
+						className='text-black mb-4 whitespace-pre-line break-words'
 						dangerouslySetInnerHTML={{
 							__html: desc,
 						}}

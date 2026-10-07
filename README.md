@@ -26,25 +26,25 @@ DeVouch is a decentralized verification and attestation platform built on the Et
 graph TD
     A[Frontend] --> B[Ethereum Blockchain]
     A --> C[Ethereum Attestation Service]
-    A --> D[Web3Modal]
+    A --> D[Reown AppKit]
     A --> E[React Query]
 ```
 
 ### Tech Stack
 
--   **Framework**: Next.js 14.2.3
--   **UI**: React 18, Tailwind CSS
+-   **Framework**: Next.js 16
+-   **UI**: React 19, Tailwind CSS 4
 -   **State Management**: React Query
 -   **Web3 Integration**:
     -   Wagmi
     -   Viem
-    -   Web3Modal
+    -   Reown AppKit (formerly Web3Modal)
 -   **Attestation Service**: EAS SDK
 -   **Language**: TypeScript
 
 ### Data Flow
 
-1. User connects wallet via Web3Modal
+1. User connects wallet via Reown AppKit
 2. Frontend interacts with EAS SDK for attestation operations
 3. React Query manages data fetching and caching
 4. Wagmi handles blockchain interactions
@@ -54,8 +54,8 @@ graph TD
 
 ### Prerequisites
 
--   Node.js (v18 or higher)
--   Yarn package manager
+-   Node.js 24 LTS (v20.19 or higher is supported; see `.nvmrc`)
+-   Yarn 1.x (classic) package manager
 -   Web3 wallet (MetaMask, WalletConnect, etc.)
 
 ### Installation Steps
@@ -83,11 +83,15 @@ graph TD
 
 ### Configuration
 
-Required environment variables:
+Environment variables (see `.env.example`):
 
--   `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID`: Your WalletConnect project ID
--   `NEXT_PUBLIC_EAS_CONTRACT_ADDRESS`: EAS contract address
--   `NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS`: Schema registry contract address
+-   `NEXT_PUBLIC_ENV`: `production` selects the Optimism instance, anything else selects the Sepolia (staging) instance
+-   `NEXT_PUBLIC_WALLET_CONNECT_ID`: Your Reown (WalletConnect) project ID
+-   `NEXT_PUBLIC_EAS_CONTRACT_ADDRESS`: EAS contract address (defaults per instance)
+-   `NEXT_PUBLIC_PROJECT_VERIFY_SCHEMA`: EAS schema UID used for vouch/flag attestations
+-   `NEXT_PUBLIC_ATTESTATION_FEE`: Fee (in ETH) sent with each attestation
+-   `NEXT_PUBLIC_GRAPHQL_ENDPOINT`: Backend GraphQL endpoint (defaults per instance)
+-   `NEXT_PUBLIC_DRPC_ENDPOINT`: Optional Ethereum mainnet RPC used for ENS name lookups
 
 ## 4. Usage Instructions
 
@@ -108,10 +112,11 @@ yarn start
 
 ### Testing
 
-Run linting:
+Run linting and type checking:
 
 ```bash
 yarn lint
+yarn typecheck
 ```
 
 ### Common Tasks

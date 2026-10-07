@@ -35,7 +35,7 @@ const AttestationsTable: FC<AttestationsTableProps> = ({
 }) => {
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const attestOnAction = useRef<ProjectAttestation>();
+	const attestOnAction = useRef<ProjectAttestation | undefined>(undefined);
 
 	return (
 		<div className='overflow-x-auto relative'>

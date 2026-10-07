@@ -1,4 +1,4 @@
-import { useWalletInfo } from '@web3modal/wagmi/react';
+import { useWalletInfo } from '@reown/appkit/react';
 import Image from 'next/image';
 import React from 'react';
 import { useAccount } from 'wagmi';
@@ -7,7 +7,6 @@ import { AddressName } from '../AddressName';
 
 export const ConnectedWalletInfo = () => {
 	const { walletInfo } = useWalletInfo();
-	console.log(walletInfo?.name, walletInfo?.icon);
 	const { address, chainId } = useAccount();
 
 	return address ? (

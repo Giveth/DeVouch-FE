@@ -1,6 +1,110 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Tailwind v4: classes are detected automatically from ./src. Utilities that are
+   only ever built dynamically (see Button.tsx / OutlineButton.tsx) are safelisted here. */
+@source inline('{bg,border,text}-c-{blue,red}-200');
+@source inline('{bg,border}-white');
+@source inline('border-black');
+
+@theme {
+	--color-c-blue-100: #1b9cfc;
+	--color-c-blue-200: #3742fa;
+	--color-c-red-100: #ff416c;
+	--color-c-red-200: #ff4b2b;
+
+	--animate-move-bounce-enter: move-bounce-enter 0.3s forwards;
+	--animate-move-bounce-leave: move-bounce-leave 0.2s forwards;
+	--animate-color-bounce-enter: color-bounce-enter 0.3s forwards;
+
+	@keyframes move-bounce-enter {
+		0% {
+			transform: translate(0, 0);
+		}
+		40% {
+			transform: translate(-10px, 10px);
+		}
+		70% {
+			transform: translate(-6px, 6px);
+		}
+		100% {
+			transform: translate(-8px, 8px);
+		}
+	}
+	@keyframes move-bounce-leave {
+		0% {
+			transform: translate(-8px, 8px);
+		}
+		70% {
+			transform: translate(2px, -2px);
+		}
+		100% {
+			transform: translate(0px, 0px);
+		}
+	}
+	@keyframes color-bounce-enter {
+		0% {
+			background-color: var(--bounce-bg-start);
+			border-color: var(--bounce-border-start);
+			color: var(--bounce-color-start);
+		}
+		40% {
+			background-color: var(--bounce-bg-middle);
+			border-color: var(--bounce-border-middle);
+			color: var(--bounce-text-end);
+		}
+		70% {
+			background-color: var(--bounce-bg-middle);
+			border-color: var(--bounce-border-middle);
+			color: var(--bounce-text-end);
+		}
+		100% {
+			background-color: var(--bounce-bg-end);
+			border-color: var(--bounce-border-end);
+			color: var(--bounce-text-end);
+		}
+	}
+}
+
+/* v3 `theme.container = { center: true, padding: '2rem' }` equivalent. */
+@utility container {
+	margin-inline: auto;
+	padding-inline: 2rem;
+}
+
+@utility text-balance {
+	text-wrap: balance;
+}
+
+/*
+  Tailwind CSS v4 compatibility: keep the v3 defaults for border color,
+  placeholder color and button cursor so the UI looks the same as before.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
+
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--color-gray-400);
+	}
+
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+
+	/* v4 preflight makes form fields transparent; v3 left the browser default (white). */
+	input:not([type='checkbox']):not([type='radio']),
+	textarea,
+	select {
+		background-color: white;
+	}
+}
 
 :root {
 	--foreground-rgb: 0, 0, 0;
@@ -23,7 +127,8 @@ html {
 
 body {
 	color: rgb(var(--foreground-rgb));
-	background-image: radial-gradient(
+	background-image:
+		radial-gradient(
 			circle at 10% 10%,
 			rgba(55, 66, 250, 0.25),
 			transparent 30%
@@ -44,12 +149,6 @@ body {
 			transparent 30%
 		);
 	background-color: #ffffff; /* Background color */
-}
-
-@layer utilities {
-	.text-balance {
-		text-wrap: balance;
-	}
 }
 
 .hover-gradient-text {

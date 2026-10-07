@@ -107,7 +107,7 @@ const FilterMenu: FC<FilterMenuProps> = ({
 					<div>{label}</div>
 					<div className='flex gap-2 items-center'>
 						{showCount && (
-							<div className='bg-black block rounded-full text-white !min-w-[20px] text-sm text-center px-2'>
+							<div className='bg-black block rounded-full text-white min-w-[20px]! text-sm text-center px-2'>
 								{count}
 							</div>
 						)}

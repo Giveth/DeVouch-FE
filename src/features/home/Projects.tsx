@@ -7,15 +7,10 @@ import { ProjectCard } from '@/components/ProjectCard/ProjectCard';
 import FilterMenu from '@/components/FilterMenu/FilterMenu';
 import { fetchGraphQL } from '@/helpers/request';
 import { Button, ButtonType } from '@/components/Button/Button';
-import {
-	generateFetchProjectsByIdsQuery,
-	generateFetchProjectsQuery,
-	generateGetProjectsSortedByVouchOrFlagQuery,
-} from './query-genrator';
+import { fetchProjectsPage, PROJECTS_PAGE_SIZE } from './fetch-projects-page';
 import config from '@/config/configuration';
 import { Spinner } from '@/components/Loading/Spinner';
 import { SearchInput } from './SearchInput';
-import { IProject } from './types';
 import { fetchOrganization } from '@/services/organization';
 import SelectedFilters from './SelectedFilters';
 
@@ -62,7 +57,6 @@ export const optionSectionLabel = {
 	[FilterKey.ORGANIZATION]: 'Attested By',
 };
 
-const limit = 20;
 const defaultSort = sortOptions[0];
 
 export const Projects = () => {
@@ -81,95 +75,6 @@ export const Projects = () => {
 			.map(source => parseInt(source.replace('rf', ''), 10));
 	}, [sourceParams]);
 
-	const fetchProjects = async ({ pageParam = 0 }) => {
-		const nonRfSources = sourceParams.filter(
-			source => !source.startsWith('rf'),
-		);
-		const rfSources = sourceParams.filter(source =>
-			source.startsWith('rf'),
-		);
-		const rfRounds = rfSources.map(source =>
-			parseInt(source.replace('rf', ''), 10),
-		);
-
-		const queryVariables = {
-			orderBy: [sortParam, 'lastUpdatedTimestamp_DESC'],
-			limit: limit as number,
-			offset: pageParam as number,
-			non_rf_sources: nonRfSources,
-			rf_rounds: rfRounds,
-			organisation_id: organisationParams,
-			term: termParam,
-		};
-
-		if (organisationParams.length > 0) {
-			// Fetch sorted project IDs
-			const allSources = sourceParams.some(s => s.startsWith('rf'))
-				? ['rf', ...sourceParams.filter(s => !s.startsWith('rf'))]
-				: nonRfSources;
-			const idsData = await fetchGraphQL<{
-				getProjectsSortedByVouchOrFlag: { id: string }[];
-			}>(generateGetProjectsSortedByVouchOrFlagQuery(), {
-				organizations: organisationParams,
-				sortBy: sortParam,
-				limit: limit as number,
-				offset: pageParam as number,
-				sources: allSources,
-				rfRounds: rfRounds.length > 0 ? rfRounds : [],
-			});
-			const projectIds = idsData.getProjectsSortedByVouchOrFlag.map(
-				item => item.id,
-			);
-
-			if (projectIds.length === 0) {
-				return {
-					projects: [],
-					nextPage: undefined,
-				};
-			}
-
-			// Fetch full project data
-			const data = await fetchGraphQL<{ projects: IProject[] }>(
-				generateFetchProjectsByIdsQuery(),
-				{
-					ids: projectIds,
-				},
-			);
-
-			const projectsMap = new Map(
-				data.projects.map(project => [project.id, project]),
-			);
-			const sortedProjects = projectIds
-				.map(id => projectsMap.get(id))
-				.filter((project): project is IProject => Boolean(project));
-
-			return {
-				projects: sortedProjects,
-				nextPage:
-					projectIds.length === limit ? pageParam + limit : undefined,
-			};
-		} else {
-			// Existing logic
-			const data = await fetchGraphQL<{ projects: IProject[] }>(
-				generateFetchProjectsQuery(
-					sourceParams,
-					organisationParams,
-					termParam,
-					rfRounds,
-				),
-				queryVariables,
-			);
-
-			return {
-				projects: data.projects,
-				nextPage:
-					data.projects.length === limit
-						? pageParam + limit
-						: undefined,
-			};
-		}
-	};
-
 	const {
 		data,
 		error,
@@ -187,7 +92,13 @@ export const Projects = () => {
 			rfRounds,
 		],
 		initialPageParam: 0,
-		queryFn: fetchProjects,
+		queryFn: ({ pageParam }) =>
+			fetchProjectsPage(
+				fetchGraphQL,
+				{ sourceParams, organisationParams, sortParam, termParam },
+				pageParam,
+				PROJECTS_PAGE_SIZE,
+			),
 		getNextPageParam: lastPage => lastPage.nextPage,
 	});
 

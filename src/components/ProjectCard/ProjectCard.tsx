@@ -1,8 +1,8 @@
 import { useRef, useState, useMemo, useCallback, type FC } from 'react';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { Address } from 'viem';
+import { useAppKit } from '@reown/appkit/react';
+import { type Address } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { AttestInfo } from './AttestsInfo/AttestInfo';
@@ -92,12 +92,13 @@ const analyzeAttests = (
 };
 
 export const NO_DATA = 'No data available to show here!';
+export const PROJECT_FALLBACK_IMAGE = '/images/project-fallback.png';
 
 export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 	const [showAttestModal, setShowAttestModal] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 	const { address } = useAccount();
-	const { open: openWeb3Modal } = useWeb3Modal();
+	const { open: openAppKit } = useAppKit();
 	const queryClient = useQueryClient();
 
 	const { vouches, flags, attestedByMe } = useMemo(
@@ -111,7 +112,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 			isVouching.current = _vouch;
 			setShowAttestModal(true);
 		} else {
-			openWeb3Modal();
+			openAppKit();
 		}
 	};
 
@@ -139,14 +140,13 @@ export const ProjectCard: FC<IProjectCardProps> = ({ project, queryKey }) => {
 					href={`${ROUTES.PROJECT}/${project.source}/${project.projectId}`}
 				>
 					<div className='h-56 bg-blue-100 relative'>
-						{project.image && (
-							<Image
-								src={project.image}
-								fill
-								alt='Project Image'
-								className='object-cover'
-							/>
-						)}
+						<Image
+							src={project.image || PROJECT_FALLBACK_IMAGE}
+							fill
+							sizes='(max-width: 1024px) 100vw, 50vw'
+							alt='Project Image'
+							className='object-cover'
+						/>
 						<SourceBadge
 							source={project.source}
 							rfRound={project.rfRounds}

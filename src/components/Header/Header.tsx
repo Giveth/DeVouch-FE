@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { type HTMLAttributes } from 'react';
 import { useAccount, useDisconnect } from 'wagmi';
 import Link from 'next/link';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAppKit } from '@reown/appkit/react';
 import { Button } from '../Button/Button';
 import Dropdown from '../Dropdown/Dropdown';
 import { ConnectedWalletInfo } from './ConnectedWalletInfo';
@@ -17,7 +17,7 @@ const optionClasses: HTMLAttributes<HTMLDivElement>['className'] =
 	'text-gray-600 py-2 px-2 cursor-pointer transition-colors hover:bg-gray-100';
 
 export const Header = () => {
-	const { open: openWeb3Modal } = useWeb3Modal();
+	const { open: openAppKit } = useAppKit();
 	const { disconnect } = useDisconnect();
 	const { address } = useAccount();
 	const pathname = usePathname();
@@ -89,7 +89,7 @@ export const Header = () => {
 					/>
 				</div>
 			) : (
-				<Button onClick={() => openWeb3Modal()}>Connect Wallet</Button>
+				<Button onClick={() => openAppKit()}>Connect Wallet</Button>
 			)}
 		</div>
 	);

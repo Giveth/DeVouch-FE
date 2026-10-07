@@ -7,7 +7,7 @@ interface SearchInputProps {
 }
 
 export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
-	const [value, setValue] = useState<string>();
+	const [value, setValue] = useState<string>('');
 	const searchParams = useSearchParams();
 
 	useEffect(() => {
@@ -19,7 +19,7 @@ export const SearchInput: FC<SearchInputProps> = ({ setTerm }) => {
 		<div className='relative w-full lg:w-fit'>
 			<input
 				placeholder='Search for projects'
-				className={`w-full max-h-fit py-2 px-2 pr-16 border border-gray-300 hover:border-black outline-none focus:border-black transition-all`}
+				className={`w-full max-h-fit py-2 px-2 pr-16 border border-gray-300 hover:border-black outline-hidden focus:border-black transition-all`}
 				value={value}
 				onChange={e => setValue(e.target.value)}
 				onKeyDown={e => {

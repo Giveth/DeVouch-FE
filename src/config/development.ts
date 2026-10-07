@@ -1,4 +1,4 @@
-import { sepolia } from 'wagmi/chains';
+import { sepolia } from '@reown/appkit/networks';
 
 const config = {
 	SUPPORTED_CHAINS: [sepolia] as const,
