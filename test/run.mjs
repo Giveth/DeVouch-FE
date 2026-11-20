@@ -1,6 +1,6 @@
 // Runs every `src/**/*.test.ts` file with Node's test runner, loading the
-// TypeScript through tsx. The files are listed here because `node --test`
-// only accepts glob patterns from Node 21, and engines.node allows 20.19.
+// TypeScript through tsx. The files are listed here and passed to
+// `node --test` by path.
 import { spawnSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
