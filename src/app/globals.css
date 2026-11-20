@@ -172,3 +172,147 @@ body {
 	color: transparent;
 	background-size: 100% 100%; /* Expand gradient to full size on hover, from top to bottom */
 }
+
+/* Default formatting for the elements kept in imported project descriptions
+   (see src/helpers/description.ts). Tailwind's reset removes it, so it is
+   restored here for `.project-description` only. Paragraphs keep no margin:
+   the source editors separate them with empty lines. */
+.project-description :is(h1, h2, h3, h4, h5, h6) {
+	margin: 0.75em 0 0.25em;
+	font-weight: 700;
+	line-height: 1.3;
+}
+.project-description h1 {
+	font-size: 1.75em;
+}
+.project-description h2 {
+	font-size: 1.5em;
+}
+.project-description h3 {
+	font-size: 1.25em;
+}
+.project-description h4 {
+	font-size: 1.125em;
+}
+.project-description :is(h5, h6) {
+	font-size: 1em;
+}
+.project-description :is(ul, ol) {
+	padding-left: 1.5em;
+}
+.project-description ul {
+	list-style: disc;
+}
+.project-description ol {
+	list-style: decimal;
+}
+.project-description :is(ul, ol) ul {
+	list-style: circle;
+}
+.project-description a[href] {
+	color: var(--color-c-blue-200);
+	text-decoration: underline;
+}
+.project-description blockquote {
+	margin: 0.5em 0;
+	padding-left: 1em;
+	border-left: 4px solid #d1d5db;
+}
+.project-description hr {
+	margin: 1em 0;
+	border-color: #d1d5db;
+}
+.project-description :is(code, pre) {
+	font-family: var(--font-mono, monospace);
+	font-size: 0.9em;
+	background-color: #f3f4f6;
+}
+.project-description code {
+	padding: 0.1em 0.3em;
+}
+.project-description pre {
+	margin: 0.5em 0;
+	padding: 0.75em 1em;
+	overflow-x: auto;
+}
+.project-description pre code {
+	padding: 0;
+	font-size: 1em;
+	background: none;
+}
+.project-description table {
+	display: block;
+	max-width: 100%;
+	margin: 0.5em 0;
+	overflow-x: auto;
+	white-space: normal;
+}
+.project-description :is(th, td) {
+	padding: 0.25em 0.75em;
+	border: 1px solid #d1d5db;
+	text-align: left;
+	vertical-align: top;
+}
+.project-description th {
+	font-weight: 700;
+	background-color: #f3f4f6;
+}
+.project-description caption {
+	padding-bottom: 0.25em;
+	font-weight: 700;
+}
+
+/* Formatting classes kept in imported project descriptions. A size nested in
+   the same size does not compound; a different size nested inside applies
+   relative to the outer one, as it does in the source editor. */
+.project-description .ql-size-small {
+	font-size: 0.75em;
+}
+.project-description .ql-size-large {
+	font-size: 1.5em;
+}
+.project-description .ql-size-huge {
+	font-size: 2.5em;
+}
+.project-description
+	:is(
+		.ql-size-small .ql-size-small,
+		.ql-size-large .ql-size-large,
+		.ql-size-huge .ql-size-huge
+	) {
+	font-size: 1em;
+}
+.project-description .ql-font-monospace {
+	font-family: var(--font-mono, monospace);
+}
+.project-description .ql-indent-1 {
+	padding-left: 3em;
+}
+.project-description .ql-indent-2 {
+	padding-left: 6em;
+}
+.project-description .ql-indent-3 {
+	padding-left: 9em;
+}
+.project-description .ql-indent-4 {
+	padding-left: 12em;
+}
+.project-description .ql-indent-5 {
+	padding-left: 15em;
+}
+.project-description .ql-indent-6 {
+	padding-left: 18em;
+}
+.project-description .ql-indent-7 {
+	padding-left: 21em;
+}
+.project-description .ql-indent-8 {
+	padding-left: 24em;
+}
+.project-description iframe.ql-video {
+	display: block;
+	width: 100%;
+	max-width: 640px;
+	aspect-ratio: 16 / 9;
+	margin-inline: auto;
+}
