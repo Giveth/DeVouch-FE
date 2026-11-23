@@ -54,7 +54,7 @@ graph TD
 
 ### Prerequisites
 
--   Node.js 24 LTS (v22.12 or higher is supported; see `.nvmrc`)
+-   Node.js 24 LTS (see `.nvmrc`). Node 22.13 or later on the 22.x line is also supported; Node 23 is not
 -   Yarn 1.x (classic) package manager
 -   Web3 wallet (MetaMask, WalletConnect, etc.)
 
