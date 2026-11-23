@@ -1,11 +1,19 @@
 'use client';
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type FC,
+} from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useAppKit } from '@reown/appkit/react';
 import { getSourceLink } from '@/helpers/source';
+import { getDescriptionHtml } from '@/helpers/description';
 import {
 	OutlineButton,
 	OutlineButtonType,
@@ -164,6 +172,16 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 		totalCount?.vouches.totalCount,
 	]);
 
+	const desc = useMemo(
+		() =>
+			getDescriptionHtml({
+				source: project?.source,
+				description: project?.description,
+				descriptionHtml: project?.descriptionHtml,
+			}),
+		[project?.source, project?.description, project?.descriptionHtml],
+	);
+
 	const onAttestSuccess = useCallback(() => {
 		setTimeout(() => {
 			refetchAttestations();
@@ -236,11 +254,6 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				: source.toLowerCase()),
 	)?.key;
 
-	// Source HTML uses &nbsp; between words, which prevents line wrapping
-	const desc = (project?.descriptionHtml || project?.description)?.replace(
-		/&nbsp;|\u00a0/g,
-		' ',
-	);
 	const createdAt = project?.sourceCreatedAt;
 
 	return (
@@ -321,7 +334,7 @@ export const ProjectDetails: FC<ProjectDetailsProps> = ({
 				</div>
 				{desc ? (
 					<div
-						className='text-black mb-4 whitespace-pre-line break-words'
+						className='project-description text-black mb-4 whitespace-pre-line break-words'
 						dangerouslySetInnerHTML={{
 							__html: desc,
 						}}
